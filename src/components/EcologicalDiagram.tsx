@@ -1,0 +1,695 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { motion, useMotionValue, useSpring, animate } from 'framer-motion';
+import { 
+  User, Briefcase, Smartphone, Footprints, Pill, Activity, 
+  Globe, Syringe, Clock, Apple, FlaskConical, HeartHandshake, 
+  Stethoscope, Tv, Building2, DollarSign, Home, HeartPulse, 
+  RefreshCcw, LucideIcon
+} from 'lucide-react';
+
+interface DiagramElement {
+  icon: LucideIcon;
+  label: string;
+  angle: number; 
+  radius: number;
+  size?: number;
+  // Extra spacing between the icon and the text label (along the arc), in px.
+  // Used to prevent long labels from overlapping their icons.
+  labelGapPx?: number;
+}
+
+interface Layer {
+  name: string;
+  radius: number;
+  width: number;
+  elements: DiagramElement[];
+}
+
+const cx = 600;
+const cy = 600;
+
+// Helper to get coordinates
+const getPos = (angle: number, r: number) => {
+  const rad = (angle * Math.PI) / 180;
+  return {
+    x: cx + r * Math.cos(rad),
+    y: cy + r * Math.sin(rad)
+  };
+};
+
+const RingLayer: React.FC<{ 
+  layer: Layer; 
+  index: number; 
+  svgRef: React.RefObject<SVGSVGElement>;
+  svgSize: number;
+}> = ({ layer, index, svgRef, svgSize }) => {
+  const rotation = useMotionValue(0);
+  const springConfig = { damping: 25, stiffness: 120, mass: 0.8 };
+  const smoothRotation = useSpring(rotation, springConfig);
+  const lastAngle = useRef(0);
+  const isDraggingRef = useRef(false);
+  const activePointerIdRef = useRef<number | null>(null);
+  const [renderRotation, setRenderRotation] = useState(0);
+  const isRaisedRing = layer.name === 'MICROSYSTEM';
+
+  // Render rotation via a real SVG transform attribute.
+  // This avoids Framer's SVG/CSS transform edge cases that can break dragging
+  // and cause the microsystem ring to appear detached under scaling.
+  useEffect(() => {
+    const unsubscribe = smoothRotation.on('change', (v) => setRenderRotation(v));
+    return unsubscribe;
+  }, [smoothRotation]);
+
+  // Angular Drag Logic
+  const getAngle = (event: MouseEvent | TouchEvent | PointerEvent) => {
+    if (!svgRef.current) return 0;
+    const rect = svgRef.current.getBoundingClientRect();
+    // Map SVG user-space center (cx, cy) into screen coordinates
+    const centerX = rect.left + (cx / svgSize) * rect.width;
+    const centerY = rect.top + (cy / svgSize) * rect.height;
+    
+    const clientX = (event as any).clientX || (event as any).touches?.[0].clientX;
+    const clientY = (event as any).clientY || (event as any).touches?.[0].clientY;
+    
+    const angleRad = Math.atan2(clientY - centerY, clientX - centerX);
+    return angleRad * (180 / Math.PI);
+  };
+
+  const handlePointerDown: React.PointerEventHandler<SVGGElement> = (e) => {
+    // Prevent scroll/drag image behaviors (esp. on touch devices)
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Capture pointer so we keep receiving move/up even if pointer leaves shape
+    (e.currentTarget as SVGGElement).setPointerCapture(e.pointerId);
+    isDraggingRef.current = true;
+    activePointerIdRef.current = e.pointerId;
+    lastAngle.current = getAngle(e.nativeEvent);
+  };
+
+  const handlePointerMove: React.PointerEventHandler<SVGGElement> = (e) => {
+    if (!isDraggingRef.current) return;
+    if (activePointerIdRef.current !== e.pointerId) return;
+
+    const currentAngle = getAngle(e.nativeEvent);
+    let delta = currentAngle - lastAngle.current;
+
+    if (delta > 180) delta -= 360;
+    if (delta < -180) delta += 360;
+
+    lastAngle.current = currentAngle;
+    rotation.set(rotation.get() + delta);
+  };
+
+  const endDrag = (pointerId: number) => {
+    if (activePointerIdRef.current !== pointerId) return;
+    isDraggingRef.current = false;
+    activePointerIdRef.current = null;
+    animate(rotation, 0, { type: 'spring', ...springConfig });
+  };
+
+  const handlePointerUp: React.PointerEventHandler<SVGGElement> = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    endDrag(e.pointerId);
+  };
+
+  const handlePointerCancel: React.PointerEventHandler<SVGGElement> = (e) => {
+    endDrag(e.pointerId);
+  };
+
+  const microDividers = [162.5, 277.5, 17.5];
+
+  const renderMicroLed = () => {
+    if (layer.name !== 'MICROSYSTEM') return null;
+
+    // Sunken “socket” indicator (Safari-safe: gradient + strokes, no complex filters)
+    const a = 305;
+    const p = getPos(a, layer.radius + layer.width / 2 - 18);
+
+    return (
+      <g pointerEvents="none">
+        {/* Main recess */}
+        <circle cx={p.x} cy={p.y} r={10.5} fill="url(#socketGrad)" />
+        {/* Inner bed */}
+        <circle cx={p.x} cy={p.y} r={6.7} fill="url(#socketInnerGrad)" opacity={0.95} />
+        {/* Highlight rim (top-left) */}
+        <circle
+          cx={p.x}
+          cy={p.y}
+          r={10.5}
+          fill="none"
+          stroke="rgba(255,255,255,0.35)"
+          strokeWidth="1"
+          strokeDasharray="42 999"
+          strokeLinecap="round"
+          transform={`rotate(225 ${p.x} ${p.y})`}
+          opacity={0.6}
+        />
+        {/* Shadow rim (bottom-right) */}
+        <circle
+          cx={p.x}
+          cy={p.y}
+          r={10.5}
+          fill="none"
+          stroke="rgba(0,0,0,0.22)"
+          strokeWidth="1"
+          strokeDasharray="42 999"
+          strokeLinecap="round"
+          transform={`rotate(45 ${p.x} ${p.y})`}
+          opacity={0.55}
+        />
+      </g>
+    );
+  };
+
+  const renderScaleTexture = () => {
+    // “Complicated but elegant” = layered ticks + dot index + subtle dashed arc
+    const baseOpacityMinor = 'text-text-light/10 dark:text-text-dark/10';
+    const baseOpacityMajor = 'text-text-light/20 dark:text-text-dark/20';
+    const accentOpacity = 'text-text-light/15 dark:text-text-dark/15';
+
+    const isMicro = layer.name === 'MICROSYSTEM';
+    const isMeso = layer.name === 'MESOSYSTEM';
+    const isMacro = layer.name === 'MACROSYSTEM';
+    const isChrono = layer.name === 'CHRONOSYSTEM';
+    const shouldAvoidTopLabel = isMeso || isMacro || isChrono;
+    // Small per-ring phase offsets so scale textures don't align perfectly
+    // (keeps icons/labels stable; only the texture phase shifts).
+    const scalePhaseDeg = isMicro ? 0 : isMeso ? 11 : isMacro ? -7 : 17; // chrono
+
+    // Per-ring density
+    const tickCount = isMicro ? 72 : isMeso ? 60 : isMacro ? 72 : 84; // chrono densest
+    const majorEvery = isMicro ? 6 : isMeso ? 5 : isMacro ? 6 : 7;
+
+    const step = 360 / tickCount;
+    const rOuter = layer.radius + layer.width / 2 - (isMicro ? 10 : 8);
+    const rDots = rOuter + (isMicro ? 8 : 10);
+    const avoidCenterDeg = 270; // top of circle (matches label placement at startOffset 50%)
+    const avoidWindowDeg = 22; // removes marks that would overlap system label
+
+    // Secondary micro ticks (very subtle)
+    const microTickCount = isMicro ? 120 : isChrono ? 120 : 0;
+    const microStep = microTickCount ? 360 / microTickCount : 0;
+    const rMicroOuter = layer.radius - layer.width / 2 + (isMicro ? 22 : 18);
+    const rMicroInner = rMicroOuter - (isMicro ? 6 : 5);
+
+    // Dashed arc engraving
+    const arcR = layer.radius - (isMicro ? 6 : 8);
+
+    return (
+      <g pointerEvents="none">
+        {/* Primary ticks + dot indices */}
+        {Array.from({ length: tickCount }).map((_, i) => {
+          const a = i * step + scalePhaseDeg;
+          if (shouldAvoidTopLabel) {
+            const diff = ((a - avoidCenterDeg + 540) % 360) - 180;
+            if (Math.abs(diff) < avoidWindowDeg) return null;
+          }
+          const isMajor = i % majorEvery === 0;
+          const len = isMajor ? (isMicro ? 14 : 12) : (isMicro ? 8 : 7);
+          const start = getPos(a, rOuter - len);
+          const end = getPos(a, rOuter);
+          const dotPos = getPos(a, rDots);
+          return (
+            <g key={`scale-${layer.name}-${i}`}>
+              <line
+                x1={start.x}
+                y1={start.y}
+                x2={end.x}
+                y2={end.y}
+                stroke="currentColor"
+                strokeWidth={isMajor ? 2 : 1}
+                strokeLinecap="round"
+                className={isMajor ? baseOpacityMajor : baseOpacityMinor}
+              />
+              <circle
+                cx={dotPos.x}
+                cy={dotPos.y}
+                r={isMajor ? 2.0 : 1.1}
+                fill="currentColor"
+                className={isMajor ? baseOpacityMajor : baseOpacityMinor}
+              />
+            </g>
+          );
+        })}
+
+        {/* Secondary micro ticks (extra detail) */}
+        {microTickCount > 0 &&
+          Array.from({ length: microTickCount }).map((_, i) => {
+            const a = i * microStep + scalePhaseDeg;
+            if (shouldAvoidTopLabel) {
+              const diff = ((a - avoidCenterDeg + 540) % 360) - 180;
+              if (Math.abs(diff) < avoidWindowDeg) return null;
+            }
+            const start = getPos(a, rMicroInner);
+            const end = getPos(a, rMicroOuter);
+            return (
+              <line
+                key={`microtick-${layer.name}-${i}`}
+                x1={start.x}
+                y1={start.y}
+                x2={end.x}
+                y2={end.y}
+                stroke="currentColor"
+                strokeWidth="1"
+                strokeLinecap="round"
+                className={accentOpacity}
+                opacity={0.55}
+              />
+            );
+          })}
+
+        {/* Subtle dashed engraving arc */}
+        <circle
+          cx={cx}
+          cy={cy}
+          r={arcR}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1"
+          strokeDasharray={isMicro ? '2 10' : '2 14'}
+          className="text-text-light/10 dark:text-text-dark/10"
+        />
+      </g>
+    );
+  };
+
+  return (
+    <g
+      transform={`rotate(${renderRotation} ${cx} ${cy})`}
+      style={{ touchAction: 'none' }}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerCancel}
+      className="cursor-grab active:cursor-grabbing"
+    >
+      {renderScaleTexture()}
+
+      {/* Wide transparent hit ring to reliably capture drags */}
+      <circle
+        cx={cx}
+        cy={cy}
+        r={layer.radius}
+        fill="transparent"
+        stroke="transparent"
+        strokeWidth={layer.width + 24}
+      />
+      {/* Ring Body */}
+      <circle
+        cx={cx}
+        cy={cy}
+        r={layer.radius}
+        fill="none"
+        strokeWidth={layer.width}
+        className={`transition-colors ${
+          isRaisedRing
+            ? 'stroke-bg-light dark:stroke-bg-dark'
+            : 'stroke-text-light/5 dark:stroke-text-dark/5'
+        }`}
+        style={
+          isRaisedRing
+            ? { filter: `drop-shadow(0px 6px 14px rgba(0,0,0,0.18))` }
+            : undefined
+        }
+      />
+
+      {/* Flat rings: add subtle engraved boundaries (vault-dial feel) */}
+      {!isRaisedRing && (
+        <>
+          <circle
+            cx={cx}
+            cy={cy}
+            r={layer.radius - layer.width / 2}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1"
+            className="text-text-light/10 dark:text-text-dark/10"
+          />
+          <circle
+            cx={cx}
+            cy={cy}
+            r={layer.radius + layer.width / 2}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1"
+            className="text-text-light/10 dark:text-text-dark/10"
+          />
+        </>
+      )}
+      
+      {/* Guide Line (System Boundary) */}
+      <circle
+        cx={cx}
+        cy={cy}
+        r={layer.radius + layer.width/2}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1"
+        className="text-text-light/10 dark:text-text-dark/10"
+      />
+
+      {/* Microsystem indicator light (rendered above ring surface) */}
+      {renderMicroLed()}
+
+      {/* Layer Label - System Name */}
+      {layer.name === 'MICROSYSTEM' && (
+        // Inner boundary line to align MICROSYSTEM label on the inside edge
+        <circle
+          cx={cx}
+          cy={cy}
+          r={layer.radius - layer.width / 2 + 14}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1"
+          className="text-text-light/10 dark:text-text-dark/10"
+        />
+      )}
+
+      {(() => {
+        const isMicroLabel = layer.name === 'MICROSYSTEM';
+
+        // MICROSYSTEM stays on the inner edge.
+        // Other system labels should sit just inside the OUTER boundary line.
+        const labelRadius = isMicroLabel
+          ? layer.radius - layer.width / 2 + 14
+          : layer.radius + layer.width / 2 - 34;
+
+        return (
+          <>
+            <path
+              id={`curve-text-${index}`}
+              d={`M ${cx - labelRadius},${cy} A ${labelRadius},${labelRadius} 0 0,0 ${cx + labelRadius},${cy}`}
+              fill="none"
+            />
+            <text
+              className="text-[12px] uppercase font-bold tracking-[0.4em] fill-text-light/30 dark:fill-text-dark/30 pointer-events-none select-none"
+              dy={isMicroLabel ? 10 : 10}
+            >
+              <textPath href={`#curve-text-${index}`} startOffset="50%" textAnchor="middle">
+                {layer.name}
+              </textPath>
+            </text>
+          </>
+        );
+      })()}
+
+      {/* Dividers (Microsystem only) */}
+      {layer.name === 'MICROSYSTEM' && microDividers.map((angle, i) => {
+          const rCenter = layer.radius;
+          const h = 24; 
+          const start = getPos(angle, rCenter - h);
+          const end = getPos(angle, rCenter + h);
+          return (
+            <line 
+              key={`div-${i}`}
+              x1={start.x} y1={start.y} 
+              x2={end.x} y2={end.y} 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round"
+              className="text-text-light/10 dark:text-text-dark/10"
+            />
+          );
+      })}
+
+      {/* Elements */}
+      {layer.elements.map((el, j) => {
+        const { x, y } = getPos(el.angle, el.radius);
+        const isMicrosystem = layer.name === 'MICROSYSTEM';
+        
+        // Normalize angle 0-360 for flip check
+        let normalizedAngle = el.angle % 360;
+        if (normalizedAngle < 0) normalizedAngle += 360;
+        
+        // Flip Logic: Flip text on the bottom half (0 to 180) to be readable
+        // 0-90 (Bottom Right) and 90-180 (Bottom Left)
+        const isBottomHalf = normalizedAngle > 0 && normalizedAngle < 180;
+
+        // Radii for text path
+        const pathRadius = isMicrosystem ? (layer.radius + layer.width/2 - 5) : layer.radius;
+        
+        // Angular offset for text (Gap between icon and text)
+        // Increased to avoid overlap
+        // Default is 55px; can be overridden per element for long labels.
+        const gapPx = isMicrosystem ? 0 : (el.labelGapPx ?? 55);
+        const angleGap = isMicrosystem ? 0 : (gapPx / layer.radius) * (180 / Math.PI);
+        
+        return (
+          <g key={`${layer.name}-${j}`} className="group">
+              {/* Text Label */}
+              {isBottomHalf ? (
+                // Bottom Half: Reversed Path (CCW)
+                <g>
+                  <path 
+                    id={`label-path-${layer.name}-${j}-rev`}
+                    d={`M ${cx + pathRadius},${cy} A ${pathRadius},${pathRadius} 0 0,0 ${cx - pathRadius},${cy} A ${pathRadius},${pathRadius} 0 0,0 ${cx + pathRadius},${cy}`}
+                    fill="none"
+                  />
+                  <text 
+                    className={`text-[10px] font-bold fill-text-light dark:fill-text-dark uppercase tracking-widest transition-opacity duration-300 pointer-events-none select-none
+                      ${isMicrosystem ? 'opacity-0 group-hover:opacity-100' : 'opacity-60 group-hover:opacity-100'}`} 
+                    dy={isMicrosystem ? -10 : 4} 
+                  >
+                    <textPath 
+                      href={`#label-path-${layer.name}-${j}-rev`} 
+                      // For reversed path (0->360 CCW), angle A becomes 100 - (A/3.6)
+                      startOffset={`${(1 - ((el.angle + (isMicrosystem ? 0 : -angleGap)) / 360)) * 100}%`} 
+                      textAnchor="middle"
+                    >
+                      {el.label}
+                    </textPath>
+                  </text>
+                </g>
+              ) : (
+                // Top Half: Standard Path (CW)
+                <g>
+                   <path 
+                    id={`label-path-${layer.name}-${j}`}
+                    d={`M ${cx + pathRadius},${cy} A ${pathRadius},${pathRadius} 0 0,1 ${cx - pathRadius},${cy} A ${pathRadius},${pathRadius} 0 0,1 ${cx + pathRadius},${cy}`}
+                    fill="none"
+                  />
+                  <text 
+                    className={`text-[10px] font-bold fill-text-light dark:fill-text-dark uppercase tracking-widest transition-opacity duration-300 pointer-events-none select-none
+                      ${isMicrosystem ? 'opacity-0 group-hover:opacity-100' : 'opacity-60 group-hover:opacity-100'}`} 
+                    dy={isMicrosystem ? 12 : 4} 
+                  >
+                    <textPath 
+                      href={`#label-path-${layer.name}-${j}`} 
+                      startOffset={`${((el.angle + (isMicrosystem ? 0 : angleGap)) / 360) * 100}%`} 
+                      textAnchor="middle"
+                    >
+                      {el.label}
+                    </textPath>
+                  </text>
+                </g>
+              )}
+
+              {/* Icon */}
+              <foreignObject x={x - 20} y={y - 20} width={40} height={40} className="overflow-visible pointer-events-none">
+                <div className="w-full h-full flex items-center justify-center">
+                  <div 
+                    className="text-text-light dark:text-text-dark opacity-50 group-hover:text-blue-500 dark:group-hover:text-blue-400 group-hover:opacity-100 transition-all duration-300"
+                    style={{ filter: 'drop-shadow(1px 1px 0px rgba(255,255,255,0.8))' }}
+                  >
+                    <el.icon size={24} strokeWidth={2.5} />
+                  </div>
+                </div>
+              </foreignObject>
+              
+              {/* Hit Area - Transparent Circle for Hover */}
+              <circle cx={x} cy={y} r={35} fill="transparent" className="pointer-events-auto cursor-pointer" />
+          </g>
+        );
+      })}
+    </g>
+  );
+};
+
+export const EcologicalDiagram: React.FC = () => {
+  const svgRef = useRef<SVGSVGElement>(null);
+  const svgSize = 1200;
+  
+  const centerElements = [
+    { icon: User, label: 'Patient', x: 0, y: 0, size: 50 }
+  ];
+
+  const rMicro = 190;
+  const rMeso = 330;
+  const rMacro = 430;
+  const rChrono = 530;
+
+  const layers: Layer[] = [
+    {
+      name: 'MICROSYSTEM',
+      radius: rMicro,
+      width: 180,
+      elements: [
+        { icon: Smartphone, label: 'Digital devices', angle: 260, radius: rMicro },
+        { icon: Footprints, label: 'Open shoes', angle: 235, radius: rMicro },
+        { icon: Pill, label: 'Medicines', angle: 210, radius: rMicro },
+        { icon: Activity, label: 'Medical equipment', angle: 185, radius: rMicro },
+        
+        { icon: Syringe, label: 'Insulin injection', angle: 140, radius: rMicro },
+        { icon: Footprints, label: 'Footcare', angle: 115, radius: rMicro },
+        { icon: Clock, label: 'Routine', angle: 90, radius: rMicro },
+        { icon: Apple, label: 'Diet', angle: 65, radius: rMicro },
+        { icon: FlaskConical, label: 'Tests', angle: 40, radius: rMicro },
+        
+        { icon: HeartHandshake, label: 'Caregiver', angle: 295, radius: rMicro },
+        { icon: Stethoscope, label: 'Medical Providers', angle: 325, radius: rMicro },
+        { icon: Footprints, label: 'Podiatrist', angle: 355, radius: rMicro },
+      ]
+    },
+    {
+      name: 'MESOSYSTEM',
+      radius: rMeso,
+      width: 100,
+      elements: [
+        // Evenly spaced (120° apart) to keep balance on the ring
+        { icon: Globe, label: 'Internet', angle: 90, radius: rMeso },
+        { icon: Tv, label: 'Media', angle: 210, radius: rMeso },
+        { icon: Building2, label: 'Healthcare System', angle: 330, radius: rMeso, labelGapPx: 110 },
+      ]
+    },
+    {
+      name: 'MACROSYSTEM',
+      radius: rMacro,
+      width: 100,
+      elements: [
+        { icon: DollarSign, label: 'Economic Status', angle: 225, radius: rMacro, labelGapPx: 110 },
+        { icon: Briefcase, label: "Caregiver's Workspace", angle: 315, radius: rMacro, labelGapPx: 120 },
+        { icon: Home, label: 'Relocation', angle: 45, radius: rMacro },
+      ]
+    },
+    {
+      name: 'CHRONOSYSTEM',
+      radius: rChrono,
+      width: 100,
+      elements: [
+        { icon: RefreshCcw, label: 'Changes in treatment', angle: 270, radius: rChrono, labelGapPx: 120 },
+        { icon: HeartPulse, label: 'Changes in health condition', angle: 135, radius: rChrono, labelGapPx: 140 },
+      ]
+    }
+  ];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 1 }}
+      className="w-full flex justify-end items-center py-12"
+    >
+      <div 
+        className="relative flex-none scale-75 md:scale-90 lg:scale-100 origin-right" 
+        style={{ width: 1000, height: 1000 }}
+      >
+        <svg ref={svgRef} viewBox={`0 0 ${svgSize} ${svgSize}`} className="w-full h-full font-sans select-none overflow-visible">
+          <defs>
+            <pattern id="grid-pattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-text-light/5 dark:text-text-dark/5" />
+            </pattern>
+            {/* Safari-safe recessed socket gradients */}
+            <radialGradient id="socketGrad" cx="35%" cy="35%" r="75%">
+              <stop offset="0%" stopColor="#D6DBE2" />
+              <stop offset="55%" stopColor="#C6CBD3" />
+              <stop offset="100%" stopColor="#B8BDC6" />
+            </radialGradient>
+            <radialGradient id="socketInnerGrad" cx="30%" cy="30%" r="80%">
+              <stop offset="0%" stopColor="rgba(255,255,255,0.30)" />
+              <stop offset="45%" stopColor="rgba(0,0,0,0.06)" />
+              <stop offset="100%" stopColor="rgba(0,0,0,0.22)" />
+            </radialGradient>
+          </defs>
+
+          <rect x="0" y="0" width={svgSize} height={svgSize} fill="url(#grid-pattern)" className="opacity-50" />
+
+          {/* Vault dial bezel + tick marks (static scale) */}
+          <g pointerEvents="none">
+            {/* Outer bezel (subtle, matches neumorphism) */}
+            <circle
+              cx={cx}
+              cy={cy}
+              r={rChrono + 120}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="30"
+              className="text-text-light/5 dark:text-text-dark/5"
+            />
+            <circle
+              cx={cx}
+              cy={cy}
+              r={rChrono + 120}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1"
+              className="text-text-light/10 dark:text-text-dark/10"
+            />
+
+            {/* Tick marks */}
+            {Array.from({ length: 60 }).map((_, i) => {
+              const a = i * 6;
+              const isMajor = i % 5 === 0;
+              const rOuter = rChrono + 120 + 14;
+              const rInner = rOuter - (isMajor ? 18 : 10);
+              const start = getPos(a, rInner);
+              const end = getPos(a, rOuter);
+              return (
+                <line
+                  key={`tick-${i}`}
+                  x1={start.x}
+                  y1={start.y}
+                  x2={end.x}
+                  y2={end.y}
+                  stroke="currentColor"
+                  strokeWidth={isMajor ? 2 : 1}
+                  strokeLinecap="round"
+                  className={isMajor ? 'text-text-light/25 dark:text-text-dark/25' : 'text-text-light/15 dark:text-text-dark/15'}
+                />
+              );
+            })}
+          </g>
+
+          {/* Render Layers Outer to Inner for Pyramid Stacking */}
+          {layers.slice().reverse().map((layer, i) => (
+             <RingLayer key={layer.name} layer={layer} index={i} svgRef={svgRef} svgSize={svgSize} />
+          ))}
+
+          {/* Center Group (Patient) */}
+          <g>
+            <foreignObject x={cx - 100} y={cy - 100} width={200} height={200}>
+               <div className="w-full h-full rounded-full flex items-center justify-center
+                   bg-bg-light dark:bg-bg-dark
+                   shadow-[inset_6px_6px_12px_rgba(163,177,198,0.3),inset_-6px_-6px_12px_rgba(255,255,255,0.8)]
+                   dark:shadow-[inset_6px_6px_12px_rgba(0,0,0,0.6),inset_-6px_-6px_12px_rgba(255,255,255,0.05)]
+                   border border-text-light/5 dark:border-text-dark/5"
+               >
+               </div>
+            </foreignObject>
+
+            {centerElements.map((el, i) => (
+              <g key={i} transform={`translate(${cx + el.x}, ${cy + el.y})`}>
+                 <foreignObject x={-el.size/2} y={-el.size/2} width={el.size} height={el.size} className="overflow-visible pointer-events-none">
+                    <div className={`w-full h-full flex items-center justify-center ${i === 0 ? 'scale-110' : 'scale-100'}`}>
+                      <div 
+                        className="text-text-light dark:text-text-dark opacity-50"
+                        style={{ filter: 'drop-shadow(1px 1px 0px rgba(255,255,255,0.8))' }}
+                      >
+                        <el.icon size={el.size * 0.7} strokeWidth={2.5} />
+                      </div>
+                    </div>
+                 </foreignObject>
+                 <text y={el.size/2 + 18} textAnchor="middle" className="text-[11px] font-bold fill-text-light dark:fill-text-dark uppercase tracking-wider opacity-80" style={{ textShadow: '0 1px 0 rgba(255,255,255,0.8)' }}>
+                   {el.label}
+                 </text>
+              </g>
+            ))}
+          </g>
+
+        </svg>
+      </div>
+    </motion.div>
+  );
+};
