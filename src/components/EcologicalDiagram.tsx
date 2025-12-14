@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { motion, useMotionValue, useSpring, animate } from 'framer-motion';
+import React, { useEffect, useRef } from 'react';
+import { motion, useMotionValue, animate } from 'framer-motion';
 import { 
   User, Briefcase, Smartphone, Footprints, Pill, Activity, 
   Globe, Syringe, Clock, Apple, FlaskConical, HeartHandshake, 
@@ -43,30 +43,61 @@ const RingLayer: React.FC<{
   svgRef: React.RefObject<SVGSVGElement>;
   svgSize: number;
 }> = ({ layer, index, svgRef, svgSize }) => {
+  // During drag we update rotation directly (no spring) for Safari performance.
+  // On release we animate back to 0 with a spring.
   const rotation = useMotionValue(0);
   const springConfig = { damping: 25, stiffness: 120, mass: 0.8 };
-  const smoothRotation = useSpring(rotation, springConfig);
   const lastAngle = useRef(0);
   const isDraggingRef = useRef(false);
   const activePointerIdRef = useRef<number | null>(null);
-  const [renderRotation, setRenderRotation] = useState(0);
+  const groupRef = useRef<SVGGElement | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const pendingRotationRef = useRef(0);
+  const centerXRef = useRef<number | null>(null);
+  const centerYRef = useRef<number | null>(null);
+  const springAnimRef = useRef<ReturnType<typeof animate> | null>(null);
   const isRaisedRing = layer.name === 'MICROSYSTEM';
 
-  // Render rotation via a real SVG transform attribute.
-  // This avoids Framer's SVG/CSS transform edge cases that can break dragging
-  // and cause the microsystem ring to appear detached under scaling.
+  // PERF (Safari): avoid React re-render on every frame while dragging.
+  // We update the SVG transform attribute directly in rAF.
   useEffect(() => {
-    const unsubscribe = smoothRotation.on('change', (v) => setRenderRotation(v));
-    return unsubscribe;
-  }, [smoothRotation]);
+    const apply = () => {
+      rafRef.current = null;
+      if (!groupRef.current) return;
+      groupRef.current.setAttribute('transform', `rotate(${pendingRotationRef.current} ${cx} ${cy})`);
+    };
+
+    const unsubscribe = rotation.on('change', (v) => {
+      pendingRotationRef.current = v;
+      if (rafRef.current != null) return;
+      rafRef.current = requestAnimationFrame(apply);
+    });
+
+    // Set initial transform
+    pendingRotationRef.current = rotation.get();
+    if (groupRef.current) {
+      groupRef.current.setAttribute('transform', `rotate(${pendingRotationRef.current} ${cx} ${cy})`);
+    }
+
+    return () => {
+      unsubscribe();
+      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    };
+  }, [rotation]);
 
   // Angular Drag Logic
   const getAngle = (event: MouseEvent | TouchEvent | PointerEvent) => {
-    if (!svgRef.current) return 0;
-    const rect = svgRef.current.getBoundingClientRect();
-    // Map SVG user-space center (cx, cy) into screen coordinates
-    const centerX = rect.left + (cx / svgSize) * rect.width;
-    const centerY = rect.top + (cy / svgSize) * rect.height;
+    // Use cached center during drag (Safari perf)
+    let centerX = centerXRef.current;
+    let centerY = centerYRef.current;
+    if (centerX == null || centerY == null) {
+      if (!svgRef.current) return 0;
+      const rect = svgRef.current.getBoundingClientRect();
+      // Map SVG user-space center (cx, cy) into screen coordinates
+      centerX = rect.left + (cx / svgSize) * rect.width;
+      centerY = rect.top + (cy / svgSize) * rect.height;
+    }
     
     const clientX = (event as any).clientX || (event as any).touches?.[0].clientX;
     const clientY = (event as any).clientY || (event as any).touches?.[0].clientY;
@@ -84,6 +115,18 @@ const RingLayer: React.FC<{
     (e.currentTarget as SVGGElement).setPointerCapture(e.pointerId);
     isDraggingRef.current = true;
     activePointerIdRef.current = e.pointerId;
+
+    // Stop any spring-back animation currently running
+    springAnimRef.current?.stop?.();
+    springAnimRef.current = null;
+
+    // Cache center point for duration of drag
+    if (svgRef.current) {
+      const rect = svgRef.current.getBoundingClientRect();
+      centerXRef.current = rect.left + (cx / svgSize) * rect.width;
+      centerYRef.current = rect.top + (cy / svgSize) * rect.height;
+    }
+
     lastAngle.current = getAngle(e.nativeEvent);
   };
 
@@ -105,7 +148,9 @@ const RingLayer: React.FC<{
     if (activePointerIdRef.current !== pointerId) return;
     isDraggingRef.current = false;
     activePointerIdRef.current = null;
-    animate(rotation, 0, { type: 'spring', ...springConfig });
+    centerXRef.current = null;
+    centerYRef.current = null;
+    springAnimRef.current = animate(rotation, 0, { type: 'spring', ...springConfig });
   };
 
   const handlePointerUp: React.PointerEventHandler<SVGGElement> = (e) => {
@@ -123,41 +168,47 @@ const RingLayer: React.FC<{
   const renderMicroLed = () => {
     if (layer.name !== 'MICROSYSTEM') return null;
 
-    // Sunken “socket” indicator (Safari-safe: gradient + strokes, no complex filters)
+    // Sunken “socket” indicator (recessed circle)
     const a = 305;
     const p = getPos(a, layer.radius + layer.width / 2 - 18);
 
     return (
       <g pointerEvents="none">
-        {/* Main recess */}
-        <circle cx={p.x} cy={p.y} r={10.5} fill="url(#socketGrad)" />
-        {/* Inner bed */}
-        <circle cx={p.x} cy={p.y} r={6.7} fill="url(#socketInnerGrad)" opacity={0.95} />
-        {/* Highlight rim (top-left) */}
         <circle
           cx={p.x}
           cy={p.y}
           r={10.5}
-          fill="none"
-          stroke="rgba(255,255,255,0.35)"
-          strokeWidth="1"
-          strokeDasharray="42 999"
-          strokeLinecap="round"
-          transform={`rotate(225 ${p.x} ${p.y})`}
-          opacity={0.6}
+          className="fill-bg-light dark:fill-bg-dark"
+          filter="url(#inset-recess)"
         />
-        {/* Shadow rim (bottom-right) */}
+        {/* Darker inner bed (adds depth) */}
+        <circle
+          cx={p.x}
+          cy={p.y}
+          r={6.6}
+          className="fill-black/10 dark:fill-black/55"
+          opacity={0.9}
+        />
+        {/* Inner highlight ring */}
+        <circle
+          cx={p.x}
+          cy={p.y}
+          r={8.2}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1"
+          className="text-white/25 dark:text-white/10"
+          opacity={0.55}
+        />
+        {/* Subtle rim */}
         <circle
           cx={p.x}
           cy={p.y}
           r={10.5}
           fill="none"
-          stroke="rgba(0,0,0,0.22)"
+          stroke="currentColor"
           strokeWidth="1"
-          strokeDasharray="42 999"
-          strokeLinecap="round"
-          transform={`rotate(45 ${p.x} ${p.y})`}
-          opacity={0.55}
+          className="text-text-light/10 dark:text-text-dark/10"
         />
       </g>
     );
@@ -277,7 +328,8 @@ const RingLayer: React.FC<{
 
   return (
     <g
-      transform={`rotate(${renderRotation} ${cx} ${cy})`}
+      ref={groupRef}
+      transform={`rotate(0 ${cx} ${cy})`}
       style={{ touchAction: 'none' }}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
@@ -308,11 +360,7 @@ const RingLayer: React.FC<{
             ? 'stroke-bg-light dark:stroke-bg-dark'
             : 'stroke-text-light/5 dark:stroke-text-dark/5'
         }`}
-        style={
-          isRaisedRing
-            ? { filter: `drop-shadow(0px 6px 14px rgba(0,0,0,0.18))` }
-            : undefined
-        }
+        filter={isRaisedRing ? 'url(#ring-raised-shadow)' : undefined}
       />
 
       {/* Flat rings: add subtle engraved boundaries (vault-dial feel) */}
@@ -486,17 +534,16 @@ const RingLayer: React.FC<{
                 </g>
               )}
 
-              {/* Icon */}
-              <foreignObject x={x - 20} y={y - 20} width={40} height={40} className="overflow-visible pointer-events-none">
-                <div className="w-full h-full flex items-center justify-center">
-                  <div 
-                    className="text-text-light dark:text-text-dark opacity-50 group-hover:text-blue-500 dark:group-hover:text-blue-400 group-hover:opacity-100 transition-all duration-300"
-                    style={{ filter: 'drop-shadow(1px 1px 0px rgba(255,255,255,0.8))' }}
-                  >
-                    <el.icon size={24} strokeWidth={2.5} />
-                  </div>
-                </div>
-              </foreignObject>
+              {/* Icon (Safari-safe: avoid foreignObject inside transformed SVG) */}
+              <g transform={`translate(${x - 12}, ${y - 12})`} className="pointer-events-none">
+                <el.icon
+                  width={24}
+                  height={24}
+                  strokeWidth={2.5}
+                  className="text-text-light dark:text-text-dark opacity-50 group-hover:text-blue-500 dark:group-hover:text-blue-400 group-hover:opacity-100 transition-all duration-300"
+                  style={{ filter: 'drop-shadow(1px 1px 0px rgba(255,255,255,0.8))' }}
+                />
+              </g>
               
               {/* Hit Area - Transparent Circle for Hover */}
               <circle cx={x} cy={y} r={35} fill="transparent" className="pointer-events-auto cursor-pointer" />
@@ -586,71 +633,81 @@ export const EcologicalDiagram: React.FC = () => {
         className="relative flex-none scale-75 md:scale-90 lg:scale-100 origin-right" 
         style={{ width: 1000, height: 1000 }}
       >
-        <svg ref={svgRef} viewBox={`0 0 ${svgSize} ${svgSize}`} className="w-full h-full font-sans select-none overflow-visible">
+        {/* Safari can clip SVG content outside the viewBox unless overflow is set via SVG attribute. */}
+        <svg
+          ref={svgRef}
+          viewBox={`0 0 ${svgSize} ${svgSize}`}
+          overflow="visible"
+          className="w-full h-full font-sans select-none overflow-visible"
+        >
           <defs>
             <pattern id="grid-pattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
               <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-text-light/5 dark:text-text-dark/5" />
             </pattern>
-            {/* Safari-safe recessed socket gradients */}
-            <radialGradient id="socketGrad" cx="35%" cy="35%" r="75%">
-              <stop offset="0%" stopColor="#D6DBE2" />
-              <stop offset="55%" stopColor="#C6CBD3" />
-              <stop offset="100%" stopColor="#B8BDC6" />
-            </radialGradient>
-            <radialGradient id="socketInnerGrad" cx="30%" cy="30%" r="80%">
-              <stop offset="0%" stopColor="rgba(255,255,255,0.30)" />
-              <stop offset="45%" stopColor="rgba(0,0,0,0.06)" />
-              <stop offset="100%" stopColor="rgba(0,0,0,0.22)" />
-            </radialGradient>
+            {/* Recessed “socket” effect for microsystem indicator */}
+            <filter id="inset-recess" x="-140%" y="-140%" width="280%" height="280%">
+              {/* Dark inset (bottom-right) */}
+              <feOffset in="SourceAlpha" dx="3" dy="3" result="off1" />
+              <feGaussianBlur in="off1" stdDeviation="2.4" result="blur1" />
+              <feComposite in="blur1" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="inset1" />
+              <feColorMatrix
+                in="inset1"
+                type="matrix"
+                values="
+                  0 0 0 0 0
+                  0 0 0 0 0
+                  0 0 0 0 0
+                  0 0 0 0.48 0
+                "
+                result="shadow1"
+              />
+
+              {/* Light inset highlight (top-left) */}
+              <feOffset in="SourceAlpha" dx="-3" dy="-3" result="off2" />
+              <feGaussianBlur in="off2" stdDeviation="2.4" result="blur2" />
+              <feComposite in="blur2" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="inset2" />
+              <feColorMatrix
+                in="inset2"
+                type="matrix"
+                values="
+                  0 0 0 0 1
+                  0 0 0 0 1
+                  0 0 0 0 1
+                  0 0 0 0.24 0
+                "
+                result="highlight"
+              />
+
+              <feMerge>
+                <feMergeNode in="shadow1" />
+                <feMergeNode in="highlight" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+
+            {/* Raised ring shadow (Safari-safe replacement for CSS drop-shadow) */}
+            <filter id="ring-raised-shadow" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur in="SourceAlpha" stdDeviation="7" result="blur" />
+              <feOffset in="blur" dx="0" dy="6" result="offsetBlur" />
+              <feColorMatrix
+                in="offsetBlur"
+                type="matrix"
+                values="
+                  0 0 0 0 0
+                  0 0 0 0 0
+                  0 0 0 0 0
+                  0 0 0 0.18 0
+                "
+                result="shadow"
+              />
+              <feMerge>
+                <feMergeNode in="shadow" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
           </defs>
 
           <rect x="0" y="0" width={svgSize} height={svgSize} fill="url(#grid-pattern)" className="opacity-50" />
-
-          {/* Vault dial bezel + tick marks (static scale) */}
-          <g pointerEvents="none">
-            {/* Outer bezel (subtle, matches neumorphism) */}
-            <circle
-              cx={cx}
-              cy={cy}
-              r={rChrono + 120}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="30"
-              className="text-text-light/5 dark:text-text-dark/5"
-            />
-            <circle
-              cx={cx}
-              cy={cy}
-              r={rChrono + 120}
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1"
-              className="text-text-light/10 dark:text-text-dark/10"
-            />
-
-            {/* Tick marks */}
-            {Array.from({ length: 60 }).map((_, i) => {
-              const a = i * 6;
-              const isMajor = i % 5 === 0;
-              const rOuter = rChrono + 120 + 14;
-              const rInner = rOuter - (isMajor ? 18 : 10);
-              const start = getPos(a, rInner);
-              const end = getPos(a, rOuter);
-              return (
-                <line
-                  key={`tick-${i}`}
-                  x1={start.x}
-                  y1={start.y}
-                  x2={end.x}
-                  y2={end.y}
-                  stroke="currentColor"
-                  strokeWidth={isMajor ? 2 : 1}
-                  strokeLinecap="round"
-                  className={isMajor ? 'text-text-light/25 dark:text-text-dark/25' : 'text-text-light/15 dark:text-text-dark/15'}
-                />
-              );
-            })}
-          </g>
 
           {/* Render Layers Outer to Inner for Pyramid Stacking */}
           {layers.slice().reverse().map((layer, i) => (
@@ -659,28 +716,29 @@ export const EcologicalDiagram: React.FC = () => {
 
           {/* Center Group (Patient) */}
           <g>
+            {/* Center surface (restored neumorphism). Safari-safe by using XHTML namespace. */}
             <foreignObject x={cx - 100} y={cy - 100} width={200} height={200}>
-               <div className="w-full h-full rounded-full flex items-center justify-center
+              <div
+                {...({ xmlns: 'http://www.w3.org/1999/xhtml' } as any)}
+                className="w-full h-full rounded-full flex items-center justify-center
                    bg-bg-light dark:bg-bg-dark
                    shadow-[inset_6px_6px_12px_rgba(163,177,198,0.3),inset_-6px_-6px_12px_rgba(255,255,255,0.8)]
                    dark:shadow-[inset_6px_6px_12px_rgba(0,0,0,0.6),inset_-6px_-6px_12px_rgba(255,255,255,0.05)]
                    border border-text-light/5 dark:border-text-dark/5"
-               >
-               </div>
+              />
             </foreignObject>
 
             {centerElements.map((el, i) => (
               <g key={i} transform={`translate(${cx + el.x}, ${cy + el.y})`}>
-                 <foreignObject x={-el.size/2} y={-el.size/2} width={el.size} height={el.size} className="overflow-visible pointer-events-none">
-                    <div className={`w-full h-full flex items-center justify-center ${i === 0 ? 'scale-110' : 'scale-100'}`}>
-                      <div 
-                        className="text-text-light dark:text-text-dark opacity-50"
-                        style={{ filter: 'drop-shadow(1px 1px 0px rgba(255,255,255,0.8))' }}
-                      >
-                        <el.icon size={el.size * 0.7} strokeWidth={2.5} />
-                      </div>
-                    </div>
-                 </foreignObject>
+                 <g transform={`translate(${-((el.size * 0.7) / 2)}, ${-((el.size * 0.7) / 2)})`} className="pointer-events-none">
+                   <el.icon
+                     width={el.size * 0.7}
+                     height={el.size * 0.7}
+                     strokeWidth={2.5}
+                     className="text-text-light dark:text-text-dark opacity-50"
+                     style={{ filter: 'drop-shadow(1px 1px 0px rgba(255,255,255,0.8))' }}
+                   />
+                 </g>
                  <text y={el.size/2 + 18} textAnchor="middle" className="text-[11px] font-bold fill-text-light dark:fill-text-dark uppercase tracking-wider opacity-80" style={{ textShadow: '0 1px 0 rgba(255,255,255,0.8)' }}>
                    {el.label}
                  </text>

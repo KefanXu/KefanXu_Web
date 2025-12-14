@@ -5,12 +5,26 @@ import { NeuButton } from './NeuButton';
 import { TiltCard } from './TiltCard';
 import { EcologicalDiagram } from './EcologicalDiagram';
 import { publications, Publication } from '../data/portfolio';
-import { FileText, X, User, Tag, Database, Search, ChevronRight } from 'lucide-react';
+import {
+  FileText,
+  X,
+  User,
+  Tag,
+  Database,
+  Search,
+  ChevronRight,
+  UserCircle2,
+  Orbit,
+  Network,
+  Globe2,
+  Clock3,
+} from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 export const Research: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPub, setSelectedPub] = useState<Publication | null>(null);
+  const [activeSystem, setActiveSystem] = useState<'Individual' | 'Microsystem' | 'Mesosystem' | 'Macrosystem' | 'Chronosystem'>('Individual');
 
   const filteredPubs = publications.filter(pub => 
     pub.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -21,9 +35,77 @@ export const Research: React.FC = () => {
     <div className="space-y-12 max-w-7xl mx-auto">
       
       {/* Ecological Diagram Section - Above Publications */}
-      <div className="w-full -mr-4 md:-mr-12 lg:-mr-24 mb-16 flex justify-end">
-        <div className="w-full max-w-[120%] flex justify-end">
-          <EcologicalDiagram />
+      <div className="mb-16">
+        <div className="w-full flex flex-col lg:flex-row items-start justify-between gap-10 lg:gap-12 py-6">
+          {/* Left controls */}
+          <div className="shrink-0">
+            <div className="mb-4 max-w-sm">
+              <h3 className="text-[10px] font-bold uppercase tracking-widest text-text-light/40 dark:text-text-dark/40 mb-2 font-mono">
+                Ecological Lens
+              </h3>
+              <p className="text-lg md:text-xl leading-relaxed text-text-light/80 dark:text-text-dark/80 font-display">
+                I aim to investigate HCI issues from an ecological perspective.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-3 max-w-[520px]">
+              {(['Individual', 'Microsystem', 'Mesosystem', 'Macrosystem', 'Chronosystem'] as const).map((label) => {
+                const isActive = activeSystem === label;
+                const Icon =
+                  label === 'Individual'
+                    ? UserCircle2
+                    : label === 'Microsystem'
+                      ? Orbit
+                      : label === 'Mesosystem'
+                        ? Network
+                        : label === 'Macrosystem'
+                          ? Globe2
+                          : Clock3;
+                return (
+                  <button key={label} type="button" onClick={() => setActiveSystem(label)} className="group select-none">
+                    <div
+                      className={`relative h-12 w-[200px] rounded-2xl bg-bg-light dark:bg-bg-dark
+                        border border-transparent
+                        flex items-center overflow-hidden transition-colors`}
+                    >
+                      {/* Engraved border only (plain surface) */}
+                      <div
+                        className="absolute inset-0 rounded-2xl pointer-events-none
+                          shadow-[inset_1px_1px_2px_rgba(0,0,0,0.10),inset_-1px_-1px_2px_rgba(255,255,255,0.55)]
+                          dark:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.55),inset_-1px_-1px_2px_rgba(255,255,255,0.06)]"
+                      />
+
+                      {/* Left segment */}
+                      <div className="relative z-10 flex-1 h-full flex items-center gap-3 pl-4">
+                        <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-green-500' : 'bg-text-light/20 dark:bg-text-dark/20'}`} />
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-text-light/60 dark:text-text-dark/60">
+                          {label}
+                        </span>
+                      </div>
+
+                      {/* Divider */}
+                      <div className="relative z-10 h-full w-px bg-text-light/10 dark:bg-text-dark/10" />
+
+                      {/* Right segment */}
+                      <div className="relative z-10 w-14 h-full flex items-center justify-center">
+                        <Icon
+                          size={18}
+                          className={`transition-colors ${
+                            isActive ? 'text-text-light/60 dark:text-text-dark/60' : 'text-text-light/40 dark:text-text-dark/40'
+                          }`}
+                        />
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Right: Diagram (kept on right, but closer to controls) */}
+          <div className="flex-1 flex justify-end">
+            <EcologicalDiagram />
+          </div>
         </div>
       </div>
 
