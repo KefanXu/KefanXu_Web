@@ -42,7 +42,8 @@ const RingLayer: React.FC<{
   index: number; 
   svgRef: React.RefObject<SVGSVGElement>;
   svgSize: number;
-}> = ({ layer, index, svgRef, svgSize }) => {
+  activeSystems?: Set<string>;
+}> = ({ layer, index, svgRef, svgSize, activeSystems = new Set() }) => {
   // During drag we update rotation directly (no spring) for Safari performance.
   // On release we animate back to 0 with a spring.
   const rotation = useMotionValue(0);
@@ -165,54 +166,6 @@ const RingLayer: React.FC<{
 
   const microDividers = [162.5, 277.5, 17.5];
 
-  const renderMicroLed = () => {
-    if (layer.name !== 'MICROSYSTEM') return null;
-
-    // Sunken “socket” indicator (recessed circle)
-    const a = 305;
-    const p = getPos(a, layer.radius + layer.width / 2 - 18);
-
-    return (
-      <g pointerEvents="none">
-        <circle
-          cx={p.x}
-          cy={p.y}
-          r={10.5}
-          className="fill-bg-light dark:fill-bg-dark"
-          filter="url(#inset-recess)"
-        />
-        {/* Darker inner bed (adds depth) */}
-        <circle
-          cx={p.x}
-          cy={p.y}
-          r={6.6}
-          className="fill-black/10 dark:fill-black/55"
-          opacity={0.9}
-        />
-        {/* Inner highlight ring */}
-        <circle
-          cx={p.x}
-          cy={p.y}
-          r={8.2}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1"
-          className="text-white/25 dark:text-white/10"
-          opacity={0.55}
-        />
-        {/* Subtle rim */}
-        <circle
-          cx={p.x}
-          cy={p.y}
-          r={10.5}
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1"
-          className="text-text-light/10 dark:text-text-dark/10"
-        />
-      </g>
-    );
-  };
 
   const renderScaleTexture = () => {
     // “Complicated but elegant” = layered ticks + dot index + subtle dashed arc
@@ -398,8 +351,6 @@ const RingLayer: React.FC<{
         className="text-text-light/10 dark:text-text-dark/10"
       />
 
-      {/* Microsystem indicator light (rendered above ring surface) */}
-      {renderMicroLed()}
 
       {/* Layer Label - System Name */}
       {layer.name === 'MICROSYSTEM' && (
@@ -484,6 +435,9 @@ const RingLayer: React.FC<{
         const gapPx = isMicrosystem ? 0 : (el.labelGapPx ?? 55);
         const angleGap = isMicrosystem ? 0 : (gapPx / layer.radius) * (180 / Math.PI);
         
+        const layerNameTitleCase = layer.name.charAt(0) + layer.name.slice(1).toLowerCase();
+        const isActiveSystem = activeSystems.has(layerNameTitleCase);
+        
         return (
           <g key={`${layer.name}-${j}`} className="group">
               {/* Text Label */}
@@ -496,8 +450,12 @@ const RingLayer: React.FC<{
                     fill="none"
                   />
                   <text 
-                    className={`text-[10px] font-bold fill-text-light dark:fill-text-dark uppercase tracking-widest transition-opacity duration-300 pointer-events-none select-none
-                      ${isMicrosystem ? 'opacity-0 group-hover:opacity-100' : 'opacity-60 group-hover:opacity-100'}`} 
+                    className={`text-[10px] font-bold uppercase tracking-widest transition-all duration-300 pointer-events-none select-none
+                      ${isMicrosystem 
+                        ? 'opacity-0 group-hover:opacity-100 fill-text-light dark:fill-text-dark' 
+                        : isActiveSystem 
+                          ? 'opacity-100 fill-text-light dark:fill-text-dark' 
+                          : 'opacity-60 group-hover:opacity-100 fill-text-light dark:fill-text-dark'}`} 
                     dy={isMicrosystem ? -10 : 4} 
                   >
                     <textPath 
@@ -513,14 +471,18 @@ const RingLayer: React.FC<{
               ) : (
                 // Top Half: Standard Path (CW)
                 <g>
-                   <path 
+                  <path 
                     id={`label-path-${layer.name}-${j}`}
                     d={`M ${cx + pathRadius},${cy} A ${pathRadius},${pathRadius} 0 0,1 ${cx - pathRadius},${cy} A ${pathRadius},${pathRadius} 0 0,1 ${cx + pathRadius},${cy}`}
                     fill="none"
                   />
                   <text 
-                    className={`text-[10px] font-bold fill-text-light dark:fill-text-dark uppercase tracking-widest transition-opacity duration-300 pointer-events-none select-none
-                      ${isMicrosystem ? 'opacity-0 group-hover:opacity-100' : 'opacity-60 group-hover:opacity-100'}`} 
+                    className={`text-[10px] font-bold uppercase tracking-widest transition-all duration-300 pointer-events-none select-none
+                      ${isMicrosystem 
+                        ? 'opacity-0 group-hover:opacity-100 fill-text-light dark:fill-text-dark' 
+                        : isActiveSystem 
+                          ? 'opacity-100 fill-text-light dark:fill-text-dark' 
+                          : 'opacity-60 group-hover:opacity-100 fill-text-light dark:fill-text-dark'}`} 
                     dy={isMicrosystem ? 12 : 4} 
                   >
                     <textPath 
@@ -540,7 +502,10 @@ const RingLayer: React.FC<{
                   width={24}
                   height={24}
                   strokeWidth={2.5}
-                  className="text-text-light dark:text-text-dark opacity-50 group-hover:text-blue-500 dark:group-hover:text-blue-400 group-hover:opacity-100 transition-all duration-300"
+                  className={`transition-all duration-300
+                    ${isActiveSystem 
+                      ? 'text-blue-500 dark:text-blue-400 opacity-100' 
+                      : 'text-text-light dark:text-text-dark opacity-50 group-hover:text-blue-500 dark:group-hover:text-blue-400 group-hover:opacity-100'}`}
                   style={{ filter: 'drop-shadow(1px 1px 0px rgba(255,255,255,0.8))' }}
                 />
               </g>
@@ -554,7 +519,7 @@ const RingLayer: React.FC<{
   );
 };
 
-export const EcologicalDiagram: React.FC = () => {
+export const EcologicalDiagram: React.FC<{ activeSystems?: Set<string> }> = ({ activeSystems = new Set() }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const svgSize = 1200;
   
@@ -644,46 +609,6 @@ export const EcologicalDiagram: React.FC = () => {
             <pattern id="grid-pattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
               <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-text-light/5 dark:text-text-dark/5" />
             </pattern>
-            {/* Recessed “socket” effect for microsystem indicator */}
-            <filter id="inset-recess" x="-140%" y="-140%" width="280%" height="280%">
-              {/* Dark inset (bottom-right) */}
-              <feOffset in="SourceAlpha" dx="3" dy="3" result="off1" />
-              <feGaussianBlur in="off1" stdDeviation="2.4" result="blur1" />
-              <feComposite in="blur1" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="inset1" />
-              <feColorMatrix
-                in="inset1"
-                type="matrix"
-                values="
-                  0 0 0 0 0
-                  0 0 0 0 0
-                  0 0 0 0 0
-                  0 0 0 0.48 0
-                "
-                result="shadow1"
-              />
-
-              {/* Light inset highlight (top-left) */}
-              <feOffset in="SourceAlpha" dx="-3" dy="-3" result="off2" />
-              <feGaussianBlur in="off2" stdDeviation="2.4" result="blur2" />
-              <feComposite in="blur2" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="inset2" />
-              <feColorMatrix
-                in="inset2"
-                type="matrix"
-                values="
-                  0 0 0 0 1
-                  0 0 0 0 1
-                  0 0 0 0 1
-                  0 0 0 0.24 0
-                "
-                result="highlight"
-              />
-
-              <feMerge>
-                <feMergeNode in="shadow1" />
-                <feMergeNode in="highlight" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
-            </filter>
 
             {/* Raised ring shadow (Safari-safe replacement for CSS drop-shadow) */}
             <filter id="ring-raised-shadow" x="-30%" y="-30%" width="160%" height="160%">
@@ -711,7 +636,7 @@ export const EcologicalDiagram: React.FC = () => {
 
           {/* Render Layers Outer to Inner for Pyramid Stacking */}
           {layers.slice().reverse().map((layer, i) => (
-             <RingLayer key={layer.name} layer={layer} index={i} svgRef={svgRef} svgSize={svgSize} />
+             <RingLayer key={layer.name} layer={layer} index={i} svgRef={svgRef} svgSize={svgSize} activeSystems={activeSystems} />
           ))}
 
           {/* Center Group (Patient) */}

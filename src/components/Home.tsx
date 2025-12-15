@@ -198,7 +198,7 @@ export const Home: React.FC = () => {
         <div className="space-y-12 relative">
           <div className="relative z-10">
             <h2 className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark leading-tight mb-6 font-heading">
-              Investigating the <span>Behavior Change</span> Across Life Scenarios
+              Investigating Life Transitions.
             </h2>
 
             <div ref={timelineRef} className="flex gap-8 mb-24 overflow-x-auto pb-4 md:pb-0 pt-12 items-end scrollbar-hide snap-x">

@@ -13,7 +13,6 @@ import {
   Database,
   Search,
   ChevronRight,
-  UserCircle2,
   Orbit,
   Network,
   Globe2,
@@ -24,7 +23,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 export const Research: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPub, setSelectedPub] = useState<Publication | null>(null);
-  const [activeSystem, setActiveSystem] = useState<'Individual' | 'Microsystem' | 'Mesosystem' | 'Macrosystem' | 'Chronosystem'>('Individual');
+  const [activeSystems, setActiveSystems] = useState<Set<'Microsystem' | 'Mesosystem' | 'Macrosystem' | 'Chronosystem'>>(new Set());
 
   const filteredPubs = publications.filter(pub => 
     pub.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -36,35 +35,37 @@ export const Research: React.FC = () => {
       
       {/* Ecological Diagram Section - Above Publications */}
       <div className="mb-16">
-        <div className="w-full flex flex-col lg:flex-row items-start justify-between gap-10 lg:gap-12 py-6">
+        <div className="w-full flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-12 py-6">
           {/* Left controls */}
-          <div className="shrink-0">
-            <div className="mb-4 max-w-sm">
-              <h3 className="text-[10px] font-bold uppercase tracking-widest text-text-light/40 dark:text-text-dark/40 mb-2 font-mono">
-                Ecological Lens
+          <div className="shrink-0 max-w-lg">
+            <div className="mb-4">
+              <h3 className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark leading-tight mb-12 font-heading">
+                Ecological Lens.
               </h3>
-              <p className="text-lg md:text-xl leading-relaxed text-text-light/80 dark:text-text-dark/80 font-display">
-                I aim to investigate HCI issues from an ecological perspective.
-              </p>
-            </div>
-
-            <div className="flex flex-wrap gap-3 max-w-[520px]">
-              {(['Individual', 'Microsystem', 'Mesosystem', 'Macrosystem', 'Chronosystem'] as const).map((label) => {
-                const isActive = activeSystem === label;
+              
+              <div className="flex flex-wrap gap-3 mb-16">
+              {(['Microsystem', 'Mesosystem', 'Macrosystem', 'Chronosystem'] as const).map((label) => {
+                const isActive = activeSystems.has(label);
                 const Icon =
-                  label === 'Individual'
-                    ? UserCircle2
-                    : label === 'Microsystem'
-                      ? Orbit
-                      : label === 'Mesosystem'
-                        ? Network
-                        : label === 'Macrosystem'
-                          ? Globe2
-                          : Clock3;
+                  label === 'Microsystem'
+                    ? Orbit
+                    : label === 'Mesosystem'
+                      ? Network
+                      : label === 'Macrosystem'
+                        ? Globe2
+                        : Clock3;
                 return (
-                  <button key={label} type="button" onClick={() => setActiveSystem(label)} className="group select-none">
+                  <button key={label} type="button" onClick={() => {
+                    const newActiveSystems = new Set(activeSystems);
+                    if (isActive) {
+                      newActiveSystems.delete(label);
+                    } else {
+                      newActiveSystems.add(label);
+                    }
+                    setActiveSystems(newActiveSystems);
+                  }} className="group select-none">
                     <div
-                      className={`relative h-12 w-[200px] rounded-2xl bg-bg-light dark:bg-bg-dark
+                      className={`relative h-16 w-[280px] rounded-2xl bg-bg-light dark:bg-bg-dark
                         border border-transparent
                         flex items-center overflow-hidden transition-colors`}
                     >
@@ -76,9 +77,9 @@ export const Research: React.FC = () => {
                       />
 
                       {/* Left segment */}
-                      <div className="relative z-10 flex-1 h-full flex items-center gap-3 pl-4">
-                        <span className={`w-2 h-2 rounded-full ${isActive ? 'bg-green-500' : 'bg-text-light/20 dark:bg-text-dark/20'}`} />
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-text-light/60 dark:text-text-dark/60">
+                      <div className="relative z-10 flex-1 h-full flex items-center gap-4 pl-5">
+                        <span className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-green-500' : 'bg-text-light/20 dark:bg-text-dark/20'}`} />
+                        <span className="text-xs font-bold uppercase tracking-widest text-text-light/60 dark:text-text-dark/60">
                           {label}
                         </span>
                       </div>
@@ -87,11 +88,11 @@ export const Research: React.FC = () => {
                       <div className="relative z-10 h-full w-px bg-text-light/10 dark:bg-text-dark/10" />
 
                       {/* Right segment */}
-                      <div className="relative z-10 w-14 h-full flex items-center justify-center">
+                      <div className="relative z-10 w-16 h-full flex items-center justify-center">
                         <Icon
-                          size={18}
-                          className={`transition-colors ${
-                            isActive ? 'text-text-light/60 dark:text-text-dark/60' : 'text-text-light/40 dark:text-text-dark/40'
+                          size={22}
+                          className={`transition-all ${
+                            isActive ? 'text-text-light dark:text-text-dark opacity-60' : 'text-text-light dark:text-text-dark opacity-40'
                           }`}
                         />
                       </div>
@@ -99,12 +100,17 @@ export const Research: React.FC = () => {
                   </button>
                 );
               })}
+              </div>
+
+              <p className="text-lg md:text-xl leading-relaxed text-text-light/80 dark:text-text-dark/80 font-display max-w-sm">
+                My research applies an <span className="font-bold text-text-light dark:text-text-dark">ecological lens</span> that situates individuals at the center of multiple interconnected layers, aiming to investigate how the information is transiting between and how the ecology evolves over time.
+              </p>
             </div>
           </div>
 
           {/* Right: Diagram (kept on right, but closer to controls) */}
           <div className="flex-1 flex justify-end">
-            <EcologicalDiagram />
+            <EcologicalDiagram activeSystems={activeSystems} />
           </div>
         </div>
       </div>
