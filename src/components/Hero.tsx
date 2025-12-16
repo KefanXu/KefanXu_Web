@@ -54,7 +54,7 @@ export const Hero: React.FC = () => {
     : 'border-[#333]';
 
   return (
-    <section className="py-12 flex flex-col items-center justify-center min-h-[70vh] perspective-1000 w-full max-w-7xl mx-auto px-4">
+    <section className="pt-48 pb-12 mb-32 flex flex-col items-center justify-center min-h-[70vh] perspective-1000 w-full max-w-7xl mx-auto px-4">
       
       <div className="text-center mb-16">
         <h2 className="text-text-light dark:text-text-dark text-sm tracking-[0.3em] uppercase mb-2 font-mono">

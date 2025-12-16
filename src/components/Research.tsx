@@ -35,15 +35,15 @@ export const Research: React.FC = () => {
       
       {/* Ecological Diagram Section - Above Publications */}
       <div className="mb-16">
-        <div className="w-full flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-12 py-6">
+        <div className="w-full flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-16 py-8">
           {/* Left controls */}
           <div className="shrink-0 max-w-lg">
             <div className="mb-4">
-              <h3 className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark leading-tight mb-12 font-heading">
+              <h3 className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark leading-tight mb-20 font-heading">
                 Ecological Lens.
               </h3>
               
-              <div className="flex flex-wrap gap-3 mb-16">
+              <div className="flex flex-wrap gap-5 mb-24">
               {(['Microsystem', 'Mesosystem', 'Macrosystem', 'Chronosystem'] as const).map((label) => {
                 const isActive = activeSystems.has(label);
                 const Icon =
@@ -84,17 +84,36 @@ export const Research: React.FC = () => {
                         </span>
                       </div>
 
-                      {/* Divider */}
-                      <div className="relative z-10 h-full w-px bg-text-light/10 dark:bg-text-dark/10" />
-
                       {/* Right segment */}
                       <div className="relative z-10 w-16 h-full flex items-center justify-center">
-                        <Icon
-                          size={22}
-                          className={`transition-all ${
-                            isActive ? 'text-text-light dark:text-text-dark opacity-60' : 'text-text-light dark:text-text-dark opacity-40'
-                          }`}
-                        />
+                        {/* Neumorphic toggle switch (visual only; whole button toggles) */}
+                        <div
+                          className={`relative w-12 h-7 rounded-full transition-all duration-300
+                            bg-bg-light dark:bg-bg-dark
+                            border border-text-light/5 dark:border-text-dark/5
+                            shadow-[inset_2px_2px_4px_rgba(0,0,0,0.10),inset_-2px_-2px_4px_rgba(255,255,255,0.70)]
+                            dark:shadow-[inset_2px_2px_4px_rgba(0,0,0,0.55),inset_-2px_-2px_4px_rgba(255,255,255,0.06)]
+                            ${isActive ? 'ring-1 ring-blue-500/30' : ''}`}
+                        >
+                          {/* Slider knob */}
+                          <div
+                            className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full flex items-center justify-center
+                              bg-bg-light dark:bg-bg-dark
+                              shadow-[2px_2px_5px_rgba(0,0,0,0.12),-2px_-2px_5px_rgba(255,255,255,0.75)]
+                              dark:shadow-[2px_2px_6px_rgba(0,0,0,0.65),-2px_-2px_6px_rgba(255,255,255,0.06)]
+                              transition-transform duration-300 ease-out
+                              ${isActive ? 'translate-x-5' : 'translate-x-0'}`}
+                          >
+                            <Icon
+                              size={14}
+                              className={`transition-all duration-300 ${
+                                isActive
+                                  ? 'text-blue-500 dark:text-blue-400 opacity-100'
+                                  : 'text-text-light dark:text-text-dark opacity-40'
+                              }`}
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </button>
@@ -102,8 +121,8 @@ export const Research: React.FC = () => {
               })}
               </div>
 
-              <p className="text-lg md:text-xl leading-relaxed text-text-light/80 dark:text-text-dark/80 font-display max-w-sm">
-                My research applies an <span className="font-bold text-text-light dark:text-text-dark">ecological lens</span> that situates individuals at the center of multiple interconnected layers, aiming to investigate how the information is transiting between and how the ecology evolves over time.
+              <p className="text-lg md:text-xl font-normal text-text-light/80 dark:text-text-dark/80 leading-relaxed max-w-sm mt-10 font-display">
+                My research applies an <span className="font-bold">ecological lens</span> that situates individuals at the center of multiple interconnected layers, aiming to investigate how the information is transiting between and how the ecology evolves over time.
               </p>
             </div>
           </div>

@@ -108,7 +108,7 @@ export const Home: React.FC = () => {
       <Hero />
 
       {/* Introduction Section (Added below Hero) */}
-      <div className="grid lg:grid-cols-2 gap-16 items-center px-4 md:px-12 pt-20 pb-32">
+      <div className="grid lg:grid-cols-2 gap-16 items-center px-4 md:px-12 pt-20 pb-32 mb-32">
         {/* Left: Text Content */}
         <div className="flex flex-col justify-center space-y-8">
           <div className="space-y-6 text-lg md:text-xl font-display leading-relaxed text-text-light/80 dark:text-text-dark/80">
