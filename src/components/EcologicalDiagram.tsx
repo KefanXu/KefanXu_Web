@@ -592,10 +592,10 @@ export const EcologicalDiagram: React.FC<{ activeSystems?: Set<string> }> = ({ a
       whileInView={{ opacity: 1 }}
       viewport={{ once: true }}
       transition={{ duration: 1 }}
-      className="w-full flex justify-end items-center py-12"
+      className="w-full flex justify-center lg:justify-end items-center py-12"
     >
       <div 
-        className="relative flex-none scale-75 md:scale-90 lg:scale-100 origin-right" 
+        className="relative flex-none scale-75 md:scale-90 lg:scale-100 origin-center lg:origin-right" 
         style={{ width: 1000, height: 1000 }}
       >
         {/* Safari can clip SVG content outside the viewBox unless overflow is set via SVG attribute. */}

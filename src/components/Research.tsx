@@ -121,14 +121,14 @@ export const Research: React.FC = () => {
               })}
               </div>
 
-              <p className="text-lg md:text-xl font-normal text-text-light/80 dark:text-text-dark/80 leading-relaxed max-w-sm mt-10 font-display">
-                My research applies an <span className="font-bold">ecological lens</span> that situates individuals at the center of multiple interconnected layers, aiming to investigate how the information is transiting between and how the ecology evolves over time.
+              <p className="text-lg md:text-xl font-normal text-text-light/80 dark:text-text-dark/80 leading-[30px] max-w-sm mt-10 font-display">
+                My research applies an <span className="font-bold text-text-light dark:text-text-dark">ecological lens</span> that situates individuals at the center of multiple interconnected layers, aiming to investigate how the information is transiting between and how the ecology evolves over time.
               </p>
             </div>
           </div>
 
           {/* Right: Diagram (kept on right, but closer to controls) */}
-          <div className="flex-1 flex justify-end">
+          <div className="flex-1 w-full flex justify-center lg:justify-end">
             <EcologicalDiagram activeSystems={activeSystems} />
           </div>
         </div>

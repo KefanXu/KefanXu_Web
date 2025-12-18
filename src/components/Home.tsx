@@ -176,7 +176,7 @@ export const Home: React.FC = () => {
         </div>
 
         {/* Right: Interactive Matrix (Visual) */}
-        <div className="hidden lg:flex justify-center items-center">
+        <div className="flex justify-center items-center mt-12 lg:mt-0">
           <ProfileMatrix
             showCross={isHealthInformaticsHovered && !isGTHovered && !isGraduationCapHovered && !isLinkedinHovered && !isMailHovered}
             showGTLogo={isGTHovered && !isGraduationCapHovered && !isLinkedinHovered && !isMailHovered}
@@ -188,14 +188,14 @@ export const Home: React.FC = () => {
       </div>
 
       {/* Research Vision Section - Redesigned */}
-      <div className="grid lg:grid-cols-2 gap-16 items-center px-4 md:px-12 mt-24">
+      <div className="flex flex-col lg:flex-row gap-16 items-center px-4 md:px-12 mt-24 w-full max-w-7xl mx-auto">
         {/* Left: Playful Interaction */}
-        <div className="flex justify-center lg:justify-start">
+        <div className="w-full lg:w-1/2 flex justify-center lg:justify-start">
           <MoonClock value={currentMoonPhase} onSliderChange={(val) => setCurrentMoonPhase(val / 100)} />
         </div>
 
         {/* Right: Plain Text & Vision */}
-        <div className="space-y-12 relative">
+        <div className="w-full lg:w-1/2 space-y-12 relative">
           <div className="relative z-10">
             <h2 className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark leading-tight mb-6 font-heading">
               Investigating Life Transitions.
@@ -226,9 +226,9 @@ export const Home: React.FC = () => {
             </div>
 
             {/* Updated per your earlier CSS change: 300 -> 400 */}
-            <p className="text-lg md:text-xl font-normal text-text-light/80 dark:text-text-dark/80 leading-relaxed max-w-xl font-display">
-              I am intrigued by how individuals <span className="font-bold">comprehend and adjust to life transitions</span>, while also delving
-              into the designing technologies to assist individuals in <span>navigating such transitions</span>.
+            <p className="text-lg md:text-xl font-normal text-text-light/80 dark:text-text-dark/80 leading-[30px] max-w-xl font-display">
+              I am intrigued by how individuals <span className="font-bold text-text-light dark:text-text-dark">comprehend and adjust to life transitions</span>, while also delving
+              into the designing technologies to assist individuals in <span className="font-bold text-text-light dark:text-text-dark">navigating such transitions</span>.
             </p>
           </div>
         </div>
