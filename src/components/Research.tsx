@@ -35,7 +35,7 @@ export const Research: React.FC = () => {
       
       {/* Ecological Diagram Section - Above Publications */}
       <div className="mb-16">
-        <div className="w-full flex flex-col lg:flex-row items-center justify-between gap-10 lg:gap-16 py-8">
+        <div className="w-full flex flex-col lg:flex-row items-start lg:items-center justify-between gap-10 lg:gap-16 py-8 px-4 md:px-12">
           {/* Left controls */}
           <div className="shrink-0 max-w-lg">
             <div className="mb-4">
