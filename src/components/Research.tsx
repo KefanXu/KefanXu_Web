@@ -43,7 +43,7 @@ export const Research: React.FC = () => {
                 Ecological Lens.
               </h3>
               
-              <div className="flex flex-wrap gap-5 mb-24">
+              <div className="flex flex-wrap grid grid-cols-2 lg:flex lg:flex-wrap gap-5 mb-24">
               {(['Microsystem', 'Mesosystem', 'Macrosystem', 'Chronosystem'] as const).map((label) => {
                 const isActive = activeSystems.has(label);
                 const Icon =
@@ -65,7 +65,7 @@ export const Research: React.FC = () => {
                     setActiveSystems(newActiveSystems);
                   }} className="group select-none">
                     <div
-                      className={`relative h-16 w-[280px] rounded-2xl bg-bg-light dark:bg-bg-dark
+                      className={`relative h-16 w-full lg:w-[280px] rounded-2xl bg-bg-light dark:bg-bg-dark
                         border border-transparent
                         flex items-center overflow-hidden transition-colors`}
                     >
