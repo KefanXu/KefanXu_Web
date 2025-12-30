@@ -9,6 +9,9 @@ export interface Publication {
   abstract?: string;
   tags?: string[];
   image?: string;
+  methodology?: string;
+  keyFindings?: string[];
+  bibtex?: string;
 }
 
 export interface Project {
@@ -53,7 +56,22 @@ export const publications: Publication[] = [
     year: 2025,
     doi: "https://doi.org/10.1145/3757519",
     tags: ["Caregiving", "Online Health Communities", "Sense-Making"],
-    abstract: "This study investigates how informal caregivers use online health communities to make sense of conflicts and life-changing events. Through a temporal analysis of forum posts, we uncover the evolving nature of caregiving challenges and the role of peer support in navigating complex care trajectories."
+    abstract: "Informal caregivers play a crucial role in caring for family members with chronic diseases. Their mental health can be adversely affected by life-changing events, such as a patient's diagnosis or care transitions, leading to interpersonal and intrapersonal conflicts, disorientation, and escalating malaise. This study qualitatively analyzes data from online health communities to investigate caregivers' experiences with these conflicts and events. Conflicts are categorized using a psychodynamic framework, and the interplay between life-changing events and conflicts is examined to understand caregivers' sense-making and conflict mediation decisions. The study also finds that online health communities support caregivers by helping them interpret and navigate conflicts and by raising awareness of the temporal resolution of life-changing events. The paper concludes with a discussion on designing online health communities to better support caregivers in these practices.",
+    methodology: "Qualitative analysis of online health community forum posts, focusing on temporal patterns and conflict narratives.",
+    keyFindings: [
+      "Caregivers' sense-making evolves distinctly through pre-, peri-, and post-event phases.",
+      "Online communities serve as a vital 'temporal anchor' for navigating long-term care trajectories.",
+      "Peer support helps mediate both interpersonal (family) and intrapersonal (self) conflicts."
+    ],
+    bibtex: `@inproceedings{xu2025caregivers,
+  title={Understanding the Temporality of Informal Caregivers' Sense-Making on Conflicts and Life-Changing Events through Online Health Communities},
+  author={Xu, Kefan and Baseman, Cynthia M. and Swinger, Nathaniel and Ryu, Myeonghan and Arriaga, Rosa I.},
+  booktitle={Proceedings of the ACM on Human-Computer Interaction},
+  volume={9},
+  number={CSCW},
+  year={2025},
+  publisher={ACM}
+}`
   },
   {
     id: "dis2025",
@@ -63,7 +81,21 @@ export const publications: Publication[] = [
     year: 2025,
     doi: "https://doi.org/10.1145/3715336.3735796",
     tags: ["XAI", "End-Users", "Design"],
-    abstract: "We explore end-users' perspectives on Explainable AI (XAI) in daily scenarios. The study highlights reasons for non-use, user concerns regarding privacy and trust, and proposes ideal design guidelines for more user-centric XAI systems."
+    abstract: "Centering humans in explainable artificial intelligence (XAI) research has primarily focused on AI model development and high-stake scenarios. However, as AI becomes increasingly integrated into everyday applications in often opaque ways, the need for explainability tailored to end-users has grown more urgent. To address this gap, we explore end-users' perspectives on embedding XAI into daily AI application scenarios. Our findings reveal that XAI is not naturally accepted by end-users in their daily lives. When users seek explanations, they envision XAI design that promotes contextualized understanding, empowers adoption and adaption to AI systems, and considers multistakeholders' values. We further discuss supporting users' agency in XAI non-use and alternatives to XAI for managing ambiguity in AI interactions. Additionally, we provide design implications for XAI design at personal and societal levels.",
+    methodology: "User study with N=87 participants exploring reactions to XAI in everyday scenarios.",
+    keyFindings: [
+      "Comprehensibility is the top priority for end-users over technical accuracy.",
+      "Contrastive explanations (why P and not Q) often negatively impact user trust in daily contexts.",
+      "Users desire a 'reverse engineering' approach where XAI aligns with their personal goals rather than model logic."
+    ],
+    bibtex: `@inproceedings{wang2025xai,
+  title={Explainable AI for Daily Scenarios from End-Users' Perspective: Non-Use, Concerns, and Ideal Design},
+  author={Wang, Lingqing and Anyi, Chidimma Lois and Xu, Kefan and Liu, Yifan and Arriaga, Rosa I. and Goel, Ashok K.},
+  booktitle={Proceedings of the 2025 ACM Designing Interactive Systems Conference},
+  year={2025},
+  publisher={ACM},
+  doi={10.1145/3715336.3735796}
+}`
   },
   {
     id: "chi2024",
@@ -73,7 +105,21 @@ export const publications: Publication[] = [
     year: 2024,
     doi: "https://doi.org/10.1145/3613904.3641937",
     tags: ["Physical Activity", "Planning", "Reflection"],
-    abstract: "This paper examines how reflective iteration impacts physical activity planning. By analyzing user behaviors, we demonstrate that iterative reflection helps individuals create more realistic and achievable physical activity plans, leading to better adherence."
+    abstract: "Many people do not get enough physical activity. Establishing routines to incorporate physical activity into people's daily lives is known to be effective, but many people struggle to establish and maintain routines when facing disruptions. In this paper, we build on prior self-experimentation work to assist people in establishing or improving physical activity routines using a framework we call 'reflective iteration.' This framework encourages individuals to articulate, reflect upon, and iterate on high-level 'strategies' that inform their day-to-day physical activity plans. We designed and deployed a mobile application, Planneregy, that implements this framework. Sixteen U.S. college students used the Planneregy app for 42 days to reflectively iterate on their weekly physical exercise routines. Based on an analysis of usage data and interviews, we found that the reflective iteration approach has the potential to help people find and maintain effective physical activity routines, even in the face of life changes and temporary disruptions.",
+    methodology: "42-day field deployment of 'Planneregy' app with N=16 participants, combined with semi-structured interviews.",
+    keyFindings: [
+      "Reflective iteration helps individuals separate high-level strategies from day-to-day execution.",
+      "Iterating on plans allows users to adapt to life disruptions without abandoning their goals.",
+      "The framework supports the formation of sustainable physical activity routines by turning failures into learning opportunities."
+    ],
+    bibtex: `@inproceedings{xu2024reflective,
+  title={Understanding the Effect of Reflective Iteration on Individuals’ Physical Activity Planning},
+  author={Xu, Kefan and Yan, Xinghui and Ryu, Myeonghan and Newman, Mark W. and Arriaga, Rosa I.},
+  booktitle={Proceedings of the 2024 CHI Conference on Human Factors in Computing Systems},
+  year={2024},
+  publisher={ACM},
+  doi={10.1145/3613904.3641937}
+}`
   },
   {
     id: "cscw2024",
@@ -83,7 +129,23 @@ export const publications: Publication[] = [
     year: 2024,
     doi: "https://doi.org/10.1145/3637426",
     tags: ["PTSD", "Clinical Decision Support", "Sensors"],
-    abstract: "We investigate the use of sensor-captured patient-generated data (PGD) in PTSD therapy. The study reveals how such data can support clinical decision-making by providing objective insights into patient progress and symptom fluctuations."
+    abstract: "We investigate the use of sensor-captured patient-generated data (PGD) in PTSD therapy. The study reveals how such data can support clinical decision-making by providing objective insights into patient progress and symptom fluctuations.",
+    methodology: "Concept testing with N=10 clinicians using a 'Clinician Homework Review' (CHR) interface visualizing sensor data.",
+    keyFindings: [
+      "Sensor data provides 'situated objectivity' that complements patient self-reports.",
+      "Clinicians assign 'perceived reference weight' to data based on its context and source.",
+      "Objective sensor metrics can reveal symptom fluctuations that patients might forget or underreport."
+    ],
+    bibtex: `@article{evans2024sensor,
+  title={Using Sensor-Captured Patient-Generated Data to Support Clinical Decisionmaking in PTSD Therapy},
+  author={Evans, Hayley I. and Ryu, Myeonghan and Hsieh, Theresa and Zhou, Jiawei and Xu, Kefan and Akers, Kenneth W. and Sherrill, Andrew M. and Arriaga, Rosa I.},
+  journal={Proceedings of the ACM on Human-Computer Interaction},
+  volume={8},
+  number={CSCW},
+  year={2024},
+  publisher={ACM},
+  doi={10.1145/3637426}
+}`
   },
   {
     id: "chi2022",
@@ -93,7 +155,21 @@ export const publications: Publication[] = [
     year: 2022,
     doi: "https://doi.org/10.1145/3491102.3501997",
     tags: ["Physical Activity", "Historical Data", "Planning"],
-    abstract: "This research explores how access to historical planning records influences current physical activity planning. We found that reviewing past plans and outcomes helps users identify patterns and adjust their strategies for better execution."
+    abstract: "Making and executing physical activity plans can help people improve their physical activity levels. However, little is known about how people make physical activity plans in everyday settings and how people can be assisted in creating more successful plans. In this paper, we developed and deployed a mobile app as a probe to investigate the in-the-wild physical activity planning experience for 28 days with 17 participants. Additionally, we explored the impact of presenting successful and unsuccessful planning records on participants' planning behaviors. Based on interviews before, during, and after the deployment, we offer a description of what factors participants considered to fit their exercise plans into their existing routines, as well as factors leading to plan failures and dissatisfaction with planned physical activity. With access to historical records, participants derived insights to improve their plans, including trends in successes and failures.",
+    methodology: "28-day in-the-wild study with N=17 participants using a planning probe app.",
+    keyFindings: [
+      "Reviewing historical records helps users identify personal patterns of success and failure.",
+      "Successful planning requires finding a 'fit' within existing daily routines.",
+      "Visualizing past data shifts user focus from outcome goals to process improvements."
+    ],
+    bibtex: `@inproceedings{xu2022planning,
+  title={Understanding People's Experience for Physical Activity Planning and Exploring the Impact of Historical Records on Plan Creation and Execution},
+  author={Xu, Kefan and Yan, Xinghui and Newman, Mark W.},
+  booktitle={Proceedings of the 2022 CHI Conference on Human Factors in Computing Systems},
+  year={2022},
+  publisher={ACM},
+  doi={10.1145/3491102.3501997}
+}`
   }
 ];
 

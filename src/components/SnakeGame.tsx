@@ -37,7 +37,24 @@ export const SnakeGame: React.FC = () => {
   // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isPlaying) return;
+      // Handle Exit
+      if (e.key === 'Escape') {
+         // Dispatch custom event for Hero to catch if needed, or we handle via props later.
+         // For now, let's rely on Hero passing an onExit prop or handling the key globally?
+         // Actually, simpler to just let the parent handle the keydown if it's bubbling, 
+         // BUT we are stopping propagation in some cases. 
+         // Let's NOT preventDefault on Escape so it bubbles up.
+         return; 
+      }
+
+      // Handle Game Over / Start interactions
+      if (!isPlaying || gameOver) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          resetGame();
+          e.preventDefault();
+        }
+        return;
+      }
       
       switch (e.key) {
         case 'ArrowUp':
@@ -129,7 +146,7 @@ export const SnakeGame: React.FC = () => {
         </div>
       ) : gameOver ? (
         <div className="flex flex-col items-center gap-4">
-           <span className="text-xl font-bold tracking-wider text-red-900/70">GAME OVER</span>
+           <span className="text-xl font-bold tracking-wider">GAME OVER</span>
            <span className="text-xs font-bold">FINAL SCORE: {score}</span>
            <button 
              onClick={resetGame}
@@ -162,7 +179,7 @@ export const SnakeGame: React.FC = () => {
            ))}
            {/* Food */}
            <div 
-             className="absolute bg-[#1a2f23] animate-ping"
+             className="absolute bg-[#1a2f23]"
              style={{
                left: `${food.x * 10}px`,
                top: `${food.y * 10}px`,

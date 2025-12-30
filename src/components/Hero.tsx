@@ -3,6 +3,7 @@ import { ToggleSwitch, ToggleSmall } from './NeuControls';
 import { Shield, Database, Hash } from 'lucide-react';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { SnakeGame } from './SnakeGame';
+import { PSPControls } from './PSPControls';
 
 export const Hero: React.FC = () => {
   const [power, setPower] = useState(true);
@@ -221,25 +222,34 @@ export const Hero: React.FC = () => {
         </div>
 
         {/* MOBILE CONTROLS (Horizontal Grid) */}
-        <div className="lg:hidden w-full grid grid-cols-2 md:grid-cols-3 gap-8 order-2 mt-8">
-           {/* All controls flattened */}
-           <div className="flex justify-center"><ToggleSwitch isChecked={power} onChange={setPower} label="System Power" /></div>
-           <div className="flex justify-center"><ToggleSwitch isChecked={secureMode} onChange={setSecureMode} label="Secure Mode" /></div>
-           <div className="flex justify-center"><ToggleSwitch isChecked={bioMetrics} onChange={setBioMetrics} label="Bio-Metrics" /></div>
-           <div className="flex justify-center"><ToggleSmall isChecked={backlight} onChange={setBacklight} label="Backlight" /></div>
-           <div className="flex justify-center"><ToggleSwitch isChecked={consoleLock} onChange={setConsoleLock} label="Console Lock" /></div>
-           
-           {/* Static Indicators */}
-           <div className="flex flex-col gap-3 items-center justify-center pl-2">
-              <div className="flex items-center gap-3">
-                 <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.6)]" />
-                 <span className="text-[9px] font-mono uppercase opacity-50 tracking-widest">Haptics</span>
-              </div>
-              <div className="flex items-center gap-3">
-                 <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_5px_rgba(59,130,246,0.6)] animate-pulse" />
-                 <span className="text-[9px] font-mono uppercase opacity-50 tracking-widest">Data Link</span>
-              </div>
-           </div>
+        <div className="lg:hidden w-full order-2 mt-8">
+           {isEasterEggActive ? (
+             <PSPControls onExit={() => {
+                // Turn off one of the switches to exit Easter Egg mode
+                setConsoleLock(false); 
+             }} />
+           ) : (
+             <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
+                {/* All controls flattened */}
+                <div className="flex justify-center"><ToggleSwitch isChecked={power} onChange={setPower} label="System Power" /></div>
+                <div className="flex justify-center"><ToggleSwitch isChecked={secureMode} onChange={setSecureMode} label="Secure Mode" /></div>
+                <div className="flex justify-center"><ToggleSwitch isChecked={bioMetrics} onChange={setBioMetrics} label="Bio-Metrics" /></div>
+                <div className="flex justify-center"><ToggleSmall isChecked={backlight} onChange={setBacklight} label="Backlight" /></div>
+                <div className="flex justify-center"><ToggleSwitch isChecked={consoleLock} onChange={setConsoleLock} label="Console Lock" /></div>
+                
+                {/* Static Indicators */}
+                <div className="flex flex-col gap-3 items-center justify-center pl-2">
+                   <div className="flex items-center gap-3">
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.6)]" />
+                      <span className="text-[9px] font-mono uppercase opacity-50 tracking-widest">Haptics</span>
+                   </div>
+                   <div className="flex items-center gap-3">
+                      <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_5px_rgba(59,130,246,0.6)] animate-pulse" />
+                      <span className="text-[9px] font-mono uppercase opacity-50 tracking-widest">Data Link</span>
+                   </div>
+                </div>
+             </div>
+           )}
         </div>
 
       </motion.div>
