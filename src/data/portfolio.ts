@@ -63,14 +63,16 @@ export const publications: Publication[] = [
       "Online communities serve as a vital 'temporal anchor' for navigating long-term care trajectories.",
       "Peer support helps mediate both interpersonal (family) and intrapersonal (self) conflicts."
     ],
-    bibtex: `@inproceedings{xu2025caregivers,
-  title={Understanding the Temporality of Informal Caregivers' Sense-Making on Conflicts and Life-Changing Events through Online Health Communities},
-  author={Xu, Kefan and Baseman, Cynthia M. and Swinger, Nathaniel and Ryu, Myeonghan and Arriaga, Rosa I.},
-  booktitle={Proceedings of the ACM on Human-Computer Interaction},
-  volume={9},
-  number={CSCW},
-  year={2025},
-  publisher={ACM}
+    bibtex: `@article{Xu2025Caregivers,
+  author = {Xu, Kefan and Baseman, Cynthia M. and Swinger, Nathaniel and Ryu, Myeonghan and Arriaga, Rosa I.},
+  title = {Understanding the Temporality of Informal Caregivers' Sense-Making on Conflicts and Life-Changing Events through Online Health Communities},
+  journal = {Proceedings of the ACM on Human-Computer Interaction},
+  volume = {9},
+  number = {CSCW},
+  year = {2025},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  doi = {10.1145/3757519}
 }`
   },
   {
@@ -88,13 +90,18 @@ export const publications: Publication[] = [
       "Contrastive explanations (why P and not Q) often negatively impact user trust in daily contexts.",
       "Users desire a 'reverse engineering' approach where XAI aligns with their personal goals rather than model logic."
     ],
-    bibtex: `@inproceedings{wang2025xai,
-  title={Explainable AI for Daily Scenarios from End-Users' Perspective: Non-Use, Concerns, and Ideal Design},
-  author={Wang, Lingqing and Anyi, Chidimma Lois and Xu, Kefan and Liu, Yifan and Arriaga, Rosa I. and Goel, Ashok K.},
-  booktitle={Proceedings of the 2025 ACM Designing Interactive Systems Conference},
-  year={2025},
-  publisher={ACM},
-  doi={10.1145/3715336.3735796}
+    bibtex: `@inproceedings{Wang2025Explainable,
+  author = {Wang, Lingqing and Anyi, Chidimma Lois and Xu, Kefan and Liu, Yifan and Arriaga, Rosa I. and Goel, Ashok K.},
+  title = {Explainable AI for Daily Scenarios from End-Users' Perspective: Non-Use, Concerns, and Ideal Design},
+  booktitle = {Proceedings of the 2025 Designing Interactive Systems Conference},
+  series = {DIS '25},
+  year = {2025},
+  location = {Stuttgart, Germany},
+  pages = {2328--2349},
+  numpages = {22},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  doi = {10.1145/3715336.3735796}
 }`
   },
   {
@@ -112,13 +119,18 @@ export const publications: Publication[] = [
       "Iterating on plans allows users to adapt to life disruptions without abandoning their goals.",
       "The framework supports the formation of sustainable physical activity routines by turning failures into learning opportunities."
     ],
-    bibtex: `@inproceedings{xu2024reflective,
-  title={Understanding the Effect of Reflective Iteration on Individuals’ Physical Activity Planning},
-  author={Xu, Kefan and Yan, Xinghui and Ryu, Myeonghan and Newman, Mark W. and Arriaga, Rosa I.},
-  booktitle={Proceedings of the 2024 CHI Conference on Human Factors in Computing Systems},
-  year={2024},
-  publisher={ACM},
-  doi={10.1145/3613904.3641937}
+    bibtex: `@inproceedings{Xu2024Reflective,
+  author = {Xu, Kefan and Yan, Xinghui and Ryu, Myeonghan and Newman, Mark W. and Arriaga, Rosa I.},
+  title = {Understanding the Effect of Reflective Iteration on Individuals' Physical Activity Planning},
+  booktitle = {Proceedings of the CHI Conference on Human Factors in Computing Systems},
+  series = {CHI '24},
+  year = {2024},
+  location = {Honolulu, HI, USA},
+  articleno = {Article 647},
+  numpages = {17},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  doi = {10.1145/3613904.3641937}
 }`
   },
   {
@@ -136,15 +148,18 @@ export const publications: Publication[] = [
       "Clinicians assign 'perceived reference weight' to data based on its context and source.",
       "Objective sensor metrics can reveal symptom fluctuations that patients might forget or underreport."
     ],
-    bibtex: `@article{evans2024sensor,
-  title={Using Sensor-Captured Patient-Generated Data to Support Clinical Decisionmaking in PTSD Therapy},
-  author={Evans, Hayley I. and Ryu, Myeonghan and Hsieh, Theresa and Zhou, Jiawei and Xu, Kefan and Akers, Kenneth W. and Sherrill, Andrew M. and Arriaga, Rosa I.},
-  journal={Proceedings of the ACM on Human-Computer Interaction},
-  volume={8},
-  number={CSCW},
-  year={2024},
-  publisher={ACM},
-  doi={10.1145/3637426}
+    bibtex: `@article{Evans2024Sensor,
+  author = {Evans, Hayley I. and Ryu, Myeonghan and Hsieh, Theresa and Zhou, Jiawei and Xu, Kefan and Akers, Kenneth W. and Sherrill, Andrew M. and Arriaga, Rosa I.},
+  title = {Using Sensor-Captured Patient-Generated Data to Support Clinical Decisionmaking in PTSD Therapy},
+  journal = {Proceedings of the ACM on Human-Computer Interaction},
+  volume = {8},
+  number = {CSCW1},
+  year = {2024},
+  articleno = {Article 143},
+  numpages = {28},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  doi = {10.1145/3637426}
 }`
   },
   {
@@ -162,13 +177,18 @@ export const publications: Publication[] = [
       "Successful planning requires finding a 'fit' within existing daily routines.",
       "Visualizing past data shifts user focus from outcome goals to process improvements."
     ],
-    bibtex: `@inproceedings{xu2022planning,
-  title={Understanding People's Experience for Physical Activity Planning and Exploring the Impact of Historical Records on Plan Creation and Execution},
-  author={Xu, Kefan and Yan, Xinghui and Newman, Mark W.},
-  booktitle={Proceedings of the 2022 CHI Conference on Human Factors in Computing Systems},
-  year={2022},
-  publisher={ACM},
-  doi={10.1145/3491102.3501997}
+    bibtex: `@inproceedings{Xu2022Understanding,
+  author = {Xu, Kefan and Yan, Xinghui (Erica) and Newman, Mark W.},
+  title = {Understanding People's Experience for Physical Activity Planning and Exploring the Impact of Historical Records on Plan Creation and Execution},
+  booktitle = {Proceedings of the 2022 CHI Conference on Human Factors in Computing Systems},
+  series = {CHI '22},
+  year = {2022},
+  location = {New Orleans, LA, USA},
+  articleno = {Article 232},
+  numpages = {15},
+  publisher = {Association for Computing Machinery},
+  address = {New York, NY, USA},
+  doi = {10.1145/3491102.3501997}
 }`
   }
 ];

@@ -11,6 +11,7 @@ import { Activity, Database, LayoutDashboard, Menu, X } from 'lucide-react';
 function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'research' | 'projects'>('home');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isResearchDetailOpen, setIsResearchDetailOpen] = useState(false);
 
   // Scroll to section handler
   const scrollToSection = (id: 'home' | 'research' | 'projects') => {
@@ -70,88 +71,97 @@ function App() {
       </div>
 
       {/* Top System Bar (Medical Style) */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-bg-light/90 dark:bg-bg-dark/90 backdrop-blur-md border-b border-text-light/5 dark:border-text-dark/5 shadow-sm overflow-hidden">
-        
-        {/* Texture Overlay */}
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none" />
-
-        {/* Main Nav */}
-        <div className="container mx-auto px-4 h-20 flex justify-between items-center gap-4 relative z-10">
-          
-          {/* Brand */}
-          <div 
-            className="flex items-center gap-3 cursor-pointer group" 
-            onClick={() => scrollToSection('home')}
+      <AnimatePresence>
+        {!isResearchDetailOpen && (
+          <motion.nav 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-0 left-0 right-0 z-50 bg-bg-light/90 dark:bg-bg-dark/90 backdrop-blur-md border-b border-text-light/5 dark:border-text-dark/5 shadow-sm overflow-hidden"
           >
-            <div className="flex flex-col">
-              <span className="text-sm font-bold tracking-widest uppercase">Kefan Xu</span>
-              <span className="text-[9px] font-mono text-text-light/50 dark:text-text-dark/50 tracking-wider">PhD Student</span>
-            </div>
-          </div>
+            
+            {/* Texture Overlay */}
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay pointer-events-none" />
 
-          {/* Desktop Switcher */}
-          <div className="hidden md:flex flex-1 max-w-md justify-center">
-            <NeuSwitch 
-              options={[
-                { id: 'home', label: 'Home' },
-                { id: 'research', label: 'Research' },
-                { id: 'projects', label: 'Projects' }
-              ]}
-              activeId={activeTab}
-              onChange={(id) => scrollToSection(id as 'home' | 'research' | 'projects')}
-              className="w-full shadow-none bg-transparent border border-text-light/5 dark:border-text-dark/5"
-            />
-          </div>
-
-          {/* Right Controls */}
-          <div className="flex items-center gap-3">
-            <NeuKnob />
-            {/* Mobile Menu Toggle */}
-            <button 
-              className="md:hidden p-2 rounded-lg bg-black/5 dark:bg-white/5"
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            >
-              {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        <AnimatePresence>
-          {isMobileMenuOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              className="md:hidden border-t border-text-light/5 dark:border-text-dark/5 bg-bg-light dark:bg-bg-dark overflow-hidden"
-            >
-              <div className="p-4 space-y-2">
-                {[
-                  { id: 'home', label: 'Home', icon: LayoutDashboard },
-                  { id: 'research', label: 'Research', icon: Database },
-                  { id: 'projects', label: 'Projects', icon: Activity }
-                ].map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => {
-                      scrollToSection(item.id as any);
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className={`w-full flex items-center gap-3 p-3 rounded-lg font-mono text-sm uppercase tracking-wider transition-colors
-                      ${activeTab === item.id 
-                        ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20' 
-                        : 'hover:bg-black/5 dark:hover:bg-white/5 text-text-light/70 dark:text-text-dark/70'}
-                    `}
-                  >
-                    <item.icon size={16} />
-                    {item.label}
-                  </button>
-                ))}
+            {/* Main Nav */}
+            <div className="container mx-auto px-4 h-20 flex justify-between items-center gap-4 relative z-10">
+              
+              {/* Brand */}
+              <div 
+                className="flex items-center gap-3 cursor-pointer group" 
+                onClick={() => scrollToSection('home')}
+              >
+                <div className="flex flex-col">
+                  <span className="text-sm font-bold tracking-widest uppercase">Kefan Xu</span>
+                  <span className="text-[9px] font-mono text-text-light/50 dark:text-text-dark/50 tracking-wider">PhD Student</span>
+                </div>
               </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </nav>
+
+              {/* Desktop Switcher */}
+              <div className="hidden md:flex flex-1 max-w-md justify-center">
+                <NeuSwitch 
+                  options={[
+                    { id: 'home', label: 'Home' },
+                    { id: 'research', label: 'Research' },
+                    { id: 'projects', label: 'Projects' }
+                  ]}
+                  activeId={activeTab}
+                  onChange={(id) => scrollToSection(id as 'home' | 'research' | 'projects')}
+                  className="w-full shadow-none bg-transparent border border-text-light/5 dark:border-text-dark/5"
+                />
+              </div>
+
+              {/* Right Controls */}
+              <div className="flex items-center gap-3">
+                <NeuKnob />
+                {/* Mobile Menu Toggle */}
+                <button 
+                  className="md:hidden p-2 rounded-lg bg-black/5 dark:bg-white/5"
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                >
+                  {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+                </button>
+              </div>
+            </div>
+
+            {/* Mobile Menu */}
+            <AnimatePresence>
+              {isMobileMenuOpen && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="md:hidden border-t border-text-light/5 dark:border-text-dark/5 bg-bg-light dark:bg-bg-dark overflow-hidden"
+                >
+                  <div className="p-4 space-y-2">
+                    {[
+                      { id: 'home', label: 'Home', icon: LayoutDashboard },
+                      { id: 'research', label: 'Research', icon: Database },
+                      { id: 'projects', label: 'Projects', icon: Activity }
+                    ].map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => {
+                          scrollToSection(item.id as any);
+                          setIsMobileMenuOpen(false);
+                        }}
+                        className={`w-full flex items-center gap-3 p-3 rounded-lg font-mono text-sm uppercase tracking-wider transition-colors
+                          ${activeTab === item.id 
+                            ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20' 
+                            : 'hover:bg-black/5 dark:hover:bg-white/5 text-text-light/70 dark:text-text-dark/70'}
+                        `}
+                      >
+                        <item.icon size={16} />
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.nav>
+        )}
+      </AnimatePresence>
 
       <main className="container mx-auto px-4 pt-28 pb-20 flex-grow relative z-10 flex flex-col gap-24">
         
@@ -161,7 +171,7 @@ function App() {
         </section>
 
         <section id="research" className="scroll-mt-32">
-           <Research />
+           <Research setIsDetailOpen={setIsResearchDetailOpen} />
         </section>
 
         <section id="projects" className="scroll-mt-32">

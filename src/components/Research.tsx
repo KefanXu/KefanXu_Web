@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { NeuCard } from './NeuCard';
+import { createPortal } from 'react-dom';
 import { NeuInput } from './NeuInput';
-import { NeuButton } from './NeuButton';
 import { ConcaveCard } from './ConcaveCard';
 import { EcologicalDiagram } from './EcologicalDiagram';
 import { publications, Publication } from '../data/portfolio';
@@ -9,37 +8,97 @@ import {
   FileText,
   X,
   User,
-  Tag,
   Database,
   Search,
   Orbit,
   Network,
   Globe2,
   Clock3,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
-export const Research: React.FC = () => {
+export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }> = ({ setIsDetailOpen }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPub, setSelectedPub] = useState<Publication | null>(null);
   const [activeSystems, setActiveSystems] = useState<Set<'Microsystem' | 'Mesosystem' | 'Macrosystem' | 'Chronosystem'>>(new Set());
+  const [direction, setDirection] = useState(0);
 
-  // Lock body scroll logic removed to prevent layout shift/blinking
-  // useEffect(() => {
-  //   if (selectedPub) {
-  //     document.body.style.overflow = 'hidden';
-  //   } else {
-  //     document.body.style.overflow = 'unset';
-  //   }
-  //   return () => {
-  //     document.body.style.overflow = 'unset';
-  //   };
-  // }, [selectedPub]);
+  // Notify parent about detail view state
+  useEffect(() => {
+    if (setIsDetailOpen) {
+      setIsDetailOpen(!!selectedPub);
+    }
+  }, [selectedPub, setIsDetailOpen]);
+
+  // Lock body scroll logic
+  useEffect(() => {
+    if (selectedPub) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedPub]);
 
   const filteredPubs = publications.filter(pub => 
     pub.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     pub.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  const selectedIndex = selectedPub ? filteredPubs.findIndex(p => p.id === selectedPub.id) : -1;
+
+  const handlePrev = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (selectedIndex > 0) {
+      setDirection(-1);
+      setSelectedPub(filteredPubs[selectedIndex - 1]);
+    }
+  };
+
+  const handleNext = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    if (selectedIndex < filteredPubs.length - 1) {
+      setDirection(1);
+      setSelectedPub(filteredPubs[selectedIndex + 1]);
+    }
+  };
+
+  const handleClose = () => {
+    setDirection(0);
+    setSelectedPub(null);
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!selectedPub) return;
+      if (e.key === 'ArrowLeft') handlePrev();
+      if (e.key === 'ArrowRight') handleNext();
+      if (e.key === 'Escape') handleClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [selectedPub, selectedIndex, filteredPubs]);
+
+  const variants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? "100%" : direction < 0 ? "-100%" : 0,
+      opacity: 0
+    }),
+    center: {
+      zIndex: 1,
+      x: 0,
+      opacity: 1
+    },
+    exit: (direction: number) => ({
+      zIndex: 0,
+      x: direction < 0 ? "100%" : direction > 0 ? "-100%" : 0,
+      opacity: 0
+    })
+  };
 
   return (
     <div className="space-y-12 max-w-7xl mx-auto">
@@ -239,152 +298,189 @@ export const Research: React.FC = () => {
       </div>
 
             {/* Detail Modal - Belgium Poster Style */}
-      <AnimatePresence>
-        {selectedPub && (
-          <>
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setSelectedPub(null)}
-              className="fixed inset-0 bg-black/80 z-[60]" // Removed backdrop-blur to prevent scrolling repaints/blinking
-            />
-            {/* Modal Container - Half shown / Bottom Sheet style */}
-            <div className="fixed inset-x-0 bottom-0 top-12 md:top-20 z-[70] flex justify-center pointer-events-none p-4 pb-0">
+      {createPortal(
+        <AnimatePresence>
+          {selectedPub && (
+            <>
               <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={handleClose}
+                className="fixed inset-0 bg-black/80 z-[60] top-0 backdrop-blur-sm"
+              />
+              {/* Modal Container - Half shown / Bottom Sheet style */}
+              <motion.div 
+                key="modal-container"
                 initial={{ y: "100%" }}
                 animate={{ y: 0 }}
                 exit={{ y: "100%" }}
                 transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                className="w-full max-w-7xl h-full bg-[#f0f0f0] dark:bg-[#1a1a1a] shadow-2xl rounded-t-[30px] overflow-hidden pointer-events-auto flex flex-col relative will-change-transform"
+                className="fixed inset-x-0 bottom-0 top-0 z-[70] flex justify-center pointer-events-none p-4 pb-0 pt-12 md:pt-20"
               >
-                {/* Close Button */}
-                <button 
-                    onClick={() => setSelectedPub(null)}
-                    className="absolute top-6 right-6 z-50 p-2 bg-black/5 dark:bg-white/5 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
-                >
-                    <X size={24} className="text-black dark:text-white" />
-                </button>
+                {/* Navigation Buttons */}
+                <div className="absolute bottom-8 md:top-1/2 md:-translate-y-1/2 md:bottom-auto left-4 md:left-8 z-[80] pointer-events-auto">
+                   {selectedIndex > 0 && (
+                      <button 
+                         onClick={handlePrev}
+                         className="p-3 md:p-4 rounded-full backdrop-blur-md transition-all hover:scale-110 active:scale-95 shadow-sm border bg-black/10 hover:bg-black/20 text-black border-black/5 dark:bg-white/10 dark:hover:bg-white/20 dark:text-white dark:border-white/10 2xl:bg-white/10 2xl:hover:bg-white/20 2xl:text-white 2xl:border-white/10"
+                      >
+                         <ChevronLeft size={32} />
+                      </button>
+                   )}
+                </div>
+                <div className="absolute bottom-8 md:top-1/2 md:-translate-y-1/2 md:bottom-auto right-4 md:right-8 z-[80] pointer-events-auto">
+                   {selectedIndex < filteredPubs.length - 1 && (
+                      <button 
+                         onClick={handleNext}
+                         className="p-3 md:p-4 rounded-full backdrop-blur-md transition-all hover:scale-110 active:scale-95 shadow-sm border bg-black/10 hover:bg-black/20 text-black border-black/5 dark:bg-white/10 dark:hover:bg-white/20 dark:text-white dark:border-white/10 2xl:bg-white/10 2xl:hover:bg-white/20 2xl:text-white 2xl:border-white/10"
+                      >
+                         <ChevronRight size={32} />
+                      </button>
+                   )}
+                </div>
 
-                {/* Poster Content - Scrollable */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar overscroll-contain">
-                    <div className="min-h-full bg-white text-black p-8 md:p-16 relative overflow-hidden">
-                        
-                        {/* Top Header Info */}
-                        <div className="relative z-10 flex justify-end gap-12 mb-32 pt-12 text-xs font-bold tracking-widest uppercase">
-                            <div className="flex flex-col items-end">
-                                <span className="opacity-40 mb-1">Paper ID</span>
-                                <span className="text-2xl border-b-2 border-black pb-1 min-w-[60px] text-right">{selectedPub.id.toUpperCase()}</span>
-                            </div>
-                            <div className="flex flex-col items-end">
-                                <span className="opacity-40 mb-1">Conference</span>
-                                <span className="text-2xl border-b-2 border-black pb-1 min-w-[60px] text-right">{selectedPub.conference.split(' ')[0]}</span>
-                            </div>
-                        </div>
+                <AnimatePresence mode="popLayout" custom={direction}>
+                  <motion.div 
+                    key={selectedPub.id}
+                    custom={direction}
+                    variants={variants}
+                    initial="enter"
+                    animate="center"
+                    exit="exit"
+                    transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                    className="w-full max-w-7xl h-full bg-[#f0f0f0] dark:bg-[#1a1a1a] shadow-2xl rounded-t-[30px] overflow-hidden pointer-events-auto flex flex-col relative will-change-transform"
+                  >
+                    {/* Close Button */}
+                    <button 
+                        onClick={handleClose}
+                        className="absolute top-6 right-6 z-50 p-2 bg-black/5 dark:bg-white/5 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors backdrop-blur-md"
+                    >
+                        <X size={24} className="text-black dark:text-white" />
+                    </button>
 
-                        {/* Main Title */}
-                        <h2 className="relative z-10 text-6xl md:text-8xl font-['Oswald'] font-bold leading-[0.9] tracking-tight mb-24 max-w-5xl uppercase mix-blend-multiply text-[#1a1a1a]">
-                            {selectedPub.title}
-                        </h2>
-
-                        {/* Content Columns */}
-                        <div className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-12">
+                    {/* Poster Content - Scrollable */}
+                    <div className="flex-1 overflow-y-auto custom-scrollbar overscroll-contain">
+                        <div className="min-h-full bg-white text-black p-8 md:p-16 relative overflow-hidden">
                             
-                            {/* Left Column: Authors & Year */}
-                            <div className="md:col-span-4 space-y-12">
-                                <div>
-                                    <h4 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-4 border-b border-black pb-2">Authors</h4>
-                                    <ul className="space-y-2 font-bold text-sm">
-                                        {selectedPub.authors.map((author, i) => (
-                                            <li key={i} className={author === "Kefan Xu" ? "text-red-600" : ""}>
-                                                {author}
-                                            </li>
-                                        ))}
-                                    </ul>
+                            {/* Top Header Info */}
+                            <div className="relative z-10 flex justify-end gap-12 mb-32 pt-12 text-xs font-bold tracking-widest uppercase">
+                                <div className="flex flex-col items-end">
+                                    <span className="opacity-40 mb-1">Paper ID</span>
+                                    <span className="text-2xl border-b-2 border-black pb-1 min-w-[60px] text-right">{selectedPub.id.toUpperCase()}</span>
                                 </div>
-
-                                <div>
-                                    <h4 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-4 border-b border-black pb-2">Year</h4>
-                                    <div className="font-bold text-xl">{selectedPub.year}</div>
+                                <div className="flex flex-col items-end">
+                                    <span className="opacity-40 mb-1">Conference</span>
+                                    <span className="text-2xl border-b-2 border-black pb-1 min-w-[60px] text-right">{selectedPub.conference.split(' ')[0]}</span>
                                 </div>
-
-                                {selectedPub.tags && (
-                                    <div>
-                                        <h4 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-4 border-b border-black pb-2">Keywords</h4>
-                                        <div className="flex flex-wrap gap-2">
-                                            {selectedPub.tags.map(tag => (
-                                                <span key={tag} className="text-xs font-bold px-2 py-1 bg-black text-white rounded-full">
-                                                    {tag}
-                                                </span>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
                             </div>
 
-                            {/* Right Column: Abstract & Extra Details */}
-                            <div className="md:col-span-8 space-y-12">
-                                <div>
-                                    <h4 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-4 border-b border-black pb-2 font-sans">Abstract</h4>
-                                    <p className="text-lg md:text-xl font-display font-normal leading-relaxed text-justify text-neutral-800 dark:text-neutral-200">
-                                        {selectedPub.abstract || "No abstract available."}
-                                    </p>
-                                </div>
+                            {/* Main Title */}
+                            <h2 className="relative z-10 text-4xl md:text-5xl lg:text-6xl font-['Oswald'] font-bold leading-[1.1] tracking-tight mb-16 max-w-5xl uppercase mix-blend-multiply text-[#1a1a1a]">
+                                {selectedPub.title}
+                            </h2>
 
-                                {selectedPub.methodology && (
+                            {/* Content Columns */}
+                            <div className="relative z-10 grid grid-cols-1 md:grid-cols-12 gap-12">
+                                
+                                {/* Left Column: Authors & Year */}
+                                <div className="md:col-span-4 space-y-12">
                                     <div>
-                                        <h4 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-4 border-b border-black pb-2 font-sans">Methodology</h4>
-                                        <p className="text-base font-display font-normal leading-relaxed text-neutral-800 dark:text-neutral-200">
-                                            {selectedPub.methodology}
-                                        </p>
-                                    </div>
-                                )}
-
-                                {selectedPub.keyFindings && (
-                                    <div>
-                                        <h4 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-4 border-b border-black pb-2 font-sans">Key Findings</h4>
-                                        <ul className="list-disc list-outside ml-4 space-y-2 text-base font-display font-normal text-neutral-800 dark:text-neutral-200">
-                                            {selectedPub.keyFindings.map((finding, idx) => (
-                                                <li key={idx} className="pl-2">{finding}</li>
+                                        <h4 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-4 border-b border-black pb-2">Authors</h4>
+                                        <ul className="space-y-2 font-bold text-sm">
+                                            {selectedPub.authors.map((author, i) => (
+                                                <li key={i} className={author === "Kefan Xu" ? "text-red-600" : ""}>
+                                                    {author}
+                                                </li>
                                             ))}
                                         </ul>
                                     </div>
-                                )}
 
-                                {selectedPub.bibtex && (
                                     <div>
-                                        <h4 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-4 border-b border-black pb-2 font-sans">BibTeX</h4>
-                                        <div className="bg-neutral-100 dark:bg-neutral-800 p-4 rounded-sm font-mono text-xs overflow-x-auto whitespace-pre text-neutral-600 dark:text-neutral-400">
-                                            {selectedPub.bibtex}
-                                        </div>
+                                        <h4 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-4 border-b border-black pb-2">Year</h4>
+                                        <div className="font-bold text-xl">{selectedPub.year}</div>
                                     </div>
-                                )}
 
-                                {selectedPub.doi && (
-                                    <div className="mt-16 flex justify-end">
-                                        <a href={selectedPub.doi} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 group">
-                                            <span className="text-xs font-bold uppercase tracking-widest group-hover:underline">Read Full Paper</span>
-                                            <div className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                                                <FileText size={20} />
+                                    {selectedPub.tags && (
+                                        <div>
+                                            <h4 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-4 border-b border-black pb-2">Keywords</h4>
+                                            <div className="flex flex-wrap gap-2">
+                                                {selectedPub.tags.map(tag => (
+                                                    <span key={tag} className="text-xs font-bold px-2 py-1 bg-black text-white rounded-full">
+                                                        {tag}
+                                                    </span>
+                                                ))}
                                             </div>
-                                        </a>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Right Column: Abstract & Extra Details */}
+                                <div className="md:col-span-8 space-y-12">
+                                    <div>
+                                        <h4 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-4 border-b border-black pb-2 font-sans">Abstract</h4>
+                                        <p className="text-base font-serif font-normal leading-relaxed text-justify text-neutral-800 dark:text-neutral-200">
+                                            {selectedPub.abstract || "No abstract available."}
+                                        </p>
                                     </div>
-                                )}
+
+                                    {selectedPub.methodology && (
+                                        <div>
+                                            <h4 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-4 border-b border-black pb-2 font-sans">Methodology</h4>
+                                            <p className="text-base font-serif font-normal leading-relaxed text-neutral-800 dark:text-neutral-200">
+                                                {selectedPub.methodology}
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {selectedPub.keyFindings && (
+                                        <div>
+                                            <h4 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-4 border-b border-black pb-2 font-sans">Key Findings</h4>
+                                            <ul className="list-disc list-outside ml-4 space-y-2 text-base font-serif font-normal text-neutral-800 dark:text-neutral-200">
+                                                {selectedPub.keyFindings.map((finding, idx) => (
+                                                    <li key={idx} className="pl-2">{finding}</li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
+
+                                    {selectedPub.bibtex && (
+                                        <div>
+                                            <h4 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-4 border-b border-black pb-2 font-sans">BibTeX</h4>
+                                            <div className="bg-neutral-100 dark:bg-neutral-800 p-4 rounded-sm font-mono text-xs overflow-x-auto whitespace-pre text-neutral-600 dark:text-neutral-400">
+                                                {selectedPub.bibtex}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {selectedPub.doi && (
+                                        <div className="mt-16 flex justify-end">
+                                            <a href={selectedPub.doi} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-3 group">
+                                                <span className="text-xs font-bold uppercase tracking-widest group-hover:underline">Read Full Paper</span>
+                                                <div className="w-12 h-12 bg-black text-white rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                                                    <FileText size={20} />
+                                                </div>
+                                            </a>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Bottom Decoration */}
+                            <div className="mt-24 pt-8 border-t-4 border-black flex justify-between items-center font-black text-4xl tracking-tighter opacity-10">
+                                <span>WEBSITE2026</span>
+                                <span>{selectedPub.year}</span>
                             </div>
                         </div>
-
-                        {/* Bottom Decoration */}
-                        <div className="mt-24 pt-8 border-t-4 border-black flex justify-between items-center font-black text-4xl tracking-tighter opacity-10">
-                            <span>WEBSITE2026</span>
-                            <span>{selectedPub.year}</span>
-                        </div>
                     </div>
-                </div>
+                  </motion.div>
+                </AnimatePresence>
               </motion.div>
-            </div>
-          </>
-        )}
-      </AnimatePresence>
+            </>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </div>
   );
 };

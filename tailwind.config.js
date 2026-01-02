@@ -36,6 +36,7 @@ export default {
         mono: ['Fira Code', 'monospace'],
         display: ['DM Sans', 'sans-serif'], // Added DM Sans for readability
         heading: ['Gilroy', 'sans-serif'], // Updated to use local Gilroy font
+        serif: ['Merriweather', 'serif'], // Added Merriweather for print-like readability
       }
     },
   },
