@@ -93,8 +93,6 @@ export const PillContainer: React.FC<PillContainerProps> = ({ children, classNam
   // Actually, mixing them causes the muddy look.
   // We can use a transform for the base shadow opacity too.
   
-  const warmShadow = useMotionTemplate`${shadowX}px ${shadowY}px 40px rgba(255,170,50,${useTransform(() => isHovering.get() ? shadowOpacity.get() : 0)})`;
-  
   // If we want to replace, we should reduce the alpha of the base shadow as the warm shadow increases.
   // Or just simply: if hovering, base shadow is 0 opacity.
   // But we only want to replace it when the warm light is actually visible (dark mode).
