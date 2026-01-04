@@ -27,6 +27,8 @@ export default {
         'neu-pressed-light': 'inset 6px 6px 10px 0 rgba(163,177,198, 0.7), inset -6px -6px 10px 0 rgba(255,255,255, 0.8)',
         'neu-icon-light': '5px 5px 10px rgb(163,177,198,0.6), -5px -5px 10px rgba(255,255,255, 0.5)',
         
+        'neu-3': '8px 8px 35px rgba(138, 155, 189, 0.20), -8px -8px 35px #FFFFFF, inset 8px 8px 25px #FFFFFF, inset -8px -8px 25px rgba(138, 155, 189, 0.15)',
+
         'neu-dark': '5px 5px 10px #1d1e22, -5px -5px 10px #393c44',
         'neu-pressed-dark': 'inset 5px 5px 10px #1d1e22, inset -5px -5px 10px #393c44',
         'neu-icon-dark': '3px 3px 6px #1d1e22, -3px -3px 6px #393c44',

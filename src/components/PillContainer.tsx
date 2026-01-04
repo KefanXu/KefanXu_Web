@@ -1,0 +1,143 @@
+import React from 'react';
+import { motion, useMotionValue, useTransform, useSpring, useMotionTemplate } from 'framer-motion';
+
+interface PillContainerProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+export const PillContainer: React.FC<PillContainerProps> = ({ children, className = '' }) => {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const mouseXStart = useMotionValue(150); // Center width by default
+  const mouseYStart = useMotionValue(270); // Center height by default
+
+  const rotateX = useTransform(y, [-0.5, 0.5], [15, -15]);
+  const rotateY = useTransform(x, [-0.5, 0.5], [-15, 15]);
+
+  const springConfig = { damping: 20, stiffness: 300 };
+  const rotateXSpring = useSpring(rotateX, springConfig);
+  const rotateYSpring = useSpring(rotateY, springConfig);
+
+  const isHovering = useMotionValue(0);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
+    
+    x.set(xPct);
+    y.set(yPct);
+    mouseXStart.set(mouseX);
+    mouseYStart.set(mouseY);
+    isHovering.set(1);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+    mouseXStart.set(150);
+    mouseYStart.set(270);
+    isHovering.set(0);
+  };
+
+  const bgGradient = useMotionTemplate`radial-gradient(circle at ${mouseXStart}px ${mouseYStart}px, rgba(255, 170, 50, var(--light-intensity-start, 0.25)) 0%, rgba(255, 170, 50, var(--light-intensity-end, 0.05)) 50%, transparent 70%)`;
+  
+  const shadowX = useTransform(mouseXStart, [0, 300], [-20, 20]);
+  const shadowY = useTransform(mouseYStart, [0, 540], [-20, 20]);
+  const shadowOpacity = useTransform(
+    [x, y], 
+    ([latestX, latestY]: number[]) => {
+      const dist = Math.sqrt(latestX * latestX + latestY * latestY);
+      return 0.15 + (dist * 0.4); // Increases opacity as we move away from center (towards edge)
+    }
+  );
+  
+  const shadowTemplate = useMotionTemplate`${shadowX}px ${shadowY}px 40px rgba(255,170,50,${useTransform(() => isHovering.get() ? shadowOpacity.get() : 0)}), 0px 20px 40px rgba(163,177,198,0.5)`; // Added normal shadow back for light mode, checking for dark mode logic below to switch
+
+  // To properly handle light/dark mode shadows + the dynamic shadow, we need to know the theme or use CSS variables if possible. 
+  // However, framer motion boxShadow overrides class shadows. 
+  // We can construct the shadow string to include the base shadow.
+  // Base shadows: 
+  // Light: 0 20px 40px rgba(163,177,198,0.5)
+  // Dark: 0 20px 40px #1d1e22  (which is rgba(29,30,34, 1))
+
+  // Let's use a robust approach by conditionally applying the dynamic shadow ON TOP of the static one.
+  // Actually, standard CSS variables work in motion templates if defined.
+  
+  // We will simply hardcode the base shadow into the template, but we need to know if it's dark mode to change the base color.
+  // Since we don't have easy access to the theme state here without context, and Tailwind classes are overridden,
+  // we can use a CSS variable for the base shadow color.
+  
+  // Let's rely on the fact that we can set a CSS variable in the parent and use it here.
+  
+  return (
+    <div className={`flex justify-center items-center relative group ${className}`}>
+      {/* Outer Raised Rim (The "Outer Part" that is raised) */}
+      <div className="relative p-[2px] rounded-full bg-bg-light dark:bg-bg-dark shadow-neu-light dark:shadow-neu-dark">
+        
+        {/* Inner Trench (The "Concave Part") */}
+        <div 
+            className="relative w-[300px] h-[540px] rounded-full p-14 bg-bg-light dark:bg-bg-dark shadow-[inset_3px_3px_6px_0_rgba(163,177,198,0.3),inset_-3px_-3px_6px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_2px_2px_5px_#1d1e22,inset_-2px_-2px_5px_#393c44] flex items-center justify-center"
+            style={{ perspective: 1000 }} // Add perspective here
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+        >
+          
+          {/* Inner Glowing Pill */}
+          <motion.div 
+            className="w-full h-full rounded-full relative overflow-hidden [--base-shadow-color:rgba(163,177,198,0.5)] dark:[--base-shadow-color:#1d1e22]"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8 }}
+            style={{ 
+                rotateX: rotateXSpring, 
+                rotateY: rotateYSpring,
+                boxShadow: useMotionTemplate`${shadowX}px ${shadowY}px 40px rgba(255,170,50,${useTransform(() => isHovering.get() ? shadowOpacity.get() : 0)}), 0px 20px 40px var(--base-shadow-color)`
+            }}
+          >
+            {/* Main Background with Leather Texture */}
+            <div className="absolute inset-0 bg-bg-light dark:bg-bg-dark">
+              <div 
+                className="absolute inset-0 opacity-40 dark:opacity-20 mix-blend-overlay" 
+                style={{ 
+                  filter: 'contrast(120%) brightness(100%)',
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+                }} 
+              />
+            </div>
+
+            {/* Warm Light Effect (Bottom Emission) - Dark Mode Only */}
+            <motion.div 
+              className="hidden dark:block absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-out pointer-events-none z-0 [--light-intensity-start:0.45] [--light-intensity-end:0.15]"
+              style={{
+                background: bgGradient,
+                filter: 'blur(30px)',
+              }}
+            />
+            
+            {/* Inner Glow/Shadow for Depth */}
+            <div className="absolute inset-0 shadow-[inset_0_0_20px_rgba(0,0,0,0.05)] rounded-full" />
+            
+            {/* Subtle white border for glass effect */}
+            <div className="absolute inset-0 border border-white/30 rounded-full shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]" />
+            
+            {/* Content Injection */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+               {children}
+            </div>
+            
+            {/* Shine/Reflection effect */}
+            <div className="absolute -top-20 -right-20 w-60 h-60 bg-white opacity-20 blur-3xl rounded-full pointer-events-none dark:hidden" />
+          </motion.div>
+        </div>
+      </div>
+    </div>
+  );
+};
