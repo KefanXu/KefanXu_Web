@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
 import { NeuInput } from './NeuInput';
 import { projects } from '../data/portfolio';
-import { Calendar, Radio, ArrowUpRight, Cpu, Search, Activity, Brain } from 'lucide-react';
+import { Calendar, Cpu, Search, Activity, Brain } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AbstractPattern } from './AbstractPattern';
 
 import { GlowingPill } from './GlowingPill';
 import { PillContainer } from './PillContainer';
-import { ActivityMonitor } from './ActivityMonitor';
-import { MedicalControls } from './MedicalControls';
-import { DashboardPanel } from './DashboardPanel';
 
 export const Projects: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');

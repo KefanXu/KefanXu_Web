@@ -59,8 +59,6 @@ export const PillContainer: React.FC<PillContainerProps> = ({ children, classNam
     }
   );
   
-  const shadowTemplate = useMotionTemplate`${shadowX}px ${shadowY}px 40px rgba(255,170,50,${useTransform(() => isHovering.get() ? shadowOpacity.get() : 0)}), 0px 20px 40px rgba(163,177,198,0.5)`; // Added normal shadow back for light mode, checking for dark mode logic below to switch
-
   // To properly handle light/dark mode shadows + the dynamic shadow, we need to know the theme or use CSS variables if possible. 
   // However, framer motion boxShadow overrides class shadows. 
   // We can construct the shadow string to include the base shadow.

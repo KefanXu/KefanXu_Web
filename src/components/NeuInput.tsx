@@ -1,5 +1,4 @@
 import React from 'react';
-import { ArrowUp } from 'lucide-react';
 
 interface NeuInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   className?: string;
