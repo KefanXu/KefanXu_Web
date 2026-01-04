@@ -75,6 +75,39 @@ export const PillContainer: React.FC<PillContainerProps> = ({ children, classNam
   
   // Let's rely on the fact that we can set a CSS variable in the parent and use it here.
   
+  // Dynamic Shadow Logic:
+  // When isHovering is 0 (not hovering), we want ONLY the base shadow.
+  // When isHovering is 1 (hovering), we want to REPLACE the base shadow with the warm light shadow.
+  // Wait, the user wants it to REPLACE the normal shadow when triggered.
+  
+  // To achieve replacement, we can cross-fade the shadows or simply switch them.
+  // Since we have `isHovering` as a motion value (0 or 1), we can interpolate.
+  // However, `isHovering` jumps to 0/1 immediately in current implementation.
+  // If we want a smooth transition, `isHovering` should ideally be animate, but here we just use it for logic.
+  
+  // Let's make `isHovering` a Spring or use `animate` to smooth it if we want smooth replacement.
+  // But for now, let's just implement the logic:
+  // IF (hovering and shadowOpacity > 0) -> Show Warm Shadow
+  // ELSE -> Show Base Shadow
+  
+  // Actually, mixing them causes the muddy look.
+  // We can use a transform for the base shadow opacity too.
+  
+  const warmShadow = useMotionTemplate`${shadowX}px ${shadowY}px 40px rgba(255,170,50,${useTransform(() => isHovering.get() ? shadowOpacity.get() : 0)})`;
+  
+  // If we want to replace, we should reduce the alpha of the base shadow as the warm shadow increases.
+  // Or just simply: if hovering, base shadow is 0 opacity.
+  // But we only want to replace it when the warm light is actually visible (dark mode).
+  // The current logic applies warm shadow regardless of theme in JS, but we only see the light effect in dark mode via CSS.
+  // We need to be careful not to break light mode.
+  // In light mode, the warm light div is hidden. But this boxShadow logic runs in JS.
+  // This JS logic adds a warm shadow in light mode too currently! 
+  // We should fix that first: The warm shadow should probably only appear in dark mode or be very subtle.
+  // The user previously asked to remove the light effect for light view.
+  
+  // Since we can't easily detect dark mode in JS without a hook/context, 
+  // we can use a CSS variable for the warm shadow color too, and set it to transparent in light mode!
+
   return (
     <div className={`flex justify-center items-center relative group ${className}`}>
       {/* Outer Raised Rim (The "Outer Part" that is raised) */}
@@ -90,16 +123,25 @@ export const PillContainer: React.FC<PillContainerProps> = ({ children, classNam
           
           {/* Inner Glowing Pill */}
           <motion.div 
-            className="w-full h-full rounded-full relative overflow-hidden [--base-shadow-color:rgba(163,177,198,0.5)] dark:[--base-shadow-color:#1d1e22]"
+            className="w-full h-full rounded-full relative [--base-shadow-color:rgba(163,177,198,0.5)] dark:[--base-shadow-color:#1d1e22] group-hover:dark:[--base-shadow-color:transparent]"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8 }}
             style={{ 
                 rotateX: rotateXSpring, 
                 rotateY: rotateYSpring,
-                boxShadow: useMotionTemplate`${shadowX}px ${shadowY}px 40px rgba(255,170,50,${useTransform(() => isHovering.get() ? shadowOpacity.get() : 0)}), 0px 20px 40px var(--base-shadow-color)`
+                boxShadow: useMotionTemplate`${shadowX}px ${shadowY}px 40px rgba(255,170,50,${useTransform(() => isHovering.get() ? shadowOpacity.get() : 0)}), 0px 20px 40px var(--base-shadow-color)`,
+                transformStyle: 'preserve-3d', // Help with Safari rendering
             }}
           >
+            {/* Content Clipper for Safari */}
+            <div 
+               className="w-full h-full rounded-full relative overflow-hidden"
+              style={{
+                  WebkitMaskImage: '-webkit-radial-gradient(white, black)', // Force Safari clipping
+                  transform: 'translateZ(0)' // Extra help for Safari
+              }}
+            >
             {/* Main Background with Leather Texture */}
             <div className="absolute inset-0 bg-bg-light dark:bg-bg-dark">
               <div 
@@ -133,6 +175,7 @@ export const PillContainer: React.FC<PillContainerProps> = ({ children, classNam
             
             {/* Shine/Reflection effect */}
             <div className="absolute -top-20 -right-20 w-60 h-60 bg-white opacity-20 blur-3xl rounded-full pointer-events-none dark:hidden" />
+          </div>
           </motion.div>
         </div>
       </div>

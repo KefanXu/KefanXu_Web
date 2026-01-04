@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { NeuInput } from './NeuInput';
 import { projects } from '../data/portfolio';
-import { Calendar, Cpu, Search, Activity, Brain } from 'lucide-react';
+import { Calendar, Cpu, Search, Activity, LayoutDashboard } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { AbstractPattern } from './AbstractPattern';
 
@@ -44,14 +44,14 @@ export const Projects: React.FC = () => {
           <PillContainer>
              <div className="h-full w-full flex flex-col items-center justify-between py-16 px-6 relative z-10">
                 <div className="flex-grow flex items-center justify-center pb-32">
-                   <Brain 
+                   <LayoutDashboard 
                      size={96} 
                      strokeWidth={1}
                      className="text-text-light dark:text-text-dark opacity-80 drop-shadow-md"
                    />
                 </div>
                 <div className="text-center">
-                   <h3 className="text-lg font-bold text-text-light dark:text-text-dark tracking-wider uppercase mb-2">PTSD System</h3>
+                   <h3 className="text-lg font-bold text-text-light dark:text-text-dark tracking-wider uppercase mb-2">PECSS</h3>
                    <p className="text-[10px] font-medium text-text-light/60 dark:text-text-dark/60 uppercase tracking-widest">Clinical Support Interface</p>
                 </div>
              </div>
@@ -69,7 +69,7 @@ export const Projects: React.FC = () => {
   };
 
   return (
-    <div className="space-y-32 max-w-7xl mx-auto">
+    <div className="space-y-64 max-w-7xl mx-auto">
       
        <div className="flex flex-col gap-6 mb-16">
          {/* Section Header */}
@@ -96,7 +96,7 @@ export const Projects: React.FC = () => {
        </div>
 
       {/* Featured Project: DUCSS (Top) */}
-      <div className="flex flex-col lg:flex-row items-center gap-10 lg:gap-24">
+      <div className="flex flex-col lg:flex-row items-center gap-24 lg:gap-60">
         {/* Left: Glowing Pill */}
         <div className="shrink-0 transform scale-90 lg:scale-100 flex justify-center w-full lg:w-auto">
            <GlowingPill />
@@ -104,11 +104,11 @@ export const Projects: React.FC = () => {
 
         {/* Right: Text Description */}
         <div className="max-w-xl">
-            <h3 className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark leading-tight mb-10 font-heading">
+            <h3 className="text-2xl md:text-3xl font-bold text-text-light dark:text-text-dark leading-tight mb-10 font-heading">
               Diabetes Ubiquitous Computational Sensing System.
             </h3>
             
-            <div className="space-y-8 text-lg md:text-xl font-normal text-text-light/80 dark:text-text-dark/80 leading-[30px] font-display">
+            <div className="space-y-8 text-sm md:text-base font-normal text-text-light/80 dark:text-text-dark/80 leading-[30px] font-display">
                <p>
                  Designing user studies to uncover diabetes patients' <span className="font-bold text-text-light dark:text-text-dark">self-management challenges</span>.
                </p>
@@ -131,7 +131,7 @@ export const Projects: React.FC = () => {
       </div>
       
       {/* Other Projects List (Staggered) */}
-      <div className="space-y-32">
+      <div className="space-y-64">
         {filteredProjects.map((proj, index) => {
            // index 0 (Sedentary) -> Image Right, Text Left
            // index 1 (PTSD) -> Image Left, Text Right
@@ -139,7 +139,7 @@ export const Projects: React.FC = () => {
            const isImageRight = index % 2 === 0;
 
            return (
-             <div key={proj.id} className={`flex flex-col ${isImageRight ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-center gap-10 lg:gap-24`}>
+             <div key={proj.id} className={`flex flex-col ${isImageRight ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-center gap-24 lg:gap-60`}>
                 
                 {/* Visual Artifact */}
                 <motion.div 
@@ -165,11 +165,11 @@ export const Projects: React.FC = () => {
                       {proj.period}
                     </div>
 
-                    <h3 className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark leading-tight mb-10 font-heading">
+                    <h3 className="text-2xl md:text-3xl font-bold text-text-light dark:text-text-dark leading-tight mb-10 font-heading">
                       {proj.title}
                     </h3>
 
-                    <div className="space-y-8 text-lg md:text-xl font-normal text-text-light/80 dark:text-text-dark/80 leading-[30px] font-display">
+                    <div className="space-y-8 text-sm md:text-base font-normal text-text-light/80 dark:text-text-dark/80 leading-[30px] font-display">
                         {proj.description.map((desc, i) => (
                            <p key={i}>
                              {/* Simple highlighting logic for demo, ideally passed from data */}
