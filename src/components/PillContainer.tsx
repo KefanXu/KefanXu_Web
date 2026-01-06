@@ -4,9 +4,11 @@ import { motion, useMotionValue, useTransform, useSpring, useMotionTemplate } fr
 interface PillContainerProps {
   children: React.ReactNode;
   className?: string;
+  topText?: string;
+  bottomText?: string;
 }
 
-export const PillContainer: React.FC<PillContainerProps> = ({ children, className = '' }) => {
+export const PillContainer: React.FC<PillContainerProps> = ({ children, className = '', topText, bottomText }) => {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const mouseXStart = useMotionValue(150); // Center width by default
@@ -118,6 +120,30 @@ export const PillContainer: React.FC<PillContainerProps> = ({ children, classNam
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
         >
+          {/* Curved Text Overlay (On the trench, outside the inner pill) */}
+          {(topText || bottomText) && (
+              <svg className="absolute inset-0 w-full h-full pointer-events-none z-0" viewBox="0 0 300 540">
+                <defs>
+                  {/* Adjusted radius to align with the trench curve. Center (150, 150) and (150, 390). Radius ~122. */}
+                  <path id="topCurve" d="M 28,150 A 122,122 0 0,1 272,150" />
+                  <path id="bottomCurve" d="M 28,390 A 122,122 0 0,0 272,390" />
+                </defs>
+                {topText && (
+                  <text className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-text-light/50 dark:text-text-dark/50 fill-current" dominantBaseline="middle">
+                    <textPath href="#topCurve" startOffset="50%" textAnchor="middle">
+                      {topText}
+                    </textPath>
+                  </text>
+                )}
+                {bottomText && (
+                  <text className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-text-light/50 dark:text-text-dark/50 fill-current" dominantBaseline="middle">
+                    <textPath href="#bottomCurve" startOffset="50%" textAnchor="middle">
+                      {bottomText}
+                    </textPath>
+                  </text>
+                )}
+              </svg>
+            )}
           
           {/* Inner Glowing Pill */}
           <motion.div 
@@ -165,7 +191,7 @@ export const PillContainer: React.FC<PillContainerProps> = ({ children, classNam
             
             {/* Subtle white border for glass effect */}
             <div className="absolute inset-0 border border-white/30 rounded-full shadow-[inset_0_1px_1px_rgba(255,255,255,0.4)]" />
-            
+
             {/* Content Injection */}
             <div className="absolute inset-0 flex flex-col items-center justify-center">
                {children}

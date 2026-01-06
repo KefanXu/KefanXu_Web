@@ -200,8 +200,8 @@ export const projects: Project[] = [
     period: "2022 - Present",
     collaboration: "Emory University & Grady Memorial Hospital",
     description: [
-      "Designing user studies to uncover diabetes patients' self-management challenges.",
-      "Exploring caregiving dynamics in diabetes management.",
+      "Designing user studies to uncover diabetes patients' self-management challenges using a user-centric approach.",
+      "Exploring caregiving dynamics in diabetes management to illuminate collaborative aspects.",
       "Leading the creation of patient-empowering sensors and mobile technologies."
     ],
     tags: ["Health Informatics", "Diabetes", "Sensing"],
@@ -209,28 +209,128 @@ export const projects: Project[] = [
   },
   {
     id: "sedentary",
-    title: "Sense Making in Contextual Situated Sedentary Behavior Data",
+    title: "Understanding Individual's Sense Making in Contextual Situated Sedentary Behavior Data",
     period: "2022 - Present",
-    collaboration: "University of Michigan",
+    collaboration: "Georgia Tech",
     description: [
-      "Designing user studies aimed at unveiling diverse ways individuals make sense of physical activity data.",
-      "Probing feasibility of sensors in capturing holistic information about physical activity.",
-      "Refining Experience Sampling Methods."
+      "Designing user studies aimed at unveiling the diverse ways in which individuals make sense of their physical activity data.",
+      "Probing the feasibility and utility of various sensors in capturing holistic information about people's physical activity.",
+      "Refining existing Experience Sampling Methods to encompass richer annotated data."
     ],
     tags: ["Sense-Making", "Data Viz", "Activity Tracking"],
     role: "Co-Investigator"
   },
   {
-    id: "ptsd",
-    title: "PTSD Clinical Decision Support",
-    period: "2022 - 2025",
+    id: "fitbit-probe",
+    title: "FITBIT as Tech Probe: Understanding how Personal Tracking Devices can Promote Physical Activity in Low-SES Older Adults",
+    period: "2022 - Present",
+    collaboration: "Google × Georgia Tech",
     description: [
-      "Delved into PTSD patients' practices and clinical workflows of Prolonged Exposure therapy.",
+      "Examined the obstacles faced by low technology literacy individuals when engaging with technology.",
+      "Evaluated design methodologies intended for low technology literacy users.",
+      "Developing a methodology for crafting technology solutions that are intuitive and accessible.",
+      "Designing and deploying functional technology prototypes to empirically evaluate proposed design principles."
+    ],
+    tags: ["Health Equity", "Older Adults", "Wearables"],
+    role: "Researcher"
+  },
+  {
+    id: "pecss",
+    title: "Prolonged Exposure Collective Sensing System (PECSS)",
+    period: "2022 - 2025",
+    collaboration: "Georgia Tech × Emory",
+    description: [
+      "Delved into PTSD patients' practices, uncovering their treatment experiences.",
+      "Studied step-by-step clinical procedures of Prolonged Exposure therapy.",
       "Designed and implemented tools for clinicians to optimize patient management.",
       "Created patient-facing tools to aid therapy and communication."
     ],
     tags: ["Mental Health", "Clinical Tools", "PTSD"],
     role: "UX Researcher & Developer"
+  },
+  {
+    id: "caregiving-reddit",
+    title: "Understanding the Dynamics of Chronic Disease Family Caregiving Experience: Using Caregiving Reddits as a Probe",
+    period: "2021 - 2023",
+    collaboration: "Georgia Tech",
+    description: [
+      "Conducted analysis of posts originating from caregiving subreddits to unravel the multifaceted nature of enduring informal caregiving encounters.",
+      "Compiled 120 foundational posts from four distinct caregiving forums.",
+      "Pursued an author-centric approach to harvest relevant posts spanning their caregiving journey.",
+      "Parsed posts to elucidate the fluid dynamics characterizing caregiving experiences."
+    ],
+    tags: ["Caregiving", "Social Computing", "Qualitative Analysis"],
+    role: "Researcher"
+  },
+  {
+    id: "reflective-iteration",
+    title: "Understanding the Effect of Iterative Reflection on Individuals' Weekly Planning of Physical Activity",
+    period: "2021 - 2022",
+    collaboration: "Georgia Tech × University of Michigan",
+    description: [
+      "Integrated the conceptualized physical activity planning framework within the functional Planneregy app.",
+      "Managed the seamless deployment of the Planneregy app via Apple's TestFlight service.",
+      "Orchestrated a 42-day user study to assess user experiences within the newly proposed framework.",
+      "Summarized the results into an HCI paper offering valuable design insights."
+    ],
+    tags: ["Physical Activity", "Reflection", "Mobile App"],
+    role: "Lead Researcher"
+  },
+  {
+    id: "historical-planning",
+    title: "Examining the Effect of Summary of Historical Planning Data on People's Planning and Execution",
+    period: "2021 - 2022",
+    collaboration: "University of Michigan",
+    description: [
+      "Examined people's experiences of planning regular moderate aerobic exercises with historical planning records.",
+      "Developed an iOS application named Physicify.",
+      "Designed a two-phase user study assessing participants' exercise planning encounters with and without historical data.",
+      "Conducted a 28-day user study with seventeen participants."
+    ],
+    tags: ["Personal Informatics", "Planning", "iOS"],
+    role: "Lead Researcher"
+  },
+  {
+    id: "benzo-taper",
+    title: "Leveraging Large-Scale National Data to Understand, Reduce, and Prevent Benzodiazepine-Related Harms",
+    period: "2019 - 2022",
+    collaboration: "Michigan Medicine, University of Michigan",
+    description: [
+      "Designed and deployed a clinician-facing website to enhance communication regarding benzodiazepine misuse.",
+      "Conceptualized and devised the taper calculator algorithm for tailored taper schedules.",
+      "Crafted tracking mechanisms that enabled clinicians to closely monitor patients' progress.",
+      "Conducted interviews with clinicians to gauge the efficacy of the website."
+    ],
+    tags: ["Clinical Tools", "Web Development", "Healthcare"],
+    role: "Researcher & Developer"
+  },
+  {
+    id: "chronic-fatigue",
+    title: "Low-Burden Activity Pacing for Chronic Fatigue Self-Management",
+    period: "2019 - 2022",
+    collaboration: "University of Michigan",
+    description: [
+      "Developed seven reporting mechanisms inspired by self-tracking literature.",
+      "Designed low-burden hybrid Experience Sampling Methods (ESM) solutions.",
+      "Investigated activity practices of cardiac rehab patients.",
+      "Implemented 'Pace to Plan' platform using React Native and Google Firebase."
+    ],
+    tags: ["Chronic Illness", "Self-Management", "Mobile Dev"],
+    role: "Researcher & Developer"
+  },
+  {
+    id: "emog",
+    title: "Intelligent Design of Emotional Expression Sketches in Storyboards",
+    period: "2018",
+    collaboration: "TongJi University",
+    description: [
+      "Created FaceX dataset containing five million vector-drawing sketches.",
+      "Trained EmoG, a Sketch-RNN-based emotional expression generator.",
+      "Recruited 21 participants for a user study on EmoG's use in emotional storyboard creation.",
+      "Evaluated EmoG's efficiency and user-friendliness."
+    ],
+    tags: ["AI/ML", "Sketching", "Creativity Support"],
+    role: "Research Intern"
   }
 ];
 

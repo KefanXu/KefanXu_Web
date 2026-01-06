@@ -97,18 +97,19 @@ function App() {
                 </div>
               </div>
 
-              {/* Desktop Switcher */}
+              {/* Desktop Nav Items */}
               <div className="hidden md:flex flex-1 max-w-md justify-center">
-                <NeuSwitch 
-                  options={[
-                    { id: 'home', label: 'Home' },
-                    { id: 'research', label: 'Research' },
-                    { id: 'projects', label: 'Projects' }
-                  ]}
-                  activeId={activeTab}
-                  onChange={(id) => scrollToSection(id as 'home' | 'research' | 'projects')}
-                  className="w-full shadow-none bg-transparent border border-text-light/5 dark:border-text-dark/5"
-                />
+                 <NeuSwitch 
+                   variant="segment"
+                   options={[
+                     { id: 'home', label: 'Home' },
+                     { id: 'research', label: 'Research' },
+                     { id: 'projects', label: 'Projects' }
+                   ]}
+                   activeId={activeTab}
+                   onChange={(id) => scrollToSection(id as 'home' | 'research' | 'projects')}
+                   className="w-full"
+                 />
               </div>
 
               {/* Right Controls */}
