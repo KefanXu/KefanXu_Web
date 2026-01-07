@@ -281,7 +281,7 @@ export const Home: React.FC = () => {
                     {/* PDF Content */}
                     <div className="flex-1 overflow-hidden flex flex-col bg-white dark:bg-neutral-900 relative">
                         {/* Header Bar */}
-                        <div className="flex justify-between items-center p-6 border-b border-black/10 dark:border-white/10 bg-bg-light dark:bg-bg-dark">
+                        <div className="flex justify-between items-center p-6 pr-20 border-b border-black/10 dark:border-white/10 bg-bg-light dark:bg-bg-dark">
                             <h2 className="text-xl md:text-2xl font-bold text-text-light dark:text-text-dark font-heading uppercase tracking-widest">Curriculum Vitae</h2>
                             <a 
                                 href={cvPdf} 
