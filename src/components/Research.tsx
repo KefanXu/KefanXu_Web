@@ -108,12 +108,12 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
         <div className="w-full flex flex-col lg:flex-row items-start lg:items-center justify-between gap-10 lg:gap-16 py-8 px-4 md:px-12">
           {/* Left controls */}
           <div className="shrink-0 max-w-lg">
-            <div className="mb-4">
-              <h3 className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark leading-tight mb-20 font-heading">
+            <div className="flex flex-col mb-4">
+              <h3 className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark leading-tight mb-10 lg:mb-20 font-heading">
                 Ecological Lens.
               </h3>
               
-              <div className="flex flex-wrap grid grid-cols-2 lg:flex lg:flex-wrap gap-5 mb-24">
+              <div className="flex flex-wrap grid grid-cols-2 lg:flex lg:flex-wrap gap-5 mb-10 lg:mb-14 order-last lg:order-none">
               {(['Microsystem', 'Mesosystem', 'Macrosystem', 'Chronosystem'] as const).map((label) => {
                 const isActive = activeSystems.has(label);
                 const Icon =
@@ -191,7 +191,7 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
               })}
               </div>
 
-              <p className="text-lg md:text-xl font-normal text-text-light/80 dark:text-text-dark/80 leading-[30px] max-w-sm mt-10 font-display">
+              <p className="text-lg md:text-xl font-normal text-text-light/80 dark:text-text-dark/80 leading-[30px] max-w-sm mt-0 lg:mt-10 mb-8 lg:mb-0 font-display">
                 My research applies an <span className="font-bold text-text-light dark:text-text-dark">ecological lens</span> that situates individuals at the center of multiple interconnected layers, aiming to investigate how the information is transiting between and how the ecology evolves over time.
               </p>
             </div>
@@ -323,7 +323,7 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
                    {selectedIndex > 0 && (
                       <button 
                          onClick={handlePrev}
-                         className="p-3 md:p-4 rounded-full backdrop-blur-md transition-all hover:scale-110 active:scale-95 shadow-sm border bg-black/10 hover:bg-black/20 text-black border-black/5 dark:bg-white/10 dark:hover:bg-white/20 dark:text-white dark:border-white/10 2xl:bg-white/10 2xl:hover:bg-white/20 2xl:text-white 2xl:border-white/10"
+                         className="p-3 md:p-4 rounded-full backdrop-blur-md transition-all hover:scale-110 active:scale-95 shadow-sm border bg-black/10 hover:bg-black/20 text-black border-black/5 dark:bg-black/40 dark:hover:bg-black/60 dark:text-white dark:border-white/10 2xl:bg-white/10 2xl:hover:bg-white/20 2xl:text-white 2xl:border-white/10"
                       >
                          <ChevronLeft size={32} />
                       </button>
@@ -333,7 +333,7 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
                    {selectedIndex < filteredPubs.length - 1 && (
                       <button 
                          onClick={handleNext}
-                         className="p-3 md:p-4 rounded-full backdrop-blur-md transition-all hover:scale-110 active:scale-95 shadow-sm border bg-black/10 hover:bg-black/20 text-black border-black/5 dark:bg-white/10 dark:hover:bg-white/20 dark:text-white dark:border-white/10 2xl:bg-white/10 2xl:hover:bg-white/20 2xl:text-white 2xl:border-white/10"
+                         className="p-3 md:p-4 rounded-full backdrop-blur-md transition-all hover:scale-110 active:scale-95 shadow-sm border bg-black/10 hover:bg-black/20 text-black border-black/5 dark:bg-black/40 dark:hover:bg-black/60 dark:text-white dark:border-white/10 2xl:bg-white/10 2xl:hover:bg-white/20 2xl:text-white 2xl:border-white/10"
                       >
                          <ChevronRight size={32} />
                       </button>
@@ -419,7 +419,7 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
                                 <div className="md:col-span-8 space-y-12">
                                     <div>
                                         <h4 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-4 border-b border-black pb-2 font-sans">Abstract</h4>
-                                        <p className="text-base font-serif font-normal leading-relaxed text-justify text-neutral-800 dark:text-neutral-200">
+                                        <p className="text-base font-serif font-normal leading-relaxed text-justify text-neutral-800">
                                             {selectedPub.abstract || "No abstract available."}
                                         </p>
                                     </div>
@@ -427,7 +427,7 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
                                     {selectedPub.methodology && (
                                         <div>
                                             <h4 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-4 border-b border-black pb-2 font-sans">Methodology</h4>
-                                            <p className="text-base font-serif font-normal leading-relaxed text-neutral-800 dark:text-neutral-200">
+                                            <p className="text-base font-serif font-normal leading-relaxed text-neutral-800">
                                                 {selectedPub.methodology}
                                             </p>
                                         </div>
@@ -436,7 +436,7 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
                                     {selectedPub.keyFindings && (
                                         <div>
                                             <h4 className="text-xs font-bold uppercase tracking-widest opacity-40 mb-4 border-b border-black pb-2 font-sans">Key Findings</h4>
-                                            <ul className="list-disc list-outside ml-4 space-y-2 text-base font-serif font-normal text-neutral-800 dark:text-neutral-200">
+                                            <ul className="list-disc list-outside ml-4 space-y-2 text-base font-serif font-normal text-neutral-800">
                                                 {selectedPub.keyFindings.map((finding, idx) => (
                                                     <li key={idx} className="pl-2">{finding}</li>
                                                 ))}

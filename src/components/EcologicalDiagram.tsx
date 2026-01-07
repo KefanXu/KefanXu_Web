@@ -502,11 +502,10 @@ const RingLayer: React.FC<{
                   width={24}
                   height={24}
                   strokeWidth={2.5}
-                  className={`transition-all duration-300
+                  className={`transition-all duration-300 drop-shadow-[1px_1px_0px_rgba(255,255,255,0.8)] dark:drop-shadow-none
                     ${isActiveSystem 
                       ? 'text-blue-500 dark:text-blue-400 opacity-100' 
                       : 'text-text-light dark:text-text-dark opacity-50 group-hover:text-blue-500 dark:group-hover:text-blue-400 group-hover:opacity-100'}`}
-                  style={{ filter: 'drop-shadow(1px 1px 0px rgba(255,255,255,0.8))' }}
                 />
               </g>
               
@@ -660,11 +659,10 @@ export const EcologicalDiagram: React.FC<{ activeSystems?: Set<string> }> = ({ a
                      width={el.size * 0.7}
                      height={el.size * 0.7}
                      strokeWidth={2.5}
-                     className="text-text-light dark:text-text-dark opacity-50"
-                     style={{ filter: 'drop-shadow(1px 1px 0px rgba(255,255,255,0.8))' }}
+                     className="text-text-light dark:text-text-dark opacity-50 drop-shadow-[1px_1px_0px_rgba(255,255,255,0.8)] dark:drop-shadow-none"
                    />
                  </g>
-                 <text y={el.size/2 + 18} textAnchor="middle" className="text-[11px] font-bold fill-text-light dark:fill-text-dark uppercase tracking-wider opacity-80" style={{ textShadow: '0 1px 0 rgba(255,255,255,0.8)' }}>
+                 <text y={el.size/2 + 18} textAnchor="middle" className="text-[11px] font-bold fill-text-light dark:fill-text-dark uppercase tracking-wider opacity-80" style={{ textShadow: 'var(--text-drop-shadow)' }}>
                    {el.label}
                  </text>
               </g>

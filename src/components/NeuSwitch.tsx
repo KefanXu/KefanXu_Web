@@ -32,9 +32,9 @@ export const NeuSwitch: React.FC<NeuSwitchProps> = ({ options, activeId, onChang
           <div className="absolute inset-0 flex px-1.5">
             {options.map((option) => (
               <div key={option.id} className="flex-1 flex items-center justify-center">
-                 <span className="font-bold text-xs md:text-sm uppercase tracking-wider text-text-light/70 dark:text-text-dark/70" style={{
-                     textShadow: '1px 1px 1px rgba(255,255,255,0.8), -1px -1px 1px rgba(0,0,0,0.1)' 
-                 }}>
+                 <span 
+                   className="font-bold text-xs md:text-sm uppercase tracking-wider text-text-light/70 dark:text-text-dark/70"
+                 >
                    {option.label}
                  </span>
               </div>
