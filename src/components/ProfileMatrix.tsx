@@ -7,6 +7,7 @@ interface ProfileMatrixProps {
   showGraduationCap?: boolean;
   showLinkedin?: boolean;
   showMail?: boolean;
+  showCV?: boolean;
 }
 
 export const ProfileMatrix: React.FC<ProfileMatrixProps> = ({ 
@@ -14,7 +15,8 @@ export const ProfileMatrix: React.FC<ProfileMatrixProps> = ({
   showGTLogo = false,
   showGraduationCap = false,
   showLinkedin = false,
-  showMail = false
+  showMail = false,
+  showCV = false
 }) => {
   // 5x5 Grid
   const gridSize = 25;
@@ -57,10 +59,19 @@ export const ProfileMatrix: React.FC<ProfileMatrixProps> = ({
   // Row 4: . . X . .  → [22] (bottom petal)
   const mailIndices = [2, 6, 8, 10, 12, 14, 16, 18, 22];
 
+  // CV button: Letter "C" pattern
+  // Row 0: . X X X . -> [1, 2, 3]
+  // Row 1: X . . . . -> [5]
+  // Row 2: X . . . . -> [10]
+  // Row 3: X . . . . -> [15]
+  // Row 4: . X X X . -> [21, 22, 23]
+  const cvIndices = [1, 2, 3, 5, 10, 15, 21, 22, 23];
+
   // Priority: icon patterns > GT logo > cross
   const activePattern = showGraduationCap ? graduationCapIndices :
                        showLinkedin ? linkedinIndices :
                        showMail ? mailIndices :
+                       showCV ? cvIndices :
                        showGTLogo ? gtLogoIndices :
                        showCross ? crossIndices : [];
 

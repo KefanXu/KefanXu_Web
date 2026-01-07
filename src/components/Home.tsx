@@ -1,8 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { GraduationCap, Linkedin, Mail } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import { GraduationCap, Linkedin, Mail, FileText, X, Download } from 'lucide-react';
 import { Hero } from './Hero';
 import { MoonClock } from './MoonClock';
 import { ProfileMatrix } from './ProfileMatrix';
+import { AnimatePresence, motion } from 'framer-motion';
+import cvPdf from '../assets/KefanXu_CV.pdf';
 
 // Helper component for a single moon phase
 const MoonPhase: React.FC<{ phase: number; isActive: boolean }> = ({ phase, isActive }) => {
@@ -57,6 +60,8 @@ export const Home: React.FC = () => {
   const [isGraduationCapHovered, setIsGraduationCapHovered] = useState(false);
   const [isLinkedinHovered, setIsLinkedinHovered] = useState(false);
   const [isMailHovered, setIsMailHovered] = useState(false);
+  const [isCVHovered, setIsCVHovered] = useState(false);
+  const [isCVOpen, setIsCVOpen] = useState(false);
 
   // Map slider (0-1) to 7 distinct phases (0-6)
   const activePhaseIndex = Math.min(Math.floor(currentMoonPhase * 7), 6);
@@ -172,23 +177,32 @@ export const Home: React.FC = () => {
             >
               <Mail size={24} />
             </a>
+            <button
+              onClick={() => setIsCVOpen(true)}
+              className="w-12 h-12 rounded-xl bg-bg-light dark:bg-bg-dark shadow-neu-light dark:shadow-neu-dark flex items-center justify-center text-text-light/60 dark:text-text-dark/60 hover:text-blue-500 transition-all hover:scale-110 active:scale-95 group"
+              onMouseEnter={() => setIsCVHovered(true)}
+              onMouseLeave={() => setIsCVHovered(false)}
+            >
+              <span className="font-bold font-mono text-lg">CV</span>
+            </button>
           </div>
         </div>
 
         {/* Right: Interactive Matrix (Visual) */}
         <div className="hidden lg:flex justify-center items-center mt-12 lg:mt-0">
           <ProfileMatrix
-            showCross={isHealthInformaticsHovered && !isGTHovered && !isGraduationCapHovered && !isLinkedinHovered && !isMailHovered}
-            showGTLogo={isGTHovered && !isGraduationCapHovered && !isLinkedinHovered && !isMailHovered}
+            showCross={isHealthInformaticsHovered && !isGTHovered && !isGraduationCapHovered && !isLinkedinHovered && !isMailHovered && !isCVHovered}
+            showGTLogo={isGTHovered && !isGraduationCapHovered && !isLinkedinHovered && !isMailHovered && !isCVHovered}
             showGraduationCap={isGraduationCapHovered}
             showLinkedin={isLinkedinHovered}
             showMail={isMailHovered}
+            showCV={isCVHovered}
           />
         </div>
       </div>
 
       {/* Research Vision Section - Redesigned */}
-      <div className="flex flex-col lg:flex-row gap-16 items-center px-4 md:px-12 mt-24 w-full max-w-7xl mx-auto">
+      <div id="investigating-life" className="flex flex-col lg:flex-row gap-16 items-center px-4 md:px-12 mt-24 w-full max-w-7xl mx-auto scroll-mt-32">
         {/* Left: Playful Interaction */}
         <div className="w-full lg:w-1/2 flex justify-center lg:justify-start">
           <MoonClock value={currentMoonPhase} onSliderChange={(val) => setCurrentMoonPhase(val / 100)} />
@@ -233,6 +247,64 @@ export const Home: React.FC = () => {
           </div>
         </div>
       </div>
+      
+      {/* CV Modal */}
+      {createPortal(
+        <AnimatePresence>
+          {isCVOpen && (
+            <>
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsCVOpen(false)}
+                className="fixed inset-0 bg-black/80 z-[60] top-0 backdrop-blur-sm"
+              />
+              <motion.div 
+                initial={{ y: "100%" }}
+                animate={{ y: 0 }}
+                exit={{ y: "100%" }}
+                transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                className="fixed inset-x-0 bottom-0 top-0 z-[70] flex justify-center pointer-events-none p-4 pb-0 pt-12 md:pt-20"
+              >
+                <motion.div 
+                  className="w-full max-w-7xl h-full bg-[#f0f0f0] dark:bg-[#1a1a1a] shadow-2xl rounded-t-[30px] overflow-hidden pointer-events-auto flex flex-col relative will-change-transform"
+                >
+                    {/* Close Button */}
+                    <button 
+                        onClick={() => setIsCVOpen(false)}
+                        className="absolute top-6 right-6 z-50 p-2 bg-black/5 dark:bg-white/5 rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors backdrop-blur-md"
+                    >
+                        <X size={24} className="text-black dark:text-white" />
+                    </button>
+
+                    {/* PDF Content */}
+                    <div className="flex-1 overflow-hidden flex flex-col bg-white dark:bg-neutral-900 relative">
+                        {/* Header Bar */}
+                        <div className="flex justify-between items-center p-6 border-b border-black/10 dark:border-white/10 bg-bg-light dark:bg-bg-dark">
+                            <h2 className="text-xl md:text-2xl font-bold text-text-light dark:text-text-dark font-heading uppercase tracking-widest">Curriculum Vitae</h2>
+                            <a 
+                                href={cvPdf} 
+                                download="KefanXu_CV.pdf"
+                                className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-bold text-xs uppercase tracking-widest transition-colors"
+                            >
+                                <Download size={16} />
+                                <span className="hidden md:inline">Download PDF</span>
+                            </a>
+                        </div>
+                        
+                        {/* PDF Viewer */}
+                        <div className="flex-1 w-full h-full bg-gray-100 dark:bg-gray-900">
+                           <iframe src={cvPdf} className="w-full h-full border-none" title="CV PDF" />
+                        </div>
+                    </div>
+                </motion.div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </div>
   );
 };

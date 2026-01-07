@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { NeuKnob } from './components/NeuKnob';
 import { Home } from './components/Home';
 import { Research } from './components/Research';
@@ -6,16 +6,27 @@ import { Projects } from './components/Projects';
 import { Footer } from './components/Footer';
 import { NeuSwitch } from './components/NeuSwitch';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Activity, Database, LayoutDashboard, Menu, X } from 'lucide-react';
+import { Activity, Database, LayoutDashboard, Menu, X, Cpu } from 'lucide-react';
 
 function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'research' | 'projects'>('home');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isResearchDetailOpen, setIsResearchDetailOpen] = useState(false);
+  
+  // Ref to track if we are currently scrolling via a click (auto-scrolling)
+  const isAutoScrolling = useRef(false);
+  const scrollTimeout = useRef<NodeJS.Timeout | null>(null);
 
   // Scroll to section handler
   const scrollToSection = (id: 'home' | 'research' | 'projects') => {
-    const element = document.getElementById(id);
+    // Disable scroll spy temporarily
+    isAutoScrolling.current = true;
+    if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+    
+    // Map 'research' to the 'investigating-life' section in Home.tsx
+    const targetId = id === 'research' ? 'investigating-life' : id;
+    const element = document.getElementById(targetId);
+    
     if (element) {
       // Offset for fixed header
       const offset = 100; 
@@ -27,29 +38,47 @@ function App() {
         behavior: "smooth"
       });
       setActiveTab(id);
+      
+      // Re-enable scroll spy after scrolling finishes (approximate duration)
+      scrollTimeout.current = setTimeout(() => {
+        isAutoScrolling.current = false;
+      }, 1000);
+    } else {
+       // If target not found, re-enable spy immediately
+       isAutoScrolling.current = false;
     }
   };
 
   // Scroll Spy to update active tab
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ['home', 'research', 'projects'];
+      // If we are auto-scrolling (clicked a link), ignore scroll events to prevent tab jitter
+      if (isAutoScrolling.current) return;
+
+      // Priority check (bottom to top)
+      const sections = [
+        { id: 'projects', tab: 'projects' },
+        { id: 'research', tab: 'research' },
+        { id: 'investigating-life', tab: 'research' }, // Map this section to research tab
+        { id: 'home', tab: 'home' }
+      ];
       
+      const offset = 300; // Buffer zone
+
       for (const section of sections) {
-        const element = document.getElementById(section);
+        const element = document.getElementById(section.id);
         if (element) {
           const rect = element.getBoundingClientRect();
-          // If the top of the section is near the top of the viewport (with some buffer)
-          if (rect.top >= 0 && rect.top <= 300) {
-            setActiveTab(section as any);
-            break;
-          } else if (rect.top < 0 && rect.bottom > 150) {
-             // If we are "inside" the section
-             setActiveTab(section as any);
-             break;
+          // If the top of the section is above the threshold (scrolled past or current)
+          if (rect.top <= offset) {
+            setActiveTab(section.tab as any);
+            return; // Found the active section (most specific/lowest visible)
           }
         }
       }
+      
+      // Default to home if nothing matches (e.g. very top)
+      setActiveTab('home');
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -134,25 +163,28 @@ function App() {
                   exit={{ height: 0, opacity: 0 }}
                   className="md:hidden border-t border-text-light/5 dark:border-text-dark/5 bg-bg-light dark:bg-bg-dark overflow-hidden"
                 >
-                  <div className="p-4 space-y-2">
+                  <div className="p-6 space-y-4">
                     {[
                       { id: 'home', label: 'Home', icon: LayoutDashboard },
                       { id: 'research', label: 'Research', icon: Database },
-                      { id: 'projects', label: 'Projects', icon: Activity }
+                      { id: 'projects', label: 'Projects', icon: Cpu }
                     ].map((item) => (
                       <button
                         key={item.id}
                         onClick={() => {
-                          scrollToSection(item.id as any);
                           setIsMobileMenuOpen(false);
+                          // Slight delay to allow menu to start closing and ensure scroll triggers reliably on mobile
+                          setTimeout(() => {
+                            scrollToSection(item.id as any);
+                          }, 100);
                         }}
-                        className={`w-full flex items-center gap-3 p-3 rounded-lg font-mono text-sm uppercase tracking-wider transition-colors
+                        className={`w-full flex items-center gap-4 p-4 rounded-xl font-mono text-sm uppercase tracking-wider transition-all duration-200
                           ${activeTab === item.id 
-                            ? 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20' 
-                            : 'hover:bg-black/5 dark:hover:bg-white/5 text-text-light/70 dark:text-text-dark/70'}
+                            ? 'bg-bg-light dark:bg-bg-dark text-blue-500 dark:text-blue-400 shadow-[inset_3px_3px_6px_rgba(163,177,198,0.4),inset_-3px_-3px_6px_rgba(255,255,255,0.5)] dark:shadow-[inset_3px_3px_6px_#1d1e22,inset_-3px_-3px_6px_#393c44]' 
+                            : 'bg-bg-light dark:bg-bg-dark text-text-light/60 dark:text-text-dark/60 shadow-[5px_5px_10px_rgba(163,177,198,0.3),-5px_-5px_10px_rgba(255,255,255,0.6)] dark:shadow-[5px_5px_10px_#1d1e22,-5px_-5px_10px_#393c44] hover:text-blue-500 dark:hover:text-blue-400'}
                         `}
                       >
-                        <item.icon size={16} />
+                        <item.icon size={18} />
                         {item.label}
                       </button>
                     ))}
