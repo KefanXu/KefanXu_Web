@@ -155,7 +155,7 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
                       </div>
 
                       {/* Right segment */}
-                      <div className="relative z-10 w-16 h-full flex items-center justify-center">
+                      <div className="relative z-10 w-16 h-full hidden lg:flex items-center justify-center">
                         {/* Neumorphic toggle switch (visual only; whole button toggles) */}
                         <div
                           className={`relative w-12 h-7 rounded-full transition-all duration-300
