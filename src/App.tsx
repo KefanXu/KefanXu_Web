@@ -6,7 +6,7 @@ import { Projects } from './components/Projects';
 import { Footer } from './components/Footer';
 import { NeuSwitch } from './components/NeuSwitch';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Activity, Database, LayoutDashboard, Menu, X, Cpu } from 'lucide-react';
+import { Database, LayoutDashboard, Menu, X, Cpu } from 'lucide-react';
 
 function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'research' | 'projects'>('home');

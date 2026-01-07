@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { GraduationCap, Linkedin, Mail, FileText, X, Download } from 'lucide-react';
+import { GraduationCap, Linkedin, Mail, X, Download } from 'lucide-react';
 import { Hero } from './Hero';
 import { MoonClock } from './MoonClock';
 import { ProfileMatrix } from './ProfileMatrix';
