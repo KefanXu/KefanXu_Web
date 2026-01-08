@@ -102,7 +102,7 @@ export const Projects: React.FC = () => {
       case 'fitbit-probe':
         return <ProjectIcon icon={Watch} title="Fitbit Probe" subtitle="Older Adults Activity" topText={topText} bottomText={bottomText} />;
       case 'caregiving-reddit':
-        return <ProjectIcon icon={MessageSquare} title="Caregiving Probe" subtitle="Social Media Analysis" topText={topText} bottomText={bottomText} />;
+        return <ProjectIcon icon={MessageSquare} title="Caregiving" subtitle="Social Media Analysis" topText={topText} bottomText={bottomText} />;
       case 'reflective-iteration':
         return <ProjectIcon icon={RefreshCw} title="Planneregy" subtitle="Reflective Iteration" topText={topText} bottomText={bottomText} />;
       case 'historical-planning':
@@ -112,7 +112,7 @@ export const Projects: React.FC = () => {
       case 'chronic-fatigue':
         return <ProjectIcon icon={Battery} title="Pace to Plan" subtitle="Fatigue Management" topText={topText} bottomText={bottomText} />;
       case 'emog':
-        return <ProjectIcon icon={Smile} title="EmoG" subtitle="Emotional Sketching" topText={topText} bottomText={bottomText} />;
+        return <ProjectIcon icon={Smile} title="FACEX" subtitle="Emotional Sketching" topText={topText} bottomText={bottomText} />;
       default:
         return (
           <PillContainer topText={topText} bottomText={bottomText}>

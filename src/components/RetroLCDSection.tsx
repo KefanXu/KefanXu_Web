@@ -74,7 +74,6 @@ export const RetroLCDSection: React.FC = () => {
         .map(() => Array(GRID_SIZE).fill(false));
       const center = GRID_SIZE / 2;
       const wavePhase = frame * 0.15;
-      const numWaves = 3;
       for (let row = 0; row < GRID_SIZE; row++) {
         for (let col = 0; col < GRID_SIZE; col++) {
           if (!isWithinCircle(row, col)) continue;
