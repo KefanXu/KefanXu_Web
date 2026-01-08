@@ -61,3 +61,13 @@
 .dark .custom-scrollbar::-webkit-scrollbar-thumb {
   background-color: rgba(75, 85, 99, 0.5);
 }
+
+/* Retro LCD Scanline Animation */
+@keyframes scanline {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 100%; }
+}
+
+.lcd-scanline {
+  animation: scanline 3s linear infinite;
+}

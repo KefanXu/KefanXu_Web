@@ -4,6 +4,7 @@ import { Home } from './components/Home';
 import { Research } from './components/Research';
 import { Projects } from './components/Projects';
 import { Footer } from './components/Footer';
+import { RetroLCDSection } from './components/RetroLCDSection';
 import { NeuSwitch } from './components/NeuSwitch';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Database, LayoutDashboard, Menu, X, Cpu } from 'lucide-react';
@@ -214,6 +215,7 @@ function App() {
       </main>
 
       <Footer />
+      <RetroLCDSection />
     </div>
   );
 }
