@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { LCDBezel } from './LCDBezel';
 
 interface MoonClockProps {
   onSliderChange?: (value: number) => void;
@@ -114,8 +115,13 @@ export const MoonClock: React.FC<MoonClockProps> = ({ onSliderChange, value }) =
     <div className="flex flex-col items-center gap-8 w-full max-w-sm mx-auto lg:mx-0 relative z-10">
       
       {/* Retro LCD Clock Face */}
-      <div className="relative w-64 h-64 bg-bg-light dark:bg-bg-dark rounded-[40px] p-2 shadow-neu-light dark:shadow-neu-dark border border-white/20 dark:border-white/5">
-        
+      <LCDBezel
+        outerRadiusClassName="rounded-[40px]"
+        trenchRadiusClassName="rounded-[38px]"
+        outerClassName="w-64 h-64"
+        trenchClassName="w-full h-full"
+        trenchPaddingClassName="p-[6px]"
+      >
         {/* LCD Screen Container */}
         <div className="w-full h-full bg-[#8aa899] rounded-[32px] relative overflow-hidden shadow-[inset_0_0_20px_rgba(0,0,0,0.15)] flex items-center justify-center">
             
@@ -194,7 +200,7 @@ export const MoonClock: React.FC<MoonClockProps> = ({ onSliderChange, value }) =
                 </div>
             ))}
         </div>
-      </div>
+      </LCDBezel>
 
       {/* Location Label */}
       <div className="text-center font-mono space-y-1">
@@ -273,7 +279,13 @@ export const MoonClock: React.FC<MoonClockProps> = ({ onSliderChange, value }) =
       </div>
 
       {/* Retro LCD Calendar */}
-      <div className="relative w-64 h-64 bg-bg-light dark:bg-bg-dark rounded-[40px] p-2 shadow-neu-light dark:shadow-neu-dark border border-white/20 dark:border-white/5">
+      <LCDBezel
+        outerRadiusClassName="rounded-[40px]"
+        trenchRadiusClassName="rounded-[38px]"
+        outerClassName="w-64 h-64"
+        trenchClassName="w-full h-full"
+        trenchPaddingClassName="p-[6px]"
+      >
         <div className="w-full h-full bg-[#8aa899] rounded-[32px] relative overflow-hidden shadow-[inset_0_0_20px_rgba(0,0,0,0.15)] flex flex-col items-center p-5">
             {/* Pixel Grid Overlay */}
             <div className="absolute inset-0 opacity-[0.15] pointer-events-none" 
@@ -318,7 +330,7 @@ export const MoonClock: React.FC<MoonClockProps> = ({ onSliderChange, value }) =
                 ))}
             </div>
         </div>
-      </div>
+      </LCDBezel>
 
     </div>
   );

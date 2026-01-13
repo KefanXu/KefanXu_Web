@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Activity, Database, Clock, Zap } from 'lucide-react';
 import { NeuSwitch } from './NeuSwitch';
+import { LCDBezel } from './LCDBezel';
 
 export const ActivityMonitor: React.FC = () => {
   const [activeTab, setActiveTab] = useState('daily');
@@ -42,28 +43,36 @@ export const ActivityMonitor: React.FC = () => {
       </div>
 
       {/* Screen / Graph */}
-      <div className="relative h-48 rounded-xl bg-bg-light dark:bg-bg-dark shadow-neu-pressed-light dark:shadow-neu-pressed-dark p-4 overflow-hidden border border-white/20 dark:border-white/5">
-         {/* Grid Lines */}
-         <div className="absolute inset-0 p-4 flex flex-col justify-between opacity-10 pointer-events-none">
+      <LCDBezel
+        outerRadiusClassName="rounded-xl"
+        trenchRadiusClassName="rounded-[10px]"
+        outerClassName="h-48 w-full"
+        trenchClassName="w-full h-full"
+        trenchPaddingClassName="p-[3px]"
+      >
+        <div className="relative w-full h-full rounded-lg bg-bg-light dark:bg-bg-dark shadow-neu-pressed-light dark:shadow-neu-pressed-dark p-4 overflow-hidden">
+          {/* Grid Lines */}
+          <div className="absolute inset-0 p-4 flex flex-col justify-between opacity-10 pointer-events-none">
             {[...Array(5)].map((_, i) => (
               <div key={i} className="w-full h-[1px] bg-current" />
             ))}
-         </div>
+          </div>
 
-         {/* Bars */}
-         <div className="h-full flex items-end justify-between gap-2 relative z-10">
+          {/* Bars */}
+          <div className="h-full flex items-end justify-between gap-2 relative z-10">
             {dataPoints.map((h, i) => (
-               <motion.div
-                 key={i}
-                 layout
-                 className="w-full bg-blue-500 rounded-t-sm opacity-80"
-                 initial={{ height: '0%' }}
-                 animate={{ height: `${h * 100}%` }}
-                 transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-               />
+              <motion.div
+                key={i}
+                layout
+                className="w-full bg-blue-500 rounded-t-sm opacity-80"
+                initial={{ height: '0%' }}
+                animate={{ height: `${h * 100}%` }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+              />
             ))}
-         </div>
-      </div>
+          </div>
+        </div>
+      </LCDBezel>
 
       {/* Controls */}
       <div className="flex flex-col gap-4">

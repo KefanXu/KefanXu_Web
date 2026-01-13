@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { NeuInput } from './NeuInput';
 import { ConcaveCard } from './ConcaveCard';
 import { EcologicalDiagram } from './EcologicalDiagram';
+import { LCDBezel } from './LCDBezel';
 import { publications, Publication } from '../data/portfolio';
 import {
   FileText,
@@ -228,20 +229,28 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
               />
             </div>
             <div className="flex gap-2 h-full">
-               {/* Retro Camera LCD Counter - Embedded directly */}
-               <div className="bg-[#8aa899] px-4 h-14 rounded-2xl shadow-[inset_2px_2px_5px_rgba(0,0,0,0.2),inset_-2px_-2px_5px_rgba(255,255,255,0.1),0_1px_2px_rgba(0,0,0,0.1)] flex flex-col items-center justify-center min-w-[80px] relative overflow-hidden border border-white/10 dark:border-white/5">
-                  {/* Pixel Grid Overlay */}
-                  <div className="absolute inset-0 opacity-[0.08] pointer-events-none" 
-                       style={{ 
-                         backgroundImage: 'linear-gradient(to right, #1a2f23 1px, transparent 1px), linear-gradient(to bottom, #1a2f23 1px, transparent 1px)',
-                         backgroundSize: '3px 3px'
-                       }} 
-                  />
-                  <span className="text-[7px] font-bold text-[#1a2f23] opacity-60 uppercase tracking-widest mb-0.5 relative z-10">Count</span>
-                  <span className="font-mono text-xl font-bold text-[#1a2f23] leading-none tracking-widest relative z-10">
-                    {filteredPubs.length.toString().padStart(2, '0')}
-                  </span>
-               </div>
+               {/* Retro Camera LCD Counter - Unified bezel */}
+               <LCDBezel
+                 outerRadiusClassName="rounded-2xl"
+                 trenchRadiusClassName="rounded-[14px]"
+                 outerClassName="h-14 min-w-[92px]"
+                 trenchClassName="w-full h-full"
+                 trenchPaddingClassName="p-[3px]"
+               >
+                 <div className="w-full h-full bg-[#8aa899] rounded-[12px] flex flex-col items-center justify-center relative overflow-hidden">
+                   {/* Pixel Grid Overlay */}
+                   <div className="absolute inset-0 opacity-[0.08] pointer-events-none" 
+                        style={{ 
+                          backgroundImage: 'linear-gradient(to right, #1a2f23 1px, transparent 1px), linear-gradient(to bottom, #1a2f23 1px, transparent 1px)',
+                          backgroundSize: '3px 3px'
+                        }} 
+                   />
+                   <span className="text-[7px] font-bold text-[#1a2f23] opacity-60 uppercase tracking-widest mb-0.5 relative z-10">Count</span>
+                   <span className="font-mono text-xl font-bold text-[#1a2f23] leading-none tracking-widest relative z-10">
+                     {filteredPubs.length.toString().padStart(2, '0')}
+                   </span>
+                 </div>
+               </LCDBezel>
             </div>
          </div>
       </div>

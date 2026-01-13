@@ -4,6 +4,7 @@ import { Shield, Database, Hash } from 'lucide-react';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { SnakeGame } from './SnakeGame';
 import { PSPControls } from './PSPControls';
+import { LCDBezel } from './LCDBezel';
 
 export const Hero: React.FC = () => {
   const [power, setPower] = useState(true);
@@ -95,11 +96,13 @@ export const Hero: React.FC = () => {
 
         {/* CENTER SCREEN MODULE */}
         <div className="relative flex-grow max-w-2xl w-full order-1 lg:order-2">
-            {/* Screen Bezel */}
-            <div 
-            className={`
-                relative overflow-hidden font-mono rounded-[40px] p-4 shadow-neu-light dark:shadow-neu-dark transition-all duration-500 bg-bg-light dark:bg-bg-dark
-            `}
+            {/* Screen Bezel (unified LCD border style) */}
+            <LCDBezel
+              outerRadiusClassName="rounded-[40px]"
+              trenchRadiusClassName="rounded-[38px]"
+              trenchPaddingClassName="p-4"
+              outerClassName="transition-all duration-500 font-mono overflow-hidden"
+              trenchClassName="overflow-hidden"
             >
                 {/* LCD Screen Surface */}
                 <div className={`
@@ -194,7 +197,7 @@ export const Hero: React.FC = () => {
 
                     </motion.div>
                 </div>
-            </div>
+            </LCDBezel>
         </div>
 
         {/* RIGHT CONTROLS (Desktop: Right Column, Mobile: Hidden/Moved below) */}

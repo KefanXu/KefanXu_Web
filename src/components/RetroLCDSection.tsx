@@ -5,7 +5,9 @@ import { ArrowRight } from 'lucide-react';
 // Pixel animation grid dimensions (square for circular screen)
 const GRID_SIZE = 20; // 20x20 grid for better circular fit
 const ANIMATION_SPEED = 200; // ms per frame
-const MAX_RADIUS = GRID_SIZE / 2; // Maximum radius for circular boundary (increased to show outer pixels)
+// For an even-sized grid, the true visual center is between pixels (e.g. 9.5 for 20).
+const GRID_CENTER = (GRID_SIZE - 1) / 2;
+const MAX_RADIUS = GRID_CENTER; // Use the true grid center for symmetric patterns
 
 export const RetroLCDSection: React.FC = () => {
   const [pixels, setPixels] = useState<boolean[][]>([]);
@@ -14,8 +16,7 @@ export const RetroLCDSection: React.FC = () => {
 
   // Helper function to check if pixel is within circular boundary
   const isWithinCircle = (row: number, col: number, radius?: number): boolean => {
-    const center = GRID_SIZE / 2;
-    const dist = Math.sqrt((col - center) ** 2 + (row - center) ** 2);
+    const dist = Math.sqrt((col - GRID_CENTER) ** 2 + (row - GRID_CENTER) ** 2);
     const maxR = radius ?? MAX_RADIUS;
     // Allow slightly beyond MAX_RADIUS to ensure outer pixels show
     return dist <= maxR + 0.5;
@@ -36,12 +37,11 @@ export const RetroLCDSection: React.FC = () => {
       const grid = Array(GRID_SIZE)
         .fill(null)
         .map(() => Array(GRID_SIZE).fill(false));
-      const center = GRID_SIZE / 2;
       const radius = (Math.sin(frame * 0.08) * 4 + MAX_RADIUS * 0.6);
       for (let row = 0; row < GRID_SIZE; row++) {
         for (let col = 0; col < GRID_SIZE; col++) {
           if (!isWithinCircle(row, col)) continue;
-          const dist = Math.sqrt((col - center) ** 2 + (row - center) ** 2);
+          const dist = Math.sqrt((col - GRID_CENTER) ** 2 + (row - GRID_CENTER) ** 2);
           grid[row][col] = Math.abs(dist - radius) < 0.8;
         }
       }
@@ -52,14 +52,13 @@ export const RetroLCDSection: React.FC = () => {
       const grid = Array(GRID_SIZE)
         .fill(null)
         .map(() => Array(GRID_SIZE).fill(false));
-      const center = GRID_SIZE / 2;
       const angle = (frame * 0.1) % (Math.PI * 2);
       const numLines = 8;
       for (let i = 0; i < numLines; i++) {
         const lineAngle = angle + (i * Math.PI * 2 / numLines);
         for (let r = 2; r < MAX_RADIUS; r += 0.5) {
-          const x = Math.round(center + Math.cos(lineAngle) * r);
-          const y = Math.round(center + Math.sin(lineAngle) * r);
+          const x = Math.round(GRID_CENTER + Math.cos(lineAngle) * r);
+          const y = Math.round(GRID_CENTER + Math.sin(lineAngle) * r);
           if (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE && isWithinCircle(y, x)) {
             grid[y][x] = true;
           }
@@ -72,12 +71,11 @@ export const RetroLCDSection: React.FC = () => {
       const grid = Array(GRID_SIZE)
         .fill(null)
         .map(() => Array(GRID_SIZE).fill(false));
-      const center = GRID_SIZE / 2;
       const wavePhase = frame * 0.15;
       for (let row = 0; row < GRID_SIZE; row++) {
         for (let col = 0; col < GRID_SIZE; col++) {
           if (!isWithinCircle(row, col)) continue;
-          const dist = Math.sqrt((col - center) ** 2 + (row - center) ** 2);
+          const dist = Math.sqrt((col - GRID_CENTER) ** 2 + (row - GRID_CENTER) ** 2);
           const wave = Math.sin(dist * 0.8 - wavePhase) * 0.5 + 0.5;
           grid[row][col] = wave > 0.6;
         }
@@ -89,13 +87,12 @@ export const RetroLCDSection: React.FC = () => {
       const grid = Array(GRID_SIZE)
         .fill(null)
         .map(() => Array(GRID_SIZE).fill(false));
-      const center = GRID_SIZE / 2;
       const turns = 3;
       for (let angle = 0; angle < Math.PI * 2 * turns; angle += 0.15) {
         const radius = (angle / (Math.PI * 2)) * (MAX_RADIUS / turns) + frame * 0.2;
         if (radius > MAX_RADIUS) break;
-        const x = Math.round(center + Math.cos(angle) * radius);
-        const y = Math.round(center + Math.sin(angle) * radius);
+        const x = Math.round(GRID_CENTER + Math.cos(angle) * radius);
+        const y = Math.round(GRID_CENTER + Math.sin(angle) * radius);
         if (x >= 0 && x < GRID_SIZE && y >= 0 && y < GRID_SIZE && isWithinCircle(y, x)) {
           grid[y][x] = true;
         }
@@ -107,13 +104,12 @@ export const RetroLCDSection: React.FC = () => {
       const grid = Array(GRID_SIZE)
         .fill(null)
         .map(() => Array(GRID_SIZE).fill(false));
-      const center = GRID_SIZE / 2;
       const pulsePhase = frame * 0.12;
       const numCircles = 4;
       for (let row = 0; row < GRID_SIZE; row++) {
         for (let col = 0; col < GRID_SIZE; col++) {
           if (!isWithinCircle(row, col)) continue;
-          const dist = Math.sqrt((col - center) ** 2 + (row - center) ** 2);
+          const dist = Math.sqrt((col - GRID_CENTER) ** 2 + (row - GRID_CENTER) ** 2);
           for (let i = 0; i < numCircles; i++) {
             const radius = (MAX_RADIUS / numCircles) * (i + 1);
             const pulse = Math.sin(pulsePhase + i * 0.5) * 1.5;
@@ -177,14 +173,32 @@ export const RetroLCDSection: React.FC = () => {
           href="https://kefanxu.github.io/portfolio4.1/index.html" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="relative flex-shrink-0 cursor-pointer transition-transform duration-300 hover:scale-105 active:scale-95"
+          className="lcd-link relative flex-shrink-0 cursor-pointer group isolate focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 focus-visible:ring-offset-2 focus-visible:ring-offset-bg-light dark:focus-visible:ring-offset-bg-dark"
         >
+          {/* Warm back-emission (same idea as PillContainer glow) */}
+          <div
+            className="lcd-warm-glow absolute -inset-14 rounded-full pointer-events-none opacity-0 z-0"
+            style={{
+              background:
+                'radial-gradient(circle at 50% 65%, rgba(255,170,50,0.55) 0%, rgba(255,170,50,0.22) 35%, rgba(255,170,50,0.10) 55%, transparent 75%)',
+              filter: 'blur(34px)',
+            }}
+          />
+
           {/* Outer Raised Rim (circular) */}
-          <div className="relative p-[2px] rounded-full bg-bg-light dark:bg-bg-dark shadow-neu-light dark:shadow-neu-dark">
+          <div className="relative z-10 p-[2px] rounded-full bg-bg-light dark:bg-bg-dark shadow-neu-light dark:shadow-neu-dark">
             {/* Inner Trench (Concave Border) */}
             <div className="relative rounded-full bg-bg-light dark:bg-bg-dark shadow-[inset_3px_3px_6px_0_rgba(163,177,198,0.3),inset_-3px_-3px_6px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_2px_2px_5px_#1d1e22,inset_-2px_-2px_5px_#393c44] p-[3px] w-[200px] h-[200px]">
               {/* Screen Display (circular) */}
               <div className="relative bg-[#8aa899] text-[#1a2f23] rounded-full w-full h-full p-4 overflow-hidden flex items-center justify-center">
+                {/* Slight warm lift inside the LCD (helps sell “backlight”) */}
+                <div
+                  className="lcd-warm-glow-inner absolute inset-0 rounded-full pointer-events-none opacity-0"
+                  style={{
+                    background:
+                      'radial-gradient(circle at 50% 65%, rgba(255,170,50,0.10) 0%, rgba(255,255,255,0.10) 28%, transparent 70%)',
+                  }}
+                />
                 {/* Inner Shadow & Texture */}
                 <div className="absolute inset-0 shadow-[inset_0_0_40px_rgba(0,0,0,0.15)] pointer-events-none rounded-full" />
                 <div 
