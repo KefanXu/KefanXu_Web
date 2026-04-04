@@ -1,10 +1,14 @@
 export interface Publication {
   id: string;
+  displayId?: string;
   title: string;
   authors: string[];
   conference: string;
   year: number;
   doi?: string;
+  publicationDate?: string;
+  scholarId?: string;
+  scholarUrl?: string;
   status?: string;
   abstract?: string;
   tags?: string[];
@@ -47,7 +51,7 @@ export const personalInfo = {
   }
 };
 
-export const publications: Publication[] = [
+export const publicationEnrichments: Publication[] = [
   {
     id: "cscw2025",
     title: "Understanding the Temporality of Informal Caregivers' Sense-Making on Conflicts and Life-Changing Events through Online Health Communities",

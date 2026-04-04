@@ -4,7 +4,8 @@ import { NeuInput } from './NeuInput';
 import { ConcaveCard } from './ConcaveCard';
 import { EcologicalDiagram } from './EcologicalDiagram';
 import { LCDBezel } from './LCDBezel';
-import { publications, Publication } from '../data/portfolio';
+import { Publication } from '../data/portfolio';
+import { publications } from '../data/publications';
 import {
   FileText,
   X,
@@ -49,6 +50,8 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
     pub.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     pub.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  const getPublicationDisplayId = (pub: Publication) => (pub.displayId ?? pub.id).toUpperCase();
 
   const selectedIndex = selectedPub ? filteredPubs.findIndex(p => p.id === selectedPub.id) : -1;
 
@@ -210,7 +213,7 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
           <Database size={20} className="text-blue-500" />
           <div>
               <h2 className="text-xl font-bold text-text-light dark:text-text-dark">Publications</h2>
-              <p className="text-[10px] uppercase tracking-widest opacity-50 font-mono">Selected Works</p>
+              <p className="text-[10px] uppercase tracking-widest opacity-50 font-mono">Auto-synced from Google Scholar</p>
           </div>
       </div>
 
@@ -274,13 +277,13 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
                     
                     {/* ID Status Line (Mobile) */}
                     <div className="col-span-12 flex md:hidden justify-between items-center mb-4 text-xs font-mono opacity-50">
-                       <span>#{pub.id.toUpperCase()}</span>
+                       <span>#{getPublicationDisplayId(pub)}</span>
                        <span>{pub.year}</span>
                     </div>
 
                     {/* Desktop Columns */}
                     <div className="hidden md:flex col-span-1 font-mono text-xs opacity-30 justify-center items-center h-full border-r border-black/5 dark:border-white/5">
-                        <div className="-rotate-90 whitespace-nowrap tracking-widest font-bold">#{pub.id.toUpperCase()}</div>
+                        <div className="-rotate-90 whitespace-nowrap tracking-widest font-bold">#{getPublicationDisplayId(pub)}</div>
                     </div>
                     
                     <div className="col-span-12 md:col-span-8">
@@ -295,7 +298,9 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
 
                     <div className="col-span-12 md:col-span-3 mt-4 md:mt-0 flex flex-col justify-center items-start md:items-end">
                        <div className="text-right">
-                           <span className="text-xs font-mono font-bold text-blue-500 block mb-1">{pub.conference}</span>
+                           <span className="text-xs font-mono font-bold text-blue-500 block mb-1 max-w-full md:max-w-[18rem] leading-relaxed">
+                             {pub.conference}
+                           </span>
                            <span className="text-[10px] font-bold text-text-light/40 dark:text-text-dark/40 uppercase tracking-widest">{pub.year}</span>
                        </div>
                     </div>
@@ -376,11 +381,13 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
                             <div className="relative z-10 flex justify-end gap-12 mb-32 pt-12 text-xs font-bold tracking-widest uppercase">
                                 <div className="flex flex-col items-end">
                                     <span className="opacity-40 mb-1">Paper ID</span>
-                                    <span className="text-2xl border-b-2 border-black pb-1 min-w-[60px] text-right">{selectedPub.id.toUpperCase()}</span>
+                                    <span className="text-2xl border-b-2 border-black pb-1 min-w-[60px] text-right">{getPublicationDisplayId(selectedPub)}</span>
                                 </div>
                                 <div className="flex flex-col items-end">
-                                    <span className="opacity-40 mb-1">Conference</span>
-                                    <span className="text-2xl border-b-2 border-black pb-1 min-w-[60px] text-right">{selectedPub.conference.split(' ')[0]}</span>
+                                    <span className="opacity-40 mb-1">Venue</span>
+                                    <span className="text-xl md:text-2xl border-b-2 border-black pb-1 min-w-[60px] max-w-[320px] text-right leading-tight">
+                                        {selectedPub.conference}
+                                    </span>
                                 </div>
                             </div>
 
