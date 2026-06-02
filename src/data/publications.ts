@@ -23,7 +23,11 @@ const mergedPublications = (generatedPublications as Publication[]).map((publica
     ...enrichment,
     authors: enrichment.authors ?? publication.authors,
     conference: enrichment.conference ?? publication.conference,
-    displayId: enrichment.displayId ?? enrichment.id ?? publication.displayId,
+    displayId:
+      enrichment.displayId ??
+      (enrichment.hideDisplayId ? undefined : enrichment.id) ??
+      publication.displayId,
+    hideDisplayId: enrichment.hideDisplayId ?? publication.hideDisplayId,
     doi: enrichment.doi ?? publication.doi,
     id: enrichment.id ?? publication.id,
     publicationDate: enrichment.publicationDate ?? publication.publicationDate,

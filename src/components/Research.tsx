@@ -52,6 +52,7 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
   );
 
   const getPublicationDisplayId = (pub: Publication) => (pub.displayId ?? pub.id).toUpperCase();
+  const showPublicationDisplayId = (pub: Publication) => !pub.hideDisplayId;
 
   const selectedIndex = selectedPub ? filteredPubs.findIndex(p => p.id === selectedPub.id) : -1;
 
@@ -276,17 +277,25 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
                  <div className="md:grid md:grid-cols-12 md:gap-6 md:items-center">
                     
                     {/* ID Status Line (Mobile) */}
-                    <div className="col-span-12 flex md:hidden justify-between items-center mb-4 text-xs font-mono opacity-50">
-                       <span>#{getPublicationDisplayId(pub)}</span>
-                       <span>{pub.year}</span>
-                    </div>
+                    {showPublicationDisplayId(pub) ? (
+                      <div className="col-span-12 flex md:hidden justify-between items-center mb-4 text-xs font-mono opacity-50">
+                         <span>#{getPublicationDisplayId(pub)}</span>
+                         <span>{pub.year}</span>
+                      </div>
+                    ) : (
+                      <div className="col-span-12 flex md:hidden justify-end items-center mb-4 text-xs font-mono opacity-50">
+                         <span>{pub.year}</span>
+                      </div>
+                    )}
 
                     {/* Desktop Columns */}
-                    <div className="hidden md:flex col-span-1 font-mono text-xs opacity-30 justify-center items-center h-full border-r border-black/5 dark:border-white/5">
-                        <div className="-rotate-90 whitespace-nowrap tracking-widest font-bold">#{getPublicationDisplayId(pub)}</div>
-                    </div>
+                    {showPublicationDisplayId(pub) && (
+                      <div className="hidden md:flex col-span-1 font-mono text-xs opacity-30 justify-center items-center h-full border-r border-black/5 dark:border-white/5">
+                          <div className="-rotate-90 whitespace-nowrap tracking-widest font-bold">#{getPublicationDisplayId(pub)}</div>
+                      </div>
+                    )}
                     
-                    <div className="col-span-12 md:col-span-8">
+                    <div className={`col-span-12 ${showPublicationDisplayId(pub) ? 'md:col-span-8' : 'md:col-span-9'}`}>
                        <h3 className="font-bold text-lg md:text-xl text-text-light dark:text-text-dark group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-2">
                          {pub.title}
                        </h3>
@@ -379,10 +388,12 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
                             
                             {/* Top Header Info */}
                             <div className="relative z-10 flex justify-end gap-12 mb-32 pt-12 text-xs font-bold tracking-widest uppercase">
-                                <div className="flex flex-col items-end">
-                                    <span className="opacity-40 mb-1">Paper ID</span>
-                                    <span className="text-2xl border-b-2 border-black pb-1 min-w-[60px] text-right">{getPublicationDisplayId(selectedPub)}</span>
-                                </div>
+                                {showPublicationDisplayId(selectedPub) && (
+                                  <div className="flex flex-col items-end">
+                                      <span className="opacity-40 mb-1">Paper ID</span>
+                                      <span className="text-2xl border-b-2 border-black pb-1 min-w-[60px] text-right">{getPublicationDisplayId(selectedPub)}</span>
+                                  </div>
+                                )}
                                 <div className="flex flex-col items-end">
                                     <span className="opacity-40 mb-1">Venue</span>
                                     <span className="text-xl md:text-2xl border-b-2 border-black pb-1 min-w-[60px] max-w-[320px] text-right leading-tight">

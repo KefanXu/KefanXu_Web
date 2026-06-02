@@ -1,6 +1,7 @@
 export interface Publication {
   id: string;
   displayId?: string;
+  hideDisplayId?: boolean;
   title: string;
   authors: string[];
   conference: string;
@@ -27,6 +28,8 @@ export interface Project {
   collaboration?: string;
   image?: string;
   role?: string;
+  involvement?: 'lead' | 'collaborator';
+  paperUrl?: string;
 }
 
 export const personalInfo = {
@@ -52,6 +55,32 @@ export const personalInfo = {
 };
 
 export const publicationEnrichments: Publication[] = [
+  {
+    id: "chi2026",
+    title:
+      "Human-centered Perspectives on a Clinical Decision Support System for Intensive Outpatient Veteran PTSD Care",
+    authors: ["Cynthia M Baseman", "Myeonghan Ryu", "Nathaniel Swinger", "Kefan Xu", "Andrew M Sherrill", "Rosa I Arriaga"],
+    conference: "CHI2026",
+    displayId: "CHI2026",
+    year: 2026,
+  },
+  {
+    id: "chi2025-workshop",
+    title: "Facilitating Individuals' Sensemaking about Sedentary Behavior via Contextualized Data",
+    authors: ["Kefan Xu", "Rosa I Arriaga"],
+    conference: "CHI2025 Workshop",
+    displayId: "CHI2025",
+    year: 2025,
+  },
+  {
+    id: "master-thesis-2021",
+    title:
+      "Examining the Effect of Historical Planning Records on People's Planning and Execution of Subsequent Daily Physical Exercise",
+    authors: ["Kefan Xu"],
+    conference: "Master Thesis",
+    hideDisplayId: true,
+    year: 2021,
+  },
   {
     id: "cscw2025",
     title: "Understanding the Temporality of Informal Caregivers' Sense-Making on Conflicts and Life-Changing Events through Online Health Communities",
@@ -209,7 +238,8 @@ export const projects: Project[] = [
       "Leading the creation of patient-empowering sensors and mobile technologies."
     ],
     tags: ["Health Informatics", "Diabetes", "Sensing"],
-    role: "Lead Researcher"
+    role: "Lead Researcher",
+    involvement: "lead"
   },
   {
     id: "sedentary",
@@ -222,21 +252,8 @@ export const projects: Project[] = [
       "Refining existing Experience Sampling Methods to encompass richer annotated data."
     ],
     tags: ["Sense-Making", "Data Viz", "Activity Tracking"],
-    role: "Co-Investigator"
-  },
-  {
-    id: "fitbit-probe",
-    title: "FITBIT as Tech Probe: Understanding how Personal Tracking Devices can Promote Physical Activity in Low-SES Older Adults",
-    period: "2022 - Present",
-    collaboration: "Google × Georgia Tech",
-    description: [
-      "Examined the obstacles faced by low technology literacy individuals when engaging with technology.",
-      "Evaluated design methodologies intended for low technology literacy users.",
-      "Developing a methodology for crafting technology solutions that are intuitive and accessible.",
-      "Designing and deploying functional technology prototypes to empirically evaluate proposed design principles."
-    ],
-    tags: ["Health Equity", "Older Adults", "Wearables"],
-    role: "Researcher"
+    role: "Co-Investigator",
+    involvement: "lead"
   },
   {
     id: "pecss",
@@ -250,7 +267,8 @@ export const projects: Project[] = [
       "Created patient-facing tools to aid therapy and communication."
     ],
     tags: ["Mental Health", "Clinical Tools", "PTSD"],
-    role: "UX Researcher & Developer"
+    role: "UX Researcher & Developer",
+    involvement: "collaborator"
   },
   {
     id: "caregiving-reddit",
@@ -264,7 +282,9 @@ export const projects: Project[] = [
       "Parsed posts to elucidate the fluid dynamics characterizing caregiving experiences."
     ],
     tags: ["Caregiving", "Social Computing", "Qualitative Analysis"],
-    role: "Researcher"
+    role: "Researcher",
+    involvement: "lead",
+    paperUrl: "https://doi.org/10.1145/3757519"
   },
   {
     id: "reflective-iteration",
@@ -278,7 +298,9 @@ export const projects: Project[] = [
       "Summarized the results into an HCI paper offering valuable design insights."
     ],
     tags: ["Physical Activity", "Reflection", "Mobile App"],
-    role: "Lead Researcher"
+    role: "Lead Researcher",
+    involvement: "lead",
+    paperUrl: "https://doi.org/10.1145/3613904.3641937"
   },
   {
     id: "historical-planning",
@@ -292,49 +314,9 @@ export const projects: Project[] = [
       "Conducted a 28-day user study with seventeen participants."
     ],
     tags: ["Personal Informatics", "Planning", "iOS"],
-    role: "Lead Researcher"
-  },
-  {
-    id: "benzo-taper",
-    title: "Leveraging Large-Scale National Data to Understand, Reduce, and Prevent Benzodiazepine-Related Harms",
-    period: "2019 - 2022",
-    collaboration: "Michigan Medicine, University of Michigan",
-    description: [
-      "Designed and deployed a clinician-facing website to enhance communication regarding benzodiazepine misuse.",
-      "Conceptualized and devised the taper calculator algorithm for tailored taper schedules.",
-      "Crafted tracking mechanisms that enabled clinicians to closely monitor patients' progress.",
-      "Conducted interviews with clinicians to gauge the efficacy of the website."
-    ],
-    tags: ["Clinical Tools", "Web Development", "Healthcare"],
-    role: "Researcher & Developer"
-  },
-  {
-    id: "chronic-fatigue",
-    title: "Low-Burden Activity Pacing for Chronic Fatigue Self-Management",
-    period: "2019 - 2022",
-    collaboration: "University of Michigan",
-    description: [
-      "Developed seven reporting mechanisms inspired by self-tracking literature.",
-      "Designed low-burden hybrid Experience Sampling Methods (ESM) solutions.",
-      "Investigated activity practices of cardiac rehab patients.",
-      "Implemented 'Pace to Plan' platform using React Native and Google Firebase."
-    ],
-    tags: ["Chronic Illness", "Self-Management", "Mobile Dev"],
-    role: "Researcher & Developer"
-  },
-  {
-    id: "emog",
-    title: "Intelligent Design of Emotional Expression Sketches in Storyboards",
-    period: "2018",
-    collaboration: "TongJi University",
-    description: [
-      "Created FaceX dataset containing five million vector-drawing sketches.",
-      "Trained EmoG, a Sketch-RNN-based emotional expression generator.",
-      "Recruited 21 participants for a user study on EmoG's use in emotional storyboard creation.",
-      "Evaluated EmoG's efficiency and user-friendliness."
-    ],
-    tags: ["AI/ML", "Sketching", "Creativity Support"],
-    role: "Research Intern"
+    role: "Lead Researcher",
+    involvement: "lead",
+    paperUrl: "https://doi.org/10.1145/3491102.3501997"
   }
 ];
 

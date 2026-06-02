@@ -1,6 +1,6 @@
 [
   {
-    "abstract": "Psychotherapy delivery relies on a negotiation between patient self-reports and clinical intuition. Growing evidence for technological support of psychotherapy suggests opportunities to aid the mediation of this tension. To explore this prospect, we designed a prototype of a clinical decision support system (CDSS) for treating veterans with post-traumatic stress disorder in a Prolonged Exposure (PE) therapy intensive outpatient program. We conducted a two-phase interview study to collect perspectives from practicing PE clinicians and former PE patients who are United States veterans. Our analysis distills opportunities for a CDSS (e.g., offering homework review at a glance, aiding patient conceptualization) and larger challenges related to context and deployment (e.g., navigating Veterans Affairs). By reframing our findings through three human-centered perspectives (distributed cognition, situated learning, infrastructural inversion), we highlight the complexities of designing a CDSS for psychotherapists in this context and offer theory-aligned design considerations.",
+    "abstract": "Psychotherapy delivery relies on a negotiation between patient self-reports and clinical intuition. Growing evidence for technological support of psychotherapy suggests opportunities to aid the mediation of this tension. To explore this prospect, we designed a prototype of a clinical decision support system (CDSS) for treating veterans with post-traumatic stress disorder in a Prolonged Exposure (PE) therapy intensive outpatient program. We conducted a two-phase interview study to collect perspectives from practicing PE clinicians and former PE patients who are United States veterans. Our analysis distills opportunities for a CDSS (e.g., offering homework review at a glance, aiding patient conceptualization) and larger challenges related to context and deployment (e.g., navigating Veterans Affairs). By reframing our findings through three human-centered perspectives (distributed cognition, situated learning …",
     "authors": [
       "Cynthia M Baseman",
       "Myeonghan Ryu",
@@ -9,11 +9,11 @@
       "Andrew M Sherrill",
       "Rosa I Arriaga"
     ],
-    "conference": "arXiv preprint arXiv:2603.03467",
+    "conference": "Proceedings of the 2026 CHI Conference on Human Factors in Computing Systems",
     "displayId": "HCP-2026",
-    "doi": "https://arxiv.org/abs/2603.03467",
+    "doi": "https://doi.org/10.1145/3772318.3791575",
     "id": "human-centered-perspectives-on-a-clinica-se3iqnhoufwc",
-    "publicationDate": "2026/3/3",
+    "publicationDate": "2026/4/13",
     "scholarId": "ocdZFbwAAAAJ:Se3iqnhoufwC",
     "scholarUrl": "https://scholar.google.com/citations?view_op=view_citation&hl=en&user=ocdZFbwAAAAJ&pagesize=100&sortby=pubdate&citation_for_view=ocdZFbwAAAAJ:Se3iqnhoufwC",
     "title": "Human-centered Perspectives on a Clinical Decision Support System for Intensive Outpatient Veteran PTSD Care",

@@ -281,12 +281,12 @@ export const Home: React.FC = () => {
                     {/* PDF Content */}
                     <div className="flex-1 overflow-hidden flex flex-col bg-white dark:bg-neutral-900 relative">
                         {/* Header Bar */}
-                        <div className="flex justify-between items-center p-6 pr-20 border-b border-black/10 dark:border-white/10 bg-bg-light dark:bg-bg-dark">
-                            <h2 className="text-xl md:text-2xl font-bold text-text-light dark:text-text-dark font-heading uppercase tracking-widest">Curriculum Vitae</h2>
+                        <div className="flex items-center gap-4 p-6 pr-20 border-b border-black/10 dark:border-white/10 bg-bg-light dark:bg-bg-dark">
+                            <h2 className="text-xl md:text-2xl font-bold text-text-light dark:text-text-dark font-heading uppercase tracking-widest shrink-0">Curriculum Vitae</h2>
                             <a 
                                 href={cvPdf} 
                                 download="KefanXu_CV.pdf"
-                                className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-bold text-xs uppercase tracking-widest transition-colors"
+                                className="flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-bold text-xs uppercase tracking-widest transition-colors shrink-0"
                             >
                                 <Download size={16} />
                                 <span className="hidden md:inline">Download PDF</span>
