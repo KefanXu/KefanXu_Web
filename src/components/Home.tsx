@@ -2,10 +2,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { GraduationCap, Linkedin, Mail, X, Download } from 'lucide-react';
 import { Hero } from './Hero';
+import { Methodology } from './Methodology';
 import { MoonClock } from './MoonClock';
 import { ProfileMatrix } from './ProfileMatrix';
 import { AnimatePresence, motion } from 'framer-motion';
 import cvPdf from '../assets/KefanXu_CV.pdf';
+
+const carvedShell =
+  'rounded-[36px] bg-bg-light dark:bg-bg-dark border border-white/20 dark:border-white/5 shadow-[inset_3px_3px_6px_rgb(163,177,198,0.4),inset_-3px_-3px_6px_rgba(255,255,255,0.5)] dark:shadow-[inset_3px_3px_6px_#1d1e22,inset_-3px_-3px_6px_#393c44]';
 
 // Helper component for a single moon phase
 const MoonPhase: React.FC<{ phase: number; isActive: boolean }> = ({ phase, isActive }) => {
@@ -202,51 +206,59 @@ export const Home: React.FC = () => {
       </div>
 
       {/* Research Vision Section - Redesigned */}
-      <div id="investigating-life" className="flex flex-col lg:flex-row gap-16 items-center px-4 md:px-12 mt-24 w-full max-w-7xl mx-auto scroll-mt-32">
+      <div id="investigating-life" className="flex flex-col lg:flex-row gap-16 lg:items-start px-4 md:px-12 mt-24 w-full max-w-7xl mx-auto scroll-mt-32">
         {/* Left: Playful Interaction */}
         <div className="w-full lg:w-1/2 flex justify-center lg:justify-start">
           <MoonClock value={currentMoonPhase} onSliderChange={(val) => setCurrentMoonPhase(val / 100)} />
         </div>
 
-        {/* Right: Plain Text & Vision */}
-        <div className="w-full lg:w-1/2 space-y-12 relative">
-          <div className="relative z-10">
-            <h2 className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark leading-tight mb-6 font-heading">
-              Investigating Life Transitions.
-            </h2>
+        {/* Right: timeline vertically locked to MoonClock slider center on lg */}
+        <div className="w-full lg:w-1/2 relative flex flex-col">
+          {/* h2 sits just above timeline; both anchored to MoonClock slider row on lg */}
+          <h2 className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark leading-tight mb-8 lg:mb-0 font-heading lg:absolute lg:left-0 lg:right-0 lg:top-[calc(16rem+4rem+1.125rem+2.5rem-14rem)]">
+            Investigating Life Transitions.
+          </h2>
 
-            <div ref={timelineRef} className="flex gap-8 mb-24 overflow-x-auto pb-4 md:pb-0 pt-12 items-end scrollbar-hide snap-x">
-              {['Life changes', 'Reflection', 'Sense making', 'Coping', 'Iteration', 'Improving', 'Progressing'].map((step, i) => {
-                const phaseIndex = i;
-                const isActive = activePhaseIndex === phaseIndex;
+          {/* top offset = clock (16rem) + gaps (4rem) + time label (~1.125rem) + half slider (2.5rem) */}
+          <div className="mb-10 lg:mb-0 lg:absolute lg:left-0 lg:right-0 lg:top-[calc(16rem+4rem+1.125rem+2.5rem)] lg:-translate-y-1/2 z-10">
+            <div className={`${carvedShell} p-6 md:p-8 w-full`}>
+              <div
+                ref={timelineRef}
+                className="flex gap-8 overflow-x-auto pb-2 md:pb-0 pt-2 items-end scrollbar-hide snap-x px-1"
+              >
+                {['Life changes', 'Reflection', 'Sense making', 'Coping', 'Iteration', 'Improving', 'Progressing'].map((step, i) => {
+                  const phaseIndex = i;
+                  const isActive = activePhaseIndex === phaseIndex;
 
-                return (
-                  <div
-                    key={i}
-                    className="flex-shrink-0 flex flex-col items-center gap-4 group cursor-pointer"
-                    onClick={() => handleMoonPhaseClick(phaseIndex)}
-                  >
-                    <MoonPhase phase={phaseIndex} isActive={isActive} />
-                    <span
-                      className={`text-[10px] font-bold tracking-widest mt-2 transition-colors uppercase ${
-                        isActive ? 'text-text-light dark:text-text-dark' : 'text-text-light/40 dark:text-text-dark/40'
-                      }`}
+                  return (
+                    <div
+                      key={i}
+                      className="flex-shrink-0 flex flex-col items-center gap-4 group cursor-pointer"
+                      onClick={() => handleMoonPhaseClick(phaseIndex)}
                     >
-                      {step}
-                    </span>
-                  </div>
-                );
-              })}
+                      <MoonPhase phase={phaseIndex} isActive={isActive} />
+                      <span
+                        className={`text-[10px] font-bold tracking-widest mt-2 transition-colors uppercase ${
+                          isActive ? 'text-text-light dark:text-text-dark' : 'text-text-light/40 dark:text-text-dark/40'
+                        }`}
+                      >
+                        {step}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-
-            {/* Updated per your earlier CSS change: 300 -> 400 */}
-            <p className="text-lg md:text-xl font-normal text-text-light/80 dark:text-text-dark/80 leading-[30px] max-w-xl font-display">
-              I am intrigued by how individuals <span className="font-bold text-text-light dark:text-text-dark">comprehend and adjust to life transitions</span>, while also delving
-              into the designing technologies to assist individuals in <span className="font-bold text-text-light dark:text-text-dark">navigating such transitions</span>.
-            </p>
           </div>
+
+          <p className="mt-6 text-lg md:text-xl font-normal text-text-light/80 dark:text-text-dark/80 leading-[30px] max-w-xl font-display lg:mt-0 lg:pt-[calc(16rem+4rem+1.125rem+2.5rem+5.5rem+3rem)]">
+            I am intrigued by how individuals <span className="font-bold text-text-light dark:text-text-dark">comprehend and adjust to life transitions</span>, while also delving
+            into the designing technologies to assist individuals in <span className="font-bold text-text-light dark:text-text-dark">navigating such transitions</span>.
+          </p>
         </div>
       </div>
+
+      <Methodology />
       
       {/* CV Modal */}
       {createPortal(

@@ -20,6 +20,24 @@
     "year": 2026
   },
   {
+    "abstract": "With the rapid growth of the aging population, the prevalence of dementia is expected to increase significantly, leading to a growing reliance on family caregivers to provide essential support. While prior research has extensively examined the experiences of family caregivers, the perspectives of Persons Living with Dementia (PLWDs) and their roles in caregiving relationships remain underexplored in social gerontology, health informatics, and Human-Computer Interaction (HCI) literature. This study addresses this gap by conducting a qualitative analysis on posts created by PLWDs on an online dementia forum. We analyzed PLWD’s posts regarding their self-expressed needs, perceptions of their roles in caregiving relationships, and proposed design solutions to support their interactions with caregivers. We reveal that PLWDs wish to actively engage in shaping their relationships with caregivers and take proactive …",
+    "authors": [
+      "Hao Yuan",
+      "Kefan Xu",
+      "Rosa Arriaga",
+      "Jina Huh-Yoo"
+    ],
+    "conference": "ACM Transactions on Computing for Healthcare",
+    "displayId": "PNP-2026",
+    "doi": "https://doi.org/10.1145/3816696",
+    "id": "i-ma-person-not-a-patient-or-diagnosis-c-uebtzra9y70c",
+    "publicationDate": "2026",
+    "scholarId": "ocdZFbwAAAAJ:UebtZRa9Y70C",
+    "scholarUrl": "https://scholar.google.com/citations?view_op=view_citation&hl=en&user=ocdZFbwAAAAJ&pagesize=100&sortby=pubdate&citation_for_view=ocdZFbwAAAAJ:UebtZRa9Y70C",
+    "title": "“I’ma person–not a patient or diagnosis”: Centering the Person Living with Dementia’s Perspective on Caregiver Dynamics and Technology Design",
+    "year": 2026
+  },
+  {
     "abstract": "Informal caregivers perform an important role in taking care of family members with chronic disease. Informal caregivers' mental health can be negatively impacted by life-changing events (e.g., patients' diagnosis, care transitioning, etc.). This leads the caregiver to suffer from interpersonal and intrapersonal conflicts, causing a sense of disorientation and escalating malaise. In this study, we investigated informal caregivers' experiences of facing conflicts and life-changing events by qualitatively analyzing the data from online health communities. We categorized conflicts using a psychodynamic framework. We further looked at the interplay of life-changing events and conflicts and how this leads to caregivers' sense-making and decisions to mediate conflicts. We also found that online health communities provide support by helping caregivers interpret and navigate conflicts and raising awareness of the temporal …",
     "authors": [
       "Kefan Xu",

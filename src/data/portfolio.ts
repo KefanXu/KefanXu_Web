@@ -334,3 +334,54 @@ export const skills = {
     "React Native", "R", "MySQL", "d3.js"
   ]
 };
+
+export interface MethodologyStage {
+  id: string;
+  label: string;
+  blurb: string;
+  methods: string[];
+  tools: string[];
+  exampleProjectId: string;
+  exampleNote: string;
+}
+
+export const methodology: MethodologyStage[] = [
+  {
+    id: "design",
+    label: "Design",
+    blurb:
+      "I start in the field—interviews, contextual inquiry, and co-design sessions that surface what people actually need. Findings become structured insight through thematic analysis and affinity mapping, then tangible interaction concepts clinicians and participants can react to early.",
+    methods: [
+      "Interviews",
+      "Contextual Inquiry",
+      "Co-Design",
+      "Thematic Analysis",
+      "Affinity Mapping",
+      "Prototyping",
+    ],
+    tools: ["Figma", "NVivo"],
+    exampleProjectId: "pecss",
+    exampleNote: "PECSS — clinician and patient-facing tools for Prolonged Exposure therapy",
+  },
+  {
+    id: "develop",
+    label: "Develop",
+    blurb:
+      "I turn validated concepts into working systems—mobile apps, sensing pipelines, and dashboards built for the environments where people live and work. Engineering choices follow from field constraints, not the other way around.",
+    methods: ["Prototyping", "Interaction Design"],
+    tools: ["Swift", "React Native", "Python", "Unity", "Git"],
+    exampleProjectId: "historical-planning",
+    exampleNote: "Physicify — iOS app for exercise planning with historical data",
+  },
+  {
+    id: "deploy",
+    label: "Deploy",
+    blurb:
+      "Systems leave the lab through staged rollouts, field pilots, and study infrastructure that keeps participants supported. I measure impact through usability studies, longitudinal fieldwork, and peer-reviewed dissemination that closes the research loop.",
+    methods: ["Usability Evaluation", "Contextual Inquiry"],
+    tools: ["TestFlight", "Tableau", "R", "MySQL"],
+    exampleProjectId: "reflective-iteration",
+    exampleNote:
+      "Planneregy — TestFlight deployment, 42-day field study; Caregiving Reddit — CSCW 2025",
+  },
+];
