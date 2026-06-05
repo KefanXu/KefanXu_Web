@@ -400,9 +400,6 @@ const MenuGrid: React.FC<{ stage: MethodologyStage }> = ({ stage }) => {
  *  Bottom controls — carved neumorphic pills (IONIC-style)
  * ================================================================ */
 
-const carvedIcon =
-  'text-[#b0b8c6] dark:text-[#4a4f58] [filter:drop-shadow(1px_1px_0_rgba(163,177,198,0.75))_drop-shadow(-1px_-1px_0_rgba(255,255,255,0.9))] dark:[filter:drop-shadow(1px_1px_0_rgba(0,0,0,0.6))_drop-shadow(-1px_-1px_0_rgba(57,60,68,0.5))]';
-
 const PillButton = ({
   label,
   icon: Icon,
@@ -447,7 +444,7 @@ const PillButton = ({
       aria-hidden
     />
     <span className="shrink-0 flex items-center justify-center w-8">
-      <Icon size={17} strokeWidth={2.5} className={carvedIcon} />
+      <Icon size={17} strokeWidth={2.5} className="text-[#b0b8c6] dark:text-[#4a4f58]" />
     </span>
   </button>
 );
@@ -459,81 +456,80 @@ const applianceShell =
  *  Detail card
  * ================================================================ */
 
-const DetailCard: React.FC<{ stage: MethodologyStage; index: number }> = ({ stage, index }) => {
+const DetailPanel: React.FC<{ stage: MethodologyStage; index: number }> = ({ stage, index }) => {
   const num = String(index + 1).padStart(2, '0');
 
   return (
     <motion.div
       key={stage.id}
-      initial={{ opacity: 0, y: 10 }}
+      id="methodology-detail"
+      initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -6 }}
-      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-      className="w-full max-w-4xl mx-auto"
+      exit={{ opacity: 0, y: 8 }}
+      transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+      className="mt-8 pt-8 border-t border-text-light/10 dark:border-text-dark/10 text-left"
     >
-      <div className={`${applianceShell} text-left`}>
+      <motion.div
+        className="grid md:grid-cols-3 gap-6 md:gap-10 text-left"
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: {},
+          visible: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } },
+        }}
+      >
         <motion.div
-          className="grid md:grid-cols-3 gap-6 md:gap-10 text-left"
-          initial="hidden"
-          animate="visible"
           variants={{
-            hidden: {},
-            visible: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } },
+            hidden: { opacity: 0, y: 14 },
+            visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] } },
           }}
+          className="md:col-span-2 space-y-4 text-left"
         >
-          <motion.div
-            variants={{
-              hidden: { opacity: 0, y: 14 },
-              visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] } },
-            }}
-            className="md:col-span-2 space-y-4 text-left"
-          >
-            <div className="flex items-baseline justify-start gap-3">
-              <span className="text-[11px] font-mono font-bold uppercase tracking-[0.25em] text-text-light/35 dark:text-text-dark/35">
-                {num} / 03
-              </span>
-              <h3 className="text-xl md:text-2xl font-bold text-text-light dark:text-text-dark font-heading text-left">
-                {stage.label}
-              </h3>
-            </div>
-            <p className="text-base leading-relaxed text-text-light/75 dark:text-text-dark/75 font-display text-left">
-              {stage.blurb}
-            </p>
-          </motion.div>
-          <motion.div
-            variants={{
-              hidden: { opacity: 0, y: 14 },
-              visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] } },
-            }}
-            className="space-y-4 text-left"
-          >
-            <div>
-              <p className="text-[9px] font-mono font-bold uppercase tracking-[0.25em] text-text-light/35 dark:text-text-dark/35 mb-1.5 text-left">
-                Methods
-              </p>
-              <ul className="space-y-0.5 text-left list-none pl-0">
-                {stage.methods.map((m) => (
-                  <li key={m} className="text-[11px] font-mono text-text-light/60 dark:text-text-dark/60 text-left leading-snug">
-                    {m}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <p className="text-[9px] font-mono font-bold uppercase tracking-[0.25em] text-text-light/35 dark:text-text-dark/35 mb-1.5 text-left">
-                Tools
-              </p>
-              <ul className="space-y-0.5 text-left list-none pl-0">
-                {stage.tools.map((t) => (
-                  <li key={t} className="text-[11px] font-mono text-text-light/60 dark:text-text-dark/60 text-left leading-snug">
-                    {t}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </motion.div>
+          <div className="flex items-baseline justify-start gap-3">
+            <span className="text-[11px] font-mono font-bold uppercase tracking-[0.25em] text-text-light/35 dark:text-text-dark/35">
+              {num} / 03
+            </span>
+            <h3 className="text-xl md:text-2xl font-bold text-text-light dark:text-text-dark font-heading text-left">
+              {stage.label}
+            </h3>
+          </div>
+          <p className="text-base leading-relaxed text-text-light/75 dark:text-text-dark/75 font-display text-left">
+            {stage.blurb}
+          </p>
         </motion.div>
-      </div>
+        <motion.div
+          variants={{
+            hidden: { opacity: 0, y: 14 },
+            visible: { opacity: 1, y: 0, transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] } },
+          }}
+          className="space-y-4 text-left"
+        >
+          <div>
+            <p className="text-[9px] font-mono font-bold uppercase tracking-[0.25em] text-text-light/35 dark:text-text-dark/35 mb-1.5 text-left">
+              Methods
+            </p>
+            <ul className="space-y-0.5 text-left list-none pl-0">
+              {stage.methods.map((m) => (
+                <li key={m} className="text-[11px] font-mono text-text-light/60 dark:text-text-dark/60 text-left leading-snug">
+                  {m}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="text-[9px] font-mono font-bold uppercase tracking-[0.25em] text-text-light/35 dark:text-text-dark/35 mb-1.5 text-left">
+              Tools
+            </p>
+            <ul className="space-y-0.5 text-left list-none pl-0">
+              {stage.tools.map((t) => (
+                <li key={t} className="text-[11px] font-mono text-text-light/60 dark:text-text-dark/60 text-left leading-snug">
+                  {t}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </motion.div>
+      </motion.div>
     </motion.div>
   );
 };
@@ -555,19 +551,19 @@ export const Methodology: React.FC = () => {
   return (
     <section
       id="methodology"
-      className="flex flex-col gap-10 px-4 md:px-12 mt-40 mb-12 md:mt-56 md:mb-16 w-full max-w-7xl mx-auto scroll-mt-32"
+      className="flex flex-col gap-24 md:gap-28 px-4 md:px-12 mt-40 mb-12 md:mt-56 md:mb-16 w-full max-w-7xl mx-auto scroll-mt-32"
     >
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
-        className="text-center max-w-3xl mx-auto space-y-4"
+        className="text-center max-w-3xl mx-auto flex flex-col items-center"
       >
-        <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-text-light/40 dark:text-text-dark/40">
+        <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-text-light/40 dark:text-text-dark/40 mb-4">
           From Insight to Impact
         </p>
-        <h2 className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark leading-tight font-heading">
+        <h2 className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark leading-tight font-heading mb-10 md:mb-12">
           Designing, Developing, Deploying.
         </h2>
         <p className="text-lg md:text-xl font-normal text-text-light/80 dark:text-text-dark/80 leading-relaxed font-display">
@@ -665,26 +661,14 @@ export const Methodology: React.FC = () => {
               />
             ))}
           </div>
+
+          <AnimatePresence mode="wait">
+            {hasInteracted && (
+              <DetailPanel stage={activeStage} index={activeIndex} />
+            )}
+          </AnimatePresence>
         </div>
       </motion.div>
-
-      <AnimatePresence>
-        {hasInteracted && (
-          <motion.div
-            id="methodology-detail"
-            key="methodology-detail"
-            className="w-full max-w-4xl mx-auto text-left overflow-hidden"
-            initial={{ opacity: 0, y: 32 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <AnimatePresence mode="wait">
-              <DetailCard stage={activeStage} index={activeIndex} />
-            </AnimatePresence>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </section>
   );
 };
