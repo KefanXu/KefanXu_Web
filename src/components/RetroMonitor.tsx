@@ -20,9 +20,9 @@ export const RetroMonitor: React.FC<RetroMonitorProps> = ({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
+      initial={{ opacity: 0, y: 24, scale: 0.95 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 0.45, delay: index * 0.1 }}
       className="flex flex-col items-center gap-3"
     >

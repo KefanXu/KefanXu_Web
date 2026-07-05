@@ -1,9 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { NeuInput } from './NeuInput';
-import { ConcaveCard } from './ConcaveCard';
 import { EcologicalDiagram } from './EcologicalDiagram';
-import { LCDBezel } from './LCDBezel';
 import { Publication } from '../data/portfolio';
 import { publications } from '../data/publications';
 import {
@@ -19,13 +16,24 @@ import {
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion';
 
 export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }> = ({ setIsDetailOpen }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedPub, setSelectedPub] = useState<Publication | null>(null);
   const [activeSystems, setActiveSystems] = useState<Set<'Microsystem' | 'Mesosystem' | 'Macrosystem' | 'Chronosystem'>>(new Set());
   const [direction, setDirection] = useState(0);
+
+  // Ecological Lens section parallax
+  const ecologicalRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: ecologicalScroll } = useScroll({
+    target: ecologicalRef,
+    offset: ['start end', 'end start'],
+  });
+  const ecologicalHeadingY = useTransform(ecologicalScroll, [0, 1], [55, -40]);
+  const ecologicalLeftY = useTransform(ecologicalScroll, [0, 1], [55, -60]);   // text — very fast
+  const ecologicalRightY = useTransform(ecologicalScroll, [0, 1], [-10, 16]);  // visual — very slow
+  const diagramRotate = useTransform(ecologicalScroll, [0, 1], [0, 6]);       // light spin
 
   // Notify parent about detail view state
   useEffect(() => {
@@ -109,14 +117,21 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
     <div className="space-y-12 max-w-7xl mx-auto">
       
       {/* Ecological Diagram Section - Above Publications */}
-      <div className="mb-16">
+      <div ref={ecologicalRef} id="ecological-lens" className="mb-16 scroll-mt-32">
         <div className="w-full flex flex-col lg:flex-row items-start lg:items-center justify-between gap-10 lg:gap-16 py-8 px-4 md:px-12">
           {/* Left controls */}
-          <div className="shrink-0 max-w-lg">
+          <motion.div style={{ y: ecologicalLeftY }} className="shrink-0 max-w-lg">
             <div className="flex flex-col mb-4">
-              <h3 className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark leading-tight mb-10 lg:mb-20 font-heading">
+              <motion.h3
+              initial={{ opacity: 0, y: 16, scale: 0.95 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, margin: '-60px' }}
+              transition={{ duration: 0.5 }}
+              style={{ y: ecologicalHeadingY }}
+              className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark leading-tight mb-10 lg:mb-20 font-heading"
+            >
                 Ecological Lens.
-              </h3>
+            </motion.h3>
               
               <div className="flex flex-wrap grid grid-cols-2 lg:flex lg:flex-wrap gap-5 mb-10 lg:mb-14 order-last lg:order-none">
               {(['Microsystem', 'Mesosystem', 'Macrosystem', 'Chronosystem'] as const).map((label) => {
@@ -196,128 +211,87 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
               })}
               </div>
 
-              <p className="text-lg md:text-xl font-normal text-text-light/80 dark:text-text-dark/80 leading-[30px] max-w-sm mt-0 lg:mt-10 mb-8 lg:mb-0 font-display">
+              <motion.p
+                initial={{ opacity: 0, y: 16, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="text-lg md:text-xl font-normal text-text-light/80 dark:text-text-dark/80 leading-[30px] max-w-sm mt-0 lg:mt-10 mb-8 lg:mb-0 font-display"
+              >
                 My research applies an <span className="font-bold text-text-light dark:text-text-dark">ecological lens</span> that situates individuals at the center of multiple interconnected layers, aiming to investigate how the information is transiting between and how the ecology evolves over time.
-              </p>
+              </motion.p>
             </div>
-          </div>
+          </motion.div>
 
           {/* Right: Diagram (kept on right, but closer to controls) */}
-          <div className="flex-1 w-full flex justify-center lg:justify-end">
+          <motion.div style={{ y: ecologicalRightY, rotate: diagramRotate }} className="flex-1 w-full flex justify-center lg:justify-end">
             <EcologicalDiagram activeSystems={activeSystems} />
-          </div>
+          </motion.div>
         </div>
       </div>
 
       {/* Section Header */}
-      <div className="flex items-center gap-3 border-b border-text-light/10 dark:border-text-dark/10 pb-4">
+      <div id="publications" className="flex items-center gap-3 border-b border-text-light/10 dark:border-text-dark/10 pb-4 scroll-mt-32">
           <Database size={20} className="text-blue-500" />
-          <div>
-              <h2 className="text-xl font-bold text-text-light dark:text-text-dark">Publications</h2>
-              <p className="text-[10px] uppercase tracking-widest opacity-50 font-mono">Auto-synced from Google Scholar</p>
-          </div>
+          <h2 className="text-xl font-bold text-text-light dark:text-text-dark">Publications</h2>
+          <span className="text-[10px] font-mono opacity-40 ml-auto">{filteredPubs.length} papers</span>
       </div>
 
-      {/* Search & Filter Section (No Panel) */}
-      <div>
-         <div className="flex flex-col md:flex-row gap-6 items-end">
-            <div className="flex-1 w-full">
-               <label className="text-[10px] uppercase font-bold text-text-light/50 dark:text-text-dark/50 mb-2 block tracking-wider flex items-center gap-2">
-                 <Search size={12} /> Search Keywords / Tags
-               </label>
-               <NeuInput 
-                placeholder="Enter search terms..." 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="font-mono text-sm"
-              />
-            </div>
-            <div className="flex gap-2 h-full">
-               {/* Retro Camera LCD Counter - Unified bezel */}
-               <LCDBezel
-                 outerRadiusClassName="rounded-2xl"
-                 trenchRadiusClassName="rounded-[14px]"
-                 outerClassName="h-14 min-w-[92px]"
-                 trenchClassName="w-full h-full"
-                 trenchPaddingClassName="p-[3px]"
-               >
-                 <div className="w-full h-full bg-[#8aa899] rounded-[12px] flex flex-col items-center justify-center relative overflow-hidden">
-                   {/* Pixel Grid Overlay */}
-                   <div className="absolute inset-0 opacity-[0.08] pointer-events-none" 
-                        style={{ 
-                          backgroundImage: 'linear-gradient(to right, #1a2f23 1px, transparent 1px), linear-gradient(to bottom, #1a2f23 1px, transparent 1px)',
-                          backgroundSize: '3px 3px'
-                        }} 
-                   />
-                   <span className="text-[7px] font-bold text-[#1a2f23] opacity-60 uppercase tracking-widest mb-0.5 relative z-10">Count</span>
-                   <span className="font-mono text-xl font-bold text-[#1a2f23] leading-none tracking-widest relative z-10">
-                     {filteredPubs.length.toString().padStart(2, '0')}
-                   </span>
-                 </div>
-               </LCDBezel>
-            </div>
-         </div>
+      {/* Search */}
+      <div className="relative">
+        <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-text-light/30 dark:text-text-dark/30" />
+        <input
+          type="text"
+          placeholder="Search publications..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full pl-10 pr-4 py-2.5 text-sm rounded-lg border border-text-light/15 dark:border-text-dark/15 bg-transparent text-text-light dark:text-text-dark placeholder:text-text-light/30 dark:placeholder:text-text-dark/30 focus:outline-none focus:border-blue-500/50 transition-colors font-mono"
+        />
       </div>
 
-      {/* Publications Grid (No Panel) */}
+      {/* Publications List */}
       <div className="min-h-[500px]">
-        <div className="grid grid-cols-1 gap-8">
-          {/* Header Row (Hidden as we are moving to cards) */}
-          
-          {filteredPubs.map((pub) => (
-            <motion.div 
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: '-60px' }}
+          variants={{
+            hidden: {},
+            visible: { transition: { staggerChildren: 0.04, delayChildren: 0.05 } },
+          }}
+        >
+          {filteredPubs.map((pub, i) => (
+            <motion.div
               layoutId={`card-container-${pub.id}`}
-              key={pub.id} 
+              key={pub.id}
+              variants={{
+                hidden: { opacity: 0, y: 12 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] } },
+              }}
               transition={{ duration: 0 }}
+              onClick={() => setSelectedPub(pub)}
+              className={`group cursor-pointer flex items-start justify-between gap-8 py-8 border-t border-text-light/[0.07] dark:border-text-dark/[0.07] ${i === 0 ? 'border-t-0' : ''} hover:bg-text-light/[0.02] dark:hover:bg-text-dark/[0.02] -mx-2 px-2 rounded-lg transition-colors duration-150`}
             >
-              <ConcaveCard 
-                onClick={() => setSelectedPub(pub)}
-                className="cursor-pointer group"
-              >
-                 <div className="md:grid md:grid-cols-12 md:gap-6 md:items-center">
-                    
-                    {/* ID Status Line (Mobile) */}
-                    {showPublicationDisplayId(pub) ? (
-                      <div className="col-span-12 flex md:hidden justify-between items-center mb-4 text-xs font-mono opacity-50">
-                         <span>#{getPublicationDisplayId(pub)}</span>
-                         <span>{pub.year}</span>
-                      </div>
-                    ) : (
-                      <div className="col-span-12 flex md:hidden justify-end items-center mb-4 text-xs font-mono opacity-50">
-                         <span>{pub.year}</span>
-                      </div>
-                    )}
-
-                    {/* Desktop Columns */}
-                    {showPublicationDisplayId(pub) && (
-                      <div className="hidden md:flex col-span-1 font-mono text-xs opacity-30 justify-center items-center h-full border-r border-black/5 dark:border-white/5">
-                          <div className="-rotate-90 whitespace-nowrap tracking-widest font-bold">#{getPublicationDisplayId(pub)}</div>
-                      </div>
-                    )}
-                    
-                    <div className={`col-span-12 ${showPublicationDisplayId(pub) ? 'md:col-span-8' : 'md:col-span-9'}`}>
-                       <h3 className="font-bold text-lg md:text-xl text-text-light dark:text-text-dark group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-2">
-                         {pub.title}
-                       </h3>
-                       <div className="flex items-center gap-2 text-xs text-text-light/60 dark:text-text-dark/60">
-                         <User size={12} />
-                         <span className="truncate max-w-md font-mono">{pub.authors.join(", ")}</span>
-                       </div>
-                    </div>
-
-                    <div className="col-span-12 md:col-span-3 mt-4 md:mt-0 flex flex-col justify-center items-start md:items-end">
-                       <div className="text-right">
-                           <span className="text-xs font-mono font-bold text-blue-500 block mb-1 max-w-full md:max-w-[18rem] leading-relaxed">
-                             {pub.conference}
-                           </span>
-                           <span className="text-[10px] font-bold text-text-light/40 dark:text-text-dark/40 uppercase tracking-widest">{pub.year}</span>
-                       </div>
-                    </div>
-                 </div>
-              </ConcaveCard>
+              <div className="min-w-0 flex-1">
+                <h3 className="font-semibold text-base md:text-lg text-text-light dark:text-text-dark group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors leading-snug">
+                  {pub.title}
+                </h3>
+                <p className="mt-1.5 text-xs text-text-light/50 dark:text-text-dark/50 font-mono truncate">
+                  <User size={10} className="inline mr-1.5 -mt-0.5" />
+                  {pub.authors.join(", ")}
+                </p>
+              </div>
+              <div className="flex flex-col items-end shrink-0 pt-1 gap-1.5">
+                <span className="text-[11px] font-mono font-semibold text-blue-500 text-right leading-snug max-w-[14rem]">
+                  {pub.conference}
+                </span>
+                <span className="text-[10px] font-mono text-text-light/35 dark:text-text-dark/35">
+                  {pub.year}
+                </span>
+              </div>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
 
             {/* Detail Modal - Belgium Poster Style */}
@@ -383,7 +357,7 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
                     </button>
 
                     {/* Poster Content - Scrollable */}
-                    <div className="flex-1 overflow-y-auto custom-scrollbar overscroll-contain">
+                    <div className="flex-1 overflow-y-auto custom-scrollbar overscroll-contain" data-lenis-prevent>
                         <div className="min-h-full bg-white text-black p-8 md:p-16 relative overflow-hidden">
                             
                             {/* Top Header Info */}

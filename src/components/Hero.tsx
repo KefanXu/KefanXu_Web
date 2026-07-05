@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { ToggleSwitch, ToggleSmall } from './NeuControls';
 import { Shield, Database, Hash } from 'lucide-react';
-import { motion, useMotionValue, useTransform } from 'framer-motion';
+import { motion, useMotionValue, useTransform, useScroll } from 'framer-motion';
 import { SnakeGame } from './SnakeGame';
 import { PSPControls } from './PSPControls';
 import { LCDBezel } from './LCDBezel';
@@ -21,10 +21,21 @@ export const Hero: React.FC = () => {
 
   // 3D Tilt Effect
   const cardRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotateX = useTransform(y, [-300, 300], [2, -2]);
   const rotateY = useTransform(x, [-300, 300], [-2, 2]);
+
+  // Scroll-driven parallax
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end start'],
+  });
+  const cardScale = useTransform(scrollYProgress, [0, 1], [1, 0.78]);
+  const cardY = useTransform(scrollYProgress, [0, 1], [0, -70]);
+  const headerY = useTransform(scrollYProgress, [0, 1], [0, 50]);
+  const controlsY = useTransform(scrollYProgress, [0, 1], [0, 35]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
@@ -56,16 +67,17 @@ export const Hero: React.FC = () => {
     : 'border-[#333]';
 
   return (
-    <section className="pt-48 pb-12 mb-32 flex flex-col items-center justify-center min-h-[70vh] perspective-1000 w-full max-w-7xl mx-auto px-4">
+    <section ref={sectionRef} className="pt-48 pb-12 mb-32 flex flex-col items-center justify-center min-h-[70vh] perspective-1000 w-full max-w-7xl mx-auto px-4">
       
-      <div className="text-center mb-16">
+      <motion.div style={{ scale: cardScale, y: cardY }} className="w-full flex flex-col items-center">
+      <motion.div style={{ y: headerY }} className="text-center mb-16">
         <h2 className="text-text-light dark:text-text-dark text-sm tracking-[0.3em] uppercase mb-2 font-mono">
           About Me
         </h2>
         <p className="text-text-light dark:text-text-dark text-xs opacity-60">
           Kefan Xu - PhD Student
         </p>
-      </div>
+      </motion.div>
 
       <motion.div
         ref={cardRef}
@@ -76,7 +88,7 @@ export const Hero: React.FC = () => {
       >
         
         {/* LEFT CONTROLS (Desktop: Left Column, Mobile: Hidden/Moved below) */}
-        <div className="hidden lg:flex flex-col gap-10 mt-4 items-center order-1">
+        <motion.div style={{ y: controlsY }} className="hidden lg:flex flex-col gap-10 mt-4 items-center order-1">
            <ToggleSwitch 
              isChecked={power} 
              onChange={setPower} 
@@ -92,7 +104,7 @@ export const Hero: React.FC = () => {
              onChange={setBacklight}
              label="Backlight"
            />
-        </div>
+        </motion.div>
 
         {/* CENTER SCREEN MODULE */}
         <div className="relative flex-grow max-w-2xl w-full order-1 lg:order-2">
@@ -201,7 +213,7 @@ export const Hero: React.FC = () => {
         </div>
 
         {/* RIGHT CONTROLS (Desktop: Right Column, Mobile: Hidden/Moved below) */}
-        <div className="hidden lg:flex flex-col gap-10 mt-4 items-center order-3">
+        <motion.div style={{ y: controlsY }} className="hidden lg:flex flex-col gap-10 mt-4 items-center order-3">
            <ToggleSwitch 
              isChecked={bioMetrics} 
              onChange={setBioMetrics} 
@@ -222,7 +234,7 @@ export const Hero: React.FC = () => {
                  <span className="text-[9px] font-mono uppercase opacity-50 tracking-widest">Data Link</span>
               </div>
            </div>
-        </div>
+        </motion.div>
 
         {/* MOBILE CONTROLS (Horizontal Grid) */}
         <div className="lg:hidden w-full order-2 mt-8">
@@ -257,6 +269,7 @@ export const Hero: React.FC = () => {
 
       </motion.div>
 
+      </motion.div>
     </section>
   );
 };

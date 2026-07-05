@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { LCDBezel } from './LCDBezel';
 import {
   Palette,
@@ -548,24 +548,37 @@ export const Methodology: React.FC = () => {
     setActiveIndex(index);
   };
 
+  // Methodology section parallax
+  const methodologyRef = useRef<HTMLElement>(null);
+  const { scrollYProgress: methodologyScroll } = useScroll({
+    target: methodologyRef,
+    offset: ['start end', 'end start'],
+  });
+  const methodologyHeadingY = useTransform(methodologyScroll, [0, 1], [55, -45]);
+  const applianceScale = useTransform(methodologyScroll, [0, 0.3, 0.7, 1], [0.78, 1, 1, 0.90]);
+
   return (
     <section
+      ref={methodologyRef}
       id="methodology"
-      className="flex flex-col gap-24 md:gap-28 px-4 md:px-12 mt-40 mb-12 md:mt-56 md:mb-16 w-full max-w-7xl mx-auto scroll-mt-32"
+      className="flex flex-col gap-24 md:gap-28 px-4 md:px-12 mt-12 mb-24 md:mt-16 md:mb-32 w-full max-w-7xl mx-auto scroll-mt-32"
     >
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
+        initial={{ opacity: 0, y: 20, scale: 0.95 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        viewport={{ once: true, margin: '-50px' }}
         transition={{ duration: 0.5 }}
         className="text-center max-w-3xl mx-auto flex flex-col items-center"
       >
         <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-text-light/40 dark:text-text-dark/40 mb-4">
           From Insight to Impact
         </p>
-        <h2 className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark leading-tight font-heading mb-10 md:mb-12">
+        <motion.h2
+          style={{ y: methodologyHeadingY }}
+          className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark leading-tight font-heading mb-10 md:mb-12"
+        >
           Designing, Developing, Deploying.
-        </h2>
+        </motion.h2>
         <p className="text-lg md:text-xl font-normal text-text-light/80 dark:text-text-dark/80 leading-relaxed font-display">
           I translate research insight into systems that meet people where they live—through a
           repeatable pipeline from discovery to evaluation in the wild.
@@ -573,10 +586,11 @@ export const Methodology: React.FC = () => {
       </motion.div>
 
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.1 }}
+        viewport={{ once: true, margin: '-50px' }}
+        transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+        style={{ scale: applianceScale }}
         className="w-full max-w-4xl mx-auto"
       >
         <div className={applianceShell}>
@@ -649,18 +663,34 @@ export const Methodology: React.FC = () => {
             </div>
           </LCDBezel>
 
-          <div className="grid grid-cols-3 gap-4 md:gap-6 mt-8">
+          <motion.div
+            className="grid grid-cols-3 gap-4 md:gap-6 mt-8"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-30px' }}
+            variants={{
+              hidden: {},
+              visible: { transition: { staggerChildren: 0.1, delayChildren: 0.3 } },
+            }}
+          >
             {methodology.map((stage, i) => (
-              <PillButton
+              <motion.div
                 key={stage.id}
-                icon={stageIcons[i]}
-                label={stage.label}
-                onClick={() => selectStage(i)}
-                ariaLabel={`${stage.label} stage`}
-                active={hasInteracted && activeIndex === i}
-              />
+                variants={{
+                  hidden: { opacity: 0, y: 16, scale: 0.95 },
+                  visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } },
+                }}
+              >
+                <PillButton
+                  icon={stageIcons[i]}
+                  label={stage.label}
+                  onClick={() => selectStage(i)}
+                  ariaLabel={`${stage.label} stage`}
+                  active={hasInteracted && activeIndex === i}
+                />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
           <AnimatePresence mode="wait">
             {hasInteracted && (

@@ -6,7 +6,7 @@ import {
   Calendar, Cpu, Search, Activity, LayoutDashboard, 
   MessageSquare, RefreshCw, History, FileText
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { AbstractPattern } from './AbstractPattern';
 
 import { GlowingPill } from './GlowingPill';
@@ -89,12 +89,95 @@ const ProjectIcon = ({
   );
 };
 
+/* ================================================================
+ *  ProjectRow — scroll parallax for visual vs text card
+ * ================================================================ */
+
+const ProjectRow: React.FC<{
+  proj: (typeof projects)[number];
+  index: number;
+  getProjectVisual: (id: string) => React.ReactNode;
+}> = ({ proj, index, getProjectVisual }) => {
+  const rowRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: rowRef,
+    offset: ['start end', 'end start'],
+  });
+  const visualY = useTransform(scrollYProgress, [0, 1], [12, -10]);   // visual — slow
+  const textCardY = useTransform(scrollYProgress, [0, 1], [-40, 55]);  // text — fast, big move
+  const isImageRight = index % 2 === 0;
+  const involvement = proj.involvement ?? 'lead';
+
+  return (
+    <div
+      ref={rowRef}
+      id={proj.id}
+      className={`flex flex-col ${isImageRight ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-center gap-24 lg:gap-60 scroll-mt-32`}
+    >
+      <motion.div
+        className="shrink-0 flex justify-center w-full lg:w-auto"
+        initial={{ opacity: 0, scale: 0.85, y: 20 }}
+        whileInView={{ opacity: 1, scale: 1, y: 0 }}
+        viewport={{ once: true, margin: '-60px' }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        style={{ y: visualY }}
+      >
+        {getProjectVisual(proj.id)}
+      </motion.div>
+
+      <motion.div
+        className="max-w-xl w-full"
+        initial={{ opacity: 0, x: isImageRight ? -30 : 30, scale: 0.95 }}
+        whileInView={{ opacity: 1, x: 0, scale: 1 }}
+        viewport={{ once: true, margin: '-60px' }}
+        transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+        style={{ y: textCardY }}
+      >
+        <PeriodRow period={proj.period} involvement={involvement} />
+        <h3 className="text-2xl md:text-3xl font-bold text-text-light dark:text-text-dark leading-tight mb-6 font-heading">
+          {proj.title}
+        </h3>
+        <div className="mb-10 flex flex-wrap gap-2">
+          {proj.tags?.map((tag) => (
+            <span key={tag} className="text-[10px] uppercase font-bold px-2 py-1 rounded bg-black/5 dark:bg-white/5 text-text-light/50 dark:text-text-dark/50 tracking-wider">
+              {tag}
+            </span>
+          ))}
+        </div>
+        <div className="space-y-8 text-sm md:text-base font-normal text-text-light/80 dark:text-text-dark/80 leading-[30px] font-display">
+          {proj.description.map((desc, i) => (
+            <p key={i}>
+              {desc.split(' ').map((word, wI) => (
+                ['studies', 'sensors', 'clinicians', 'technologies', 'contextual', 'physical'].some((k) => word.toLowerCase().includes(k))
+                  ? <span key={wI} className="font-bold text-text-light dark:text-text-dark">{word} </span>
+                  : word + ' '
+              ))}
+            </p>
+          ))}
+        </div>
+        {proj.paperUrl && (
+          <div className="mt-8">
+            <PaperPdfButton href={proj.paperUrl} />
+          </div>
+        )}
+      </motion.div>
+    </div>
+  );
+};
+
 export const Projects: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState<'list' | 'compact'>('list');
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
 
   const itemsRef = useRef(new Map<string, HTMLDivElement>());
+  const ducssRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: ducssScroll } = useScroll({
+    target: ducssRef,
+    offset: ['start end', 'end start'],
+  });
+  const ducssLeftY = useTransform(ducssScroll, [0, 1], [10, -8]);    // visual — very slow
+  const ducssRightY = useTransform(ducssScroll, [0, 1], [-45, 65]); // text — very fast
 
   const filteredProjects = projects.filter(proj => 
     proj.id !== 'ducss' && (
@@ -205,12 +288,12 @@ export const Projects: React.FC = () => {
             className="space-y-64"
           >
                 {/* Featured Project: DUCSS */}
-                <div className="flex flex-col lg:flex-row items-center gap-24 lg:gap-60">
-                  <div className="shrink-0 transform scale-90 lg:scale-100 flex justify-center w-full lg:w-auto">
+                <div ref={ducssRef} id="ducss" className="flex flex-col lg:flex-row items-center gap-24 lg:gap-60 scroll-mt-32">
+                  <motion.div style={{ y: ducssLeftY }} className="shrink-0 transform scale-90 lg:scale-100 flex justify-center w-full lg:w-auto">
                      <GlowingPill />
-                  </div>
+                  </motion.div>
 
-                  <div className="max-w-xl w-full">
+                  <motion.div style={{ y: ducssRightY }} className="max-w-xl w-full">
                       <PeriodRow period="2022 - Present" involvement="lead" />
 
                       <h3 className="text-2xl md:text-3xl font-bold text-text-light dark:text-text-dark leading-tight mb-6 font-heading">
@@ -236,70 +319,18 @@ export const Projects: React.FC = () => {
                            Leading the creation of <span className="font-bold text-text-light dark:text-text-dark">patient-empowering sensors</span> and mobile technologies.
                          </p>
                       </div>
-                  </div>
+                  </motion.div>
                 </div>
                 
                 <div className="space-y-64">
-                  {filteredProjects.map((proj, index) => {
-                     const isImageRight = index % 2 === 0;
-                     const involvement = proj.involvement ?? 'lead';
-
-                     return (
-                       <div
-                         key={proj.id}
-                         className={`flex flex-col ${isImageRight ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-center gap-24 lg:gap-60`}
-                       >
-                          <motion.div 
-                            className="shrink-0 flex justify-center w-full lg:w-auto"
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.5 }}
-                          >
-                             {getProjectVisual(proj.id)}
-                          </motion.div>
-
-                          <motion.div 
-                            className="max-w-xl w-full"
-                            initial={{ opacity: 0, x: isImageRight ? -20 : 20 }}
-                            whileInView={{ opacity: 1, x: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.5, delay: 0.2 }}
-                          >
-                              <PeriodRow period={proj.period} involvement={involvement} />
-
-                              <h3 className="text-2xl md:text-3xl font-bold text-text-light dark:text-text-dark leading-tight mb-6 font-heading">
-                                {proj.title}
-                              </h3>
-
-                              <div className="mb-10 flex flex-wrap gap-2">
-                                {proj.tags?.map(tag => (
-                                  <span key={tag} className="text-[10px] uppercase font-bold px-2 py-1 rounded bg-black/5 dark:bg-white/5 text-text-light/50 dark:text-text-dark/50 tracking-wider">
-                                    {tag}
-                                  </span>
-                                ))}
-                              </div>
-
-                              <div className="space-y-8 text-sm md:text-base font-normal text-text-light/80 dark:text-text-dark/80 leading-[30px] font-display">
-                                  {proj.description.map((desc, i) => (
-                                     <p key={i}>
-                                       {desc.split(' ').map((word, wI) => (
-                                         ['studies', 'sensors', 'clinicians', 'technologies', 'contextual', 'physical'].some(k => word.toLowerCase().includes(k)) 
-                                         ? <span key={wI} className="font-bold text-text-light dark:text-text-dark">{word} </span>
-                                         : word + ' '
-                                       ))}
-                                     </p>
-                                  ))}
-                              </div>
-                              {proj.paperUrl && (
-                                <div className="mt-8">
-                                  <PaperPdfButton href={proj.paperUrl} />
-                                </div>
-                              )}
-                          </motion.div>
-                       </div>
-                     );
-                  })}
+                  {filteredProjects.map((proj, index) => (
+                    <ProjectRow
+                      key={proj.id}
+                      proj={proj}
+                      index={index}
+                      getProjectVisual={getProjectVisual}
+                    />
+                  ))}
                 </div>
           </motion.div>
         ) : (
@@ -322,7 +353,7 @@ export const Projects: React.FC = () => {
                   const isSelected = selectedProjectId === proj.id;
                   
                   return (
-                    <div key={proj.id} className="flex flex-col items-center">
+                    <div key={proj.id} id={proj.id} className="flex flex-col items-center scroll-mt-32">
                       <div className="px-8 transition-all duration-500 ease-in-out">
                         <motion.div 
                           layout

@@ -5,7 +5,7 @@ import { Hero } from './Hero';
 import { Methodology } from './Methodology';
 import { MoonClock } from './MoonClock';
 import { ProfileMatrix } from './ProfileMatrix';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion';
 import cvPdf from '../assets/KefanXu_CV.pdf';
 
 const carvedShell =
@@ -67,6 +67,26 @@ export const Home: React.FC = () => {
   const [isCVHovered, setIsCVHovered] = useState(false);
   const [isCVOpen, setIsCVOpen] = useState(false);
 
+  // Investigating Life section parallax
+  const investigatingRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: investigatingScroll } = useScroll({
+    target: investigatingRef,
+    offset: ['start end', 'end start'],
+  });
+  const investigatingHeadingY = useTransform(investigatingScroll, [0, 1], [55, -40]);
+  const spaceRotation = useTransform(investigatingScroll, [0, 1], [0, 8]);
+  const investingLeftY = useTransform(investigatingScroll, [0, 1], [8, -6]);    // visual — very slow
+  const investingRightY = useTransform(investigatingScroll, [0, 1], [-40, 60]); // text — very fast
+
+  // Bio section parallax
+  const bioRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: bioScroll } = useScroll({
+    target: bioRef,
+    offset: ['start end', 'end start'],
+  });
+  const bioLeftY = useTransform(bioScroll, [0, 1], [45, -60]);   // text — very fast
+  const bioRightY = useTransform(bioScroll, [0, 1], [-10, 15]);  // visual — very slow
+
   // Map slider (0-1) to 7 distinct phases (0-6)
   const activePhaseIndex = Math.min(Math.floor(currentMoonPhase * 7), 6);
 
@@ -117,9 +137,9 @@ export const Home: React.FC = () => {
       <Hero />
 
       {/* Introduction Section (Added below Hero) */}
-      <div className="grid lg:grid-cols-2 gap-16 items-center px-4 md:px-12 pt-20 pb-32 mb-32">
+      <div ref={bioRef} id="about" className="grid lg:grid-cols-2 gap-16 items-center px-4 md:px-12 pt-20 pb-32 mb-32 scroll-mt-32">
         {/* Left: Text Content */}
-        <div className="flex flex-col justify-center space-y-8">
+        <motion.div style={{ y: bioLeftY }} className="flex flex-col justify-center space-y-8">
           <div className="space-y-6 text-lg md:text-xl font-display leading-relaxed text-text-light/80 dark:text-text-dark/80">
             <p>
               A PhD student at the{' '}
@@ -190,10 +210,10 @@ export const Home: React.FC = () => {
               <span className="font-bold font-mono text-lg">CV</span>
             </button>
           </div>
-        </div>
+        </motion.div>
 
         {/* Right: Interactive Matrix (Visual) */}
-        <div className="hidden lg:flex justify-center items-center mt-12 lg:mt-0">
+        <motion.div style={{ y: bioRightY }} className="hidden lg:flex justify-center items-center mt-12 lg:mt-0">
           <ProfileMatrix
             showCross={isHealthInformaticsHovered && !isGTHovered && !isGraduationCapHovered && !isLinkedinHovered && !isMailHovered && !isCVHovered}
             showGTLogo={isGTHovered && !isGraduationCapHovered && !isLinkedinHovered && !isMailHovered && !isCVHovered}
@@ -202,26 +222,44 @@ export const Home: React.FC = () => {
             showMail={isMailHovered}
             showCV={isCVHovered}
           />
-        </div>
+        </motion.div>
       </div>
 
+      <Methodology />
+
       {/* Research Vision Section - Redesigned */}
-      <div id="investigating-life" className="flex flex-col lg:flex-row gap-16 lg:items-start px-4 md:px-12 mt-24 w-full max-w-7xl mx-auto scroll-mt-32">
+      <div ref={investigatingRef} id="investigating-life" className="flex flex-col lg:flex-row gap-16 lg:items-start px-4 md:px-12 mt-24 w-full max-w-7xl mx-auto scroll-mt-32">
         {/* Left: Playful Interaction */}
-        <div className="w-full lg:w-1/2 flex justify-center lg:justify-start">
+        <motion.div style={{ rotate: spaceRotation, y: investingLeftY }} className="w-full lg:w-1/2 flex justify-center lg:justify-start">
           <MoonClock value={currentMoonPhase} onSliderChange={(val) => setCurrentMoonPhase(val / 100)} />
-        </div>
+        </motion.div>
 
         {/* Right: timeline vertically locked to MoonClock slider center on lg */}
-        <div className="w-full lg:w-1/2 relative flex flex-col">
+        <motion.div style={{ y: investingRightY }} className="w-full lg:w-1/2 relative flex flex-col">
           {/* h2 sits just above timeline; both anchored to MoonClock slider row on lg */}
-          <h2 className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark leading-tight mb-8 lg:mb-0 font-heading lg:absolute lg:left-0 lg:right-0 lg:top-[calc(16rem+4rem+1.125rem+2.5rem-14rem)]">
+          <motion.h2
+            initial={{ opacity: 0, y: 16, scale: 0.95 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true, margin: '-80px' }}
+            transition={{ duration: 0.5 }}
+            style={{ y: investigatingHeadingY }}
+            className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark leading-tight mb-8 lg:mb-0 font-heading lg:absolute lg:left-0 lg:right-0 lg:top-[calc(16rem+4rem+1.125rem+2.5rem-14rem)]"
+          >
             Investigating Life Transitions.
-          </h2>
+          </motion.h2>
 
           {/* top offset = clock (16rem) + gaps (4rem) + time label (~1.125rem) + half slider (2.5rem) */}
           <div className="mb-10 lg:mb-0 lg:absolute lg:left-0 lg:right-0 lg:top-[calc(16rem+4rem+1.125rem+2.5rem)] lg:-translate-y-1/2 z-10">
-            <div className={`${carvedShell} p-6 md:p-8 w-full`}>
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: '-80px' }}
+              variants={{
+                hidden: {},
+                visible: { transition: { staggerChildren: 0.07, delayChildren: 0.15 } },
+              }}
+              className={`${carvedShell} p-6 md:p-8 w-full`}
+            >
               <div
                 ref={timelineRef}
                 className="flex gap-8 overflow-x-auto pb-2 md:pb-0 pt-2 items-end scrollbar-hide snap-x px-1"
@@ -231,8 +269,12 @@ export const Home: React.FC = () => {
                   const isActive = activePhaseIndex === phaseIndex;
 
                   return (
-                    <div
+                    <motion.div
                       key={i}
+                      variants={{
+                        hidden: { opacity: 0, x: i % 2 === 0 ? -40 : 40, scale: 0.9 },
+                        visible: { opacity: 1, x: 0, scale: 1, transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] } },
+                      }}
                       className="flex-shrink-0 flex flex-col items-center gap-4 group cursor-pointer"
                       onClick={() => handleMoonPhaseClick(phaseIndex)}
                     >
@@ -244,21 +286,25 @@ export const Home: React.FC = () => {
                       >
                         {step}
                       </span>
-                    </div>
+                    </motion.div>
                   );
                 })}
               </div>
-            </div>
+            </motion.div>
           </div>
 
-          <p className="mt-6 text-lg md:text-xl font-normal text-text-light/80 dark:text-text-dark/80 leading-[30px] max-w-xl font-display lg:mt-0 lg:pt-[calc(16rem+4rem+1.125rem+2.5rem+5.5rem+3rem)]">
+          <motion.p
+            initial={{ opacity: 0, y: 16, scale: 0.95 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="mt-6 text-lg md:text-xl font-normal text-text-light/80 dark:text-text-dark/80 leading-[30px] max-w-xl font-display lg:mt-0 lg:pt-[calc(16rem+4rem+1.125rem+2.5rem+5.5rem+3rem)]"
+          >
             I am intrigued by how individuals <span className="font-bold text-text-light dark:text-text-dark">comprehend and adjust to life transitions</span>, while also delving
             into the designing technologies to assist individuals in <span className="font-bold text-text-light dark:text-text-dark">navigating such transitions</span>.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
       </div>
-
-      <Methodology />
       
       {/* CV Modal */}
       {createPortal(

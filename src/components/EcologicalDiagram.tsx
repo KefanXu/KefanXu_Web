@@ -587,9 +587,9 @@ export const EcologicalDiagram: React.FC<{ activeSystems?: Set<string> }> = ({ a
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      viewport={{ once: true }}
+      initial={{ opacity: 0, scale: 0.95 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true, margin: '-60px' }}
       transition={{ duration: 1 }}
       className="w-full flex justify-center lg:justify-end items-center py-12"
     >
