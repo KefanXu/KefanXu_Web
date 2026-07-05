@@ -10,6 +10,7 @@ import { useSmoothScroll, getLenis } from './hooks/useSmoothScroll';
 
 function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'research' | 'projects'>('home');
+  const [activeNavId, setActiveNavId] = useState<NavId>('about');
   const [isResearchDetailOpen, setIsResearchDetailOpen] = useState(false);
   
   // Initialize Lenis smooth scroll
@@ -88,39 +89,63 @@ function App() {
     'caregiving-reddit': 'projects', 'reflective-iteration': 'projects', 'historical-planning': 'projects',
   };
 
-  // Scroll Spy to update active tab
+  // Scroll Spy to update active tab + active nav item
   useEffect(() => {
+    // domId → NavId reverse map
+    const reversed: Record<string, NavId> = {
+      home: 'home',
+      about: 'about',
+      methodology: 'methodology',
+      'investigating-life': 'focus',
+      'ecological-lens': 'overview',
+      publications: 'papers',
+      projects: 'projects',
+      ducss: 'ducss',
+      sedentary: 'sedentary',
+      pecss: 'pecss',
+      'caregiving-reddit': 'caregiving-reddit',
+      'reflective-iteration': 'reflective-iteration',
+      'historical-planning': 'historical-planning',
+    };
+    // Ordered top→bottom as they appear on the page
+    const sectionIdsInOrder = [
+      'home',
+      'about',
+      'methodology',
+      'investigating-life',
+      'ecological-lens',
+      'publications',
+      'projects',
+      'ducss',
+      'sedentary',
+      'pecss',
+      'caregiving-reddit',
+      'reflective-iteration',
+      'historical-planning',
+    ];
+
     const handleScroll = () => {
-      // If we are auto-scrolling (clicked a link), ignore scroll events to prevent tab jitter
       if (isAutoScrolling.current) return;
 
-      // Priority check (bottom to top)
-      const sections = [
-        { id: 'projects', tab: 'projects' },
-        { id: 'research', tab: 'research' },
-        { id: 'investigating-life', tab: 'research' }, // Map this section to research tab
-        { id: 'home', tab: 'home' }
-      ];
-      
-      const offset = 300; // Buffer zone
+      const offset = 300;
+      let activeNav: NavId = 'about';
 
-      for (const section of sections) {
-        const element = document.getElementById(section.id);
-        if (element) {
-          const rect = element.getBoundingClientRect();
-          // If the top of the section is above the threshold (scrolled past or current)
-          if (rect.top <= offset) {
-            setActiveTab(section.tab as any);
-            return; // Found the active section (most specific/lowest visible)
-          }
+      for (let i = sectionIdsInOrder.length - 1; i >= 0; i--) {
+        const domId = sectionIdsInOrder[i];
+        const element = document.getElementById(domId);
+        if (element && element.getBoundingClientRect().top <= offset) {
+          activeNav = reversed[domId];
+          break;
         }
       }
-      
-      // Default to home if nothing matches (e.g. very top)
-      setActiveTab('home');
+
+      setActiveNavId(activeNav);
+      setActiveTab(domTabMap[activeNav] || 'home');
     };
 
     window.addEventListener('scroll', handleScroll);
+    // Fire once on mount
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -244,71 +269,65 @@ function App() {
             </div>
 
             {/* Desktop (≥1190px): transparent, left-aligned, with sub-categories */}
-            <div className="hidden min-[1190px]:flex flex-col items-start gap-10">
+            <motion.div
+              className="hidden min-[1190px]:flex flex-col items-start gap-5"
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: {},
+                visible: { transition: { staggerChildren: 0.06, delayChildren: 0.5 } },
+              }}
+            >
               {[
-                {
-                  id: 'home' as NavId,
-                  label: 'HOME',
-                  subs: [
-                    { id: 'about' as NavId, label: 'About' },
-                    { id: 'methodology' as NavId, label: 'Methods' },
-                  ],
-                },
-                {
-                  id: 'research' as NavId,
-                  label: 'RESEARCH',
-                  subs: [
-                    { id: 'focus' as NavId, label: 'Focus' },
-                    { id: 'overview' as NavId, label: 'Overview' },
-                    { id: 'papers' as NavId, label: 'Publication' },
-                  ],
-                },
-                {
-                  id: 'projects' as NavId,
-                  label: 'PROJECTS',
-                  subs: [
-                    { id: 'ducss' as NavId, label: 'DUCSS' },
-                    { id: 'sedentary' as NavId, label: 'Trackya' },
-                    { id: 'pecss' as NavId, label: 'PECSS' },
-                    { id: 'caregiving-reddit' as NavId, label: 'Caregiving' },
-                    { id: 'reflective-iteration' as NavId, label: 'Planneregy' },
-                    { id: 'historical-planning' as NavId, label: 'Physicify' },
-                  ],
-                },
-              ].map(({ id, label, subs }) => {
-                const isActive = activeTab === domTabMap[id];
+                { id: 'home' as NavId, label: 'HOME', subs: [
+                  { id: 'about' as NavId, label: 'About' },
+                  { id: 'methodology' as NavId, label: 'Methods' },
+                ]},
+                { id: 'research' as NavId, label: 'RESEARCH', subs: [
+                  { id: 'focus' as NavId, label: 'Focus' },
+                  { id: 'overview' as NavId, label: 'Overview' },
+                  { id: 'papers' as NavId, label: 'Publication' },
+                ]},
+                { id: 'projects' as NavId, label: 'PROJECTS', subs: [
+                  { id: 'ducss' as NavId, label: 'DUCSS' },
+                  { id: 'sedentary' as NavId, label: 'Trackya' },
+                  { id: 'pecss' as NavId, label: 'PECSS' },
+                  { id: 'caregiving-reddit' as NavId, label: 'Caregiving' },
+                  { id: 'reflective-iteration' as NavId, label: 'Planneregy' },
+                  { id: 'historical-planning' as NavId, label: 'Physicify' },
+                ]},
+              ].flatMap(({ id, label, subs }, i, arr) => {
+                const items: { id: NavId; label: string; isSub: boolean }[] = [
+                  { id, label, isSub: false },
+                  ...subs.map(s => ({ ...s, isSub: true })),
+                ];
+                if (i < arr.length - 1) items.push({ id: `_gap_${i}` as NavId, label: '', isSub: false });
+                return items;
+              }).map((item) => {
+                if (item.id.startsWith('_gap_')) {
+                  return <div key={item.id} className="h-3" />;
+                }
+                const isActive = activeNavId === item.id;
                 return (
-                  <div key={id} className="flex flex-col items-start">
-                    <button
-                      onClick={() => scrollToSection(id)}
-                      className={`px-2 py-1 rounded-md font-mono font-semibold transition-all duration-200 select-none text-[13px] tracking-[0.12em] text-left
-                        ${isActive
-                          ? 'text-blue-500 dark:text-blue-400'
-                          : 'text-text-light/50 dark:text-text-dark/50 hover:text-blue-500/70 dark:hover:text-blue-400/70'
-                        }
-                      `}
-                    >
-                      {label}
-                    </button>
-                    <div className="flex flex-col items-start pl-3 mt-1 gap-0.5">
-                      {subs.map((sub) => (
-                        <button
-                          key={sub.id}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            scrollToSection(sub.id);
-                          }}
-                          className="px-2 py-0.5 rounded-md font-mono text-[11px] tracking-[0.10em] transition-all duration-200 select-none text-left
-                            text-text-light/30 dark:text-text-dark/30 hover:text-blue-500/60 dark:hover:text-blue-400/60"
-                        >
-                          {sub.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                  <motion.button
+                    key={item.id}
+                    onClick={() => scrollToSection(item.id)}
+                    variants={{
+                      hidden: { opacity: 0, x: -16, filter: 'blur(4px)' },
+                      visible: { opacity: 1, x: 0, filter: 'blur(0px)', transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } },
+                    }}
+                    className={`rounded-md font-mono font-semibold transition-all duration-200 select-none text-left
+                      ${item.isSub
+                        ? `pl-3 text-[11px] tracking-[0.10em] ${isActive ? 'text-blue-500 dark:text-blue-400' : 'text-text-light/30 dark:text-text-dark/30 hover:text-blue-500/60 dark:hover:text-blue-400/60'}`
+                        : `text-[13px] tracking-[0.12em] ${isActive ? 'text-blue-500 dark:text-blue-400' : 'text-text-light/50 dark:text-text-dark/50 hover:text-blue-500/70 dark:hover:text-blue-400/70'}`
+                      }
+                    `}
+                  >
+                    {item.label}
+                  </motion.button>
                 );
               })}
-            </div>
+            </motion.div>
           </motion.nav>
         )}
       </AnimatePresence>
