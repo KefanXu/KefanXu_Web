@@ -418,32 +418,34 @@ const PillButton = ({
     onClick={onClick}
     aria-label={ariaLabel ?? label}
     aria-pressed={active}
-    className="w-full flex items-center rounded-[10px] bg-bg-light dark:bg-bg-dark
+    className="w-full flex items-center justify-center min-[1190px]:justify-between rounded-[10px] bg-bg-light dark:bg-bg-dark
       border border-text-light/25 dark:border-text-dark/25
       shadow-[inset_0_1px_0_rgba(255,255,255,0.65),inset_0_-1px_0_rgba(0,0,0,0.04)]
       dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),inset_0_-1px_0_rgba(0,0,0,0.35)]
       active:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.10)] dark:active:shadow-[inset_1px_1px_2px_rgba(0,0,0,0.45)]
-      transition-colors py-3 pl-5 pr-4"
+      transition-colors py-2.5 min-[1190px]:py-3 px-2 min-[1190px]:pl-5 min-[1190px]:pr-4"
   >
+    {/* Dot — hidden below 1190px */}
     <span
-      className={`shrink-0 w-2 h-2 rounded-full transition-all duration-300 ${
+      className={`hidden min-[1190px]:block shrink-0 w-2 h-2 rounded-full transition-all duration-300 ${
         active
           ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.85),inset_0_1px_2px_rgba(0,0,0,0.25)]'
           : 'bg-text-light/15 dark:bg-text-dark/20 shadow-none'
       }`}
       aria-hidden
     />
-    <span className="flex-1 text-center text-sm md:text-[15px] font-mono font-bold uppercase tracking-[0.22em] text-[#b0b8c6] dark:text-[#4a4f58]">
+    <span className="text-center min-[1190px]:flex-1 text-sm md:text-[15px] font-mono font-bold uppercase tracking-[0.22em] text-[#b0b8c6] dark:text-[#4a4f58]">
       {label}
     </span>
+    {/* Divider — hidden below 1190px */}
     <span
-      className="shrink-0 w-px h-9 mx-3
+      className="hidden min-[1190px]:block shrink-0 w-px h-9 mx-3
         bg-[#c5ccd8]/60 dark:bg-[#3d4149]
         shadow-[1px_0_0_rgba(255,255,255,0.7),-1px_0_0_rgba(163,177,198,0.45)]
         dark:shadow-[1px_0_0_rgba(57,60,68,0.5),-1px_0_0_rgba(0,0,0,0.4)]"
       aria-hidden
     />
-    <span className="shrink-0 flex items-center justify-center w-8">
+    <span className="hidden min-[1190px]:flex shrink-0 items-center justify-center w-8">
       <Icon size={17} strokeWidth={2.5} className="text-[#b0b8c6] dark:text-[#4a4f58]" />
     </span>
   </button>
@@ -664,7 +666,7 @@ export const Methodology: React.FC = () => {
           </LCDBezel>
 
           <motion.div
-            className="grid grid-cols-3 gap-4 md:gap-6 mt-8"
+            className="grid grid-cols-3 gap-2 min-[1190px]:gap-4 md:gap-6 mt-8"
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: '-30px' }}
