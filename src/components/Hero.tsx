@@ -5,7 +5,6 @@ import { motion, useMotionValue, useTransform, useScroll } from 'framer-motion';
 import { SnakeGame } from './SnakeGame';
 import { PSPControls } from './PSPControls';
 import { LCDBezel } from './LCDBezel';
-import { safari3dTemplate } from '../utils/safari';
 
 export const Hero: React.FC = () => {
   const [power, setPower] = useState(true);
@@ -68,10 +67,10 @@ export const Hero: React.FC = () => {
     : 'border-[#333]';
 
   return (
-    <section ref={sectionRef} className="pt-48 pb-12 mb-32 flex flex-col items-center justify-center min-h-[70vh] perspective-1000 w-full max-w-7xl mx-auto px-4 parallax-container">
+    <section ref={sectionRef} className="pt-48 pb-12 mb-32 flex flex-col items-center justify-center min-h-[70vh] perspective-1000 w-full max-w-7xl mx-auto px-4" style={{ WebkitMaskImage: '-webkit-radial-gradient(white, black)' }}>
       
-      <motion.div style={{ scale: cardScale, y: cardY }} transformTemplate={safari3dTemplate} className="w-full flex flex-col items-center">
-      <motion.div style={{ y: headerY }} transformTemplate={safari3dTemplate} className="text-center mb-16">
+      <motion.div style={{ scale: cardScale, y: cardY }} className="w-full flex flex-col items-center">
+      <motion.div style={{ y: headerY }} className="text-center mb-16">
         <h2 className="text-text-light dark:text-text-dark text-sm tracking-[0.3em] uppercase mb-2 font-mono">
           About Me
         </h2>
@@ -85,11 +84,11 @@ export const Hero: React.FC = () => {
         style={{ rotateX, rotateY, perspective: 1000 }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className="relative z-10 w-full flex flex-col lg:flex-row items-center lg:items-start justify-center gap-16 parallax-container"
+        className="relative z-10 w-full flex flex-col lg:flex-row items-center lg:items-start justify-center gap-16"
       >
         
         {/* LEFT CONTROLS (Desktop: Left Column, Mobile: Hidden/Moved below) */}
-        <motion.div style={{ y: controlsY }} transformTemplate={safari3dTemplate} className="hidden lg:flex flex-col gap-10 mt-4 items-center order-1">
+        <motion.div style={{ y: controlsY }} className="hidden lg:flex flex-col gap-10 mt-4 items-center order-1">
            <ToggleSwitch 
              isChecked={power} 
              onChange={setPower} 
@@ -214,7 +213,7 @@ export const Hero: React.FC = () => {
         </div>
 
         {/* RIGHT CONTROLS (Desktop: Right Column, Mobile: Hidden/Moved below) */}
-        <motion.div style={{ y: controlsY }} transformTemplate={safari3dTemplate} className="hidden lg:flex flex-col gap-10 mt-4 items-center order-3">
+        <motion.div style={{ y: controlsY }} className="hidden lg:flex flex-col gap-10 mt-4 items-center order-3">
            <ToggleSwitch 
              isChecked={bioMetrics} 
              onChange={setBioMetrics} 

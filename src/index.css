@@ -90,30 +90,3 @@
   opacity: 1;
   animation: lcdWarmPulse 2.8s ease-in-out infinite;
 }
-
-/* ── Safari parallax compositing ──
- * Safari's compositor struggles with scroll-driven transforms,
- * leading to janky parallax and "trailing line" artifacts where
- * the previous edge of a GPU-composited element is left behind.
- *
- * .parallax-layer – applied to each motion.* element that carries a
- *   scroll-driven transform (y/scale/rotate/opacity from useTransform)
- * .parallax-container – applied to the nearest section wrapper
- *   containing parallax layers; creates a fresh compositing context
- *   so Safari repaints properly when layers move.
- */
-.parallax-layer {
-  will-change: transform;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-}
-
-.parallax-container {
-  /* Creating a fresh compositing layer prevents Safari's "ghost line"
-     artifact — the browser repaints the background behind GPU-moved
-     children.  `contain` isolates layout/paint so children moving
-     inside won't trigger a full parent repaint. */
-  transform: translate3d(0, 0, 0);
-  -webkit-transform: translate3d(0, 0, 0);
-  contain: layout style;
-}

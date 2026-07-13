@@ -17,7 +17,6 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion';
-import { safari3dTemplate } from '../utils/safari';
 
 export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }> = ({ setIsDetailOpen }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -119,16 +118,16 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
       
       {/* Ecological Diagram Section - Above Publications */}
       <div ref={ecologicalRef} id="ecological-lens" className="mb-16 scroll-mt-32">
-        <div className="w-full flex flex-col lg:flex-row items-start lg:items-center justify-between gap-10 lg:gap-16 py-8 px-4 md:px-12 parallax-container">
+        <div className="w-full flex flex-col lg:flex-row items-start lg:items-center justify-between gap-10 lg:gap-16 py-8 px-4 md:px-12">
           {/* Left controls */}
-          <motion.div style={{ y: ecologicalLeftY }} transformTemplate={safari3dTemplate} className="shrink-0 max-w-lg">
+          <motion.div style={{ y: ecologicalLeftY }} className="shrink-0 max-w-lg">
             <div className="flex flex-col mb-4">
               <motion.h3
               initial={{ opacity: 0, y: 16, scale: 0.95 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 0.5 }}
-              style={{ y: ecologicalHeadingY }} transformTemplate={safari3dTemplate}
+              style={{ y: ecologicalHeadingY }}
               className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark leading-tight mb-10 lg:mb-20 font-heading"
             >
                 Ecological Lens.
@@ -241,7 +240,7 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
           </motion.div>
 
           {/* Right: Diagram (kept on right, but closer to controls) */}
-          <motion.div style={{ y: ecologicalRightY }} transformTemplate={safari3dTemplate} className="flex-1 w-full flex justify-center lg:justify-end">
+          <motion.div style={{ y: ecologicalRightY }} className="flex-1 w-full flex justify-center lg:justify-end">
             <EcologicalDiagram activeSystems={activeSystems} spinRotation={diagramRotate} />
           </motion.div>
         </div>

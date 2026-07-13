@@ -32,7 +32,6 @@ import {
   LucideIcon,
 } from 'lucide-react';
 import { methodology, projects, MethodologyStage } from '../data/portfolio';
-import { safari3dTemplate } from '../utils/safari';
 
 const stageIcons: LucideIcon[] = [Palette, Code2, Rocket];
 
@@ -564,7 +563,7 @@ export const Methodology: React.FC = () => {
     <section
       ref={methodologyRef}
       id="methodology"
-      className="flex flex-col gap-24 md:gap-28 px-4 md:px-12 mt-12 mb-24 md:mt-16 md:mb-32 w-full max-w-7xl mx-auto scroll-mt-32 parallax-container"
+      className="flex flex-col gap-24 md:gap-28 px-4 md:px-12 mt-12 mb-24 md:mt-16 md:mb-32 w-full max-w-7xl mx-auto scroll-mt-32"
     >
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.95 }}
@@ -577,7 +576,7 @@ export const Methodology: React.FC = () => {
           From Insight to Impact
         </p>
         <motion.h2
-          style={{ y: methodologyHeadingY }} transformTemplate={safari3dTemplate}
+          style={{ y: methodologyHeadingY }}
           className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark leading-tight font-heading mb-10 md:mb-12"
         >
           Designing, Developing, Deploying.
@@ -593,7 +592,7 @@ export const Methodology: React.FC = () => {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: '-50px' }}
         transition={{ duration: 0.6, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-        style={{ scale: applianceScale }} transformTemplate={safari3dTemplate}
+        style={{ scale: applianceScale }}
         className="w-full max-w-4xl mx-auto"
       >
         <div className={applianceShell}>
