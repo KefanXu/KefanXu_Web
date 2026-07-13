@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { motion, useMotionValue, animate } from 'framer-motion';
+import { motion, useMotionValue, animate, MotionValue } from 'framer-motion';
 import { 
   User, Briefcase, Smartphone, Footprints, Pill, Activity, 
   Globe, Syringe, Clock, Apple, FlaskConical, HeartHandshake, 
@@ -43,7 +43,8 @@ const RingLayer: React.FC<{
   svgRef: React.RefObject<SVGSVGElement>;
   svgSize: number;
   activeSystems?: Set<string>;
-}> = ({ layer, index, svgRef, svgSize, activeSystems = new Set() }) => {
+  spinRotation?: MotionValue<number>;
+}> = ({ layer, index, svgRef, svgSize, activeSystems = new Set(), spinRotation }) => {
   // During drag we update rotation directly (no spring) for Safari performance.
   // On release we animate back to 0 with a spring.
   const rotation = useMotionValue(0);
@@ -65,7 +66,8 @@ const RingLayer: React.FC<{
     const apply = () => {
       rafRef.current = null;
       if (!groupRef.current) return;
-      groupRef.current.setAttribute('transform', `rotate(${pendingRotationRef.current} ${cx} ${cy})`);
+      const s = !isRaisedRing && spinRotation ? spinRotation.get() : 0;
+      groupRef.current.setAttribute('transform', `rotate(${pendingRotationRef.current + s} ${cx} ${cy})`);
     };
 
     const unsubscribe = rotation.on('change', (v) => {
@@ -74,18 +76,29 @@ const RingLayer: React.FC<{
       rafRef.current = requestAnimationFrame(apply);
     });
 
+    // Subscribe to scroll spin changes too
+    let spinUnsub: VoidFunction | undefined;
+    if (!isRaisedRing && spinRotation) {
+      spinUnsub = spinRotation.on('change', () => {
+        if (rafRef.current != null) return;
+        rafRef.current = requestAnimationFrame(apply);
+      });
+    }
+
     // Set initial transform
     pendingRotationRef.current = rotation.get();
     if (groupRef.current) {
-      groupRef.current.setAttribute('transform', `rotate(${pendingRotationRef.current} ${cx} ${cy})`);
+      const s = !isRaisedRing && spinRotation ? spinRotation.get() : 0;
+      groupRef.current.setAttribute('transform', `rotate(${pendingRotationRef.current + s} ${cx} ${cy})`);
     }
 
     return () => {
       unsubscribe();
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
+      if (spinUnsub) spinUnsub();
     };
-  }, [rotation]);
+  }, [rotation, isRaisedRing, spinRotation]);
 
   // Angular Drag Logic
   const getAngle = (event: MouseEvent | TouchEvent | PointerEvent) => {
@@ -518,7 +531,7 @@ const RingLayer: React.FC<{
   );
 };
 
-export const EcologicalDiagram: React.FC<{ activeSystems?: Set<string> }> = ({ activeSystems = new Set() }) => {
+export const EcologicalDiagram: React.FC<{ activeSystems?: Set<string>; spinRotation?: MotionValue<number> }> = ({ activeSystems = new Set(), spinRotation }) => {
   const svgRef = useRef<SVGSVGElement>(null);
   const svgSize = 1200;
   
@@ -635,7 +648,7 @@ export const EcologicalDiagram: React.FC<{ activeSystems?: Set<string> }> = ({ a
 
           {/* Render Layers Outer to Inner for Pyramid Stacking */}
           {layers.slice().reverse().map((layer, i) => (
-             <RingLayer key={layer.name} layer={layer} index={i} svgRef={svgRef} svgSize={svgSize} activeSystems={activeSystems} />
+             <RingLayer key={layer.name} layer={layer} index={i} svgRef={svgRef} svgSize={svgSize} activeSystems={activeSystems} spinRotation={spinRotation} />
           ))}
 
           {/* Center Group (Patient) */}

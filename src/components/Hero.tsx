@@ -5,6 +5,7 @@ import { motion, useMotionValue, useTransform, useScroll } from 'framer-motion';
 import { SnakeGame } from './SnakeGame';
 import { PSPControls } from './PSPControls';
 import { LCDBezel } from './LCDBezel';
+import { safari3dTemplate } from '../utils/safari';
 
 export const Hero: React.FC = () => {
   const [power, setPower] = useState(true);
@@ -32,10 +33,10 @@ export const Hero: React.FC = () => {
     target: sectionRef,
     offset: ['start start', 'end start'],
   });
-  const cardScale = useTransform(scrollYProgress, [0, 1], [1, 0.78]);
-  const cardY = useTransform(scrollYProgress, [0, 1], [0, -70]);
-  const headerY = useTransform(scrollYProgress, [0, 1], [0, 50]);
-  const controlsY = useTransform(scrollYProgress, [0, 1], [0, 35]);
+  const cardScale = useTransform(scrollYProgress, [0, 1], [1, 0.62]);
+  const cardY = useTransform(scrollYProgress, [0, 1], [0, -110]);
+  const headerY = useTransform(scrollYProgress, [0, 1], [0, 80]);
+  const controlsY = useTransform(scrollYProgress, [0, 1], [0, 55]);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!cardRef.current) return;
@@ -67,10 +68,10 @@ export const Hero: React.FC = () => {
     : 'border-[#333]';
 
   return (
-    <section ref={sectionRef} className="pt-48 pb-12 mb-32 flex flex-col items-center justify-center min-h-[70vh] perspective-1000 w-full max-w-7xl mx-auto px-4">
+    <section ref={sectionRef} className="pt-48 pb-12 mb-32 flex flex-col items-center justify-center min-h-[70vh] perspective-1000 w-full max-w-7xl mx-auto px-4 parallax-container">
       
-      <motion.div style={{ scale: cardScale, y: cardY }} className="w-full flex flex-col items-center">
-      <motion.div style={{ y: headerY }} className="text-center mb-16">
+      <motion.div style={{ scale: cardScale, y: cardY }} transformTemplate={safari3dTemplate} className="w-full flex flex-col items-center">
+      <motion.div style={{ y: headerY }} transformTemplate={safari3dTemplate} className="text-center mb-16">
         <h2 className="text-text-light dark:text-text-dark text-sm tracking-[0.3em] uppercase mb-2 font-mono">
           About Me
         </h2>
@@ -84,11 +85,11 @@ export const Hero: React.FC = () => {
         style={{ rotateX, rotateY, perspective: 1000 }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className="relative z-10 w-full flex flex-col lg:flex-row items-center lg:items-start justify-center gap-16"
+        className="relative z-10 w-full flex flex-col lg:flex-row items-center lg:items-start justify-center gap-16 parallax-container"
       >
         
         {/* LEFT CONTROLS (Desktop: Left Column, Mobile: Hidden/Moved below) */}
-        <motion.div style={{ y: controlsY }} className="hidden lg:flex flex-col gap-10 mt-4 items-center order-1">
+        <motion.div style={{ y: controlsY }} transformTemplate={safari3dTemplate} className="hidden lg:flex flex-col gap-10 mt-4 items-center order-1">
            <ToggleSwitch 
              isChecked={power} 
              onChange={setPower} 
@@ -213,7 +214,7 @@ export const Hero: React.FC = () => {
         </div>
 
         {/* RIGHT CONTROLS (Desktop: Right Column, Mobile: Hidden/Moved below) */}
-        <motion.div style={{ y: controlsY }} className="hidden lg:flex flex-col gap-10 mt-4 items-center order-3">
+        <motion.div style={{ y: controlsY }} transformTemplate={safari3dTemplate} className="hidden lg:flex flex-col gap-10 mt-4 items-center order-3">
            <ToggleSwitch 
              isChecked={bioMetrics} 
              onChange={setBioMetrics} 

@@ -7,6 +7,7 @@ import { Footer } from './components/Footer';
 import { RetroLCDSection } from './components/RetroLCDSection';
 import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion';
 import { useSmoothScroll, getLenis } from './hooks/useSmoothScroll';
+import { safari3dTemplate } from './utils/safari';
 
 function App() {
   const [activeTab, setActiveTab] = useState<'home' | 'research' | 'projects'>('home');
@@ -18,11 +19,11 @@ function App() {
 
   // Scroll-linked background parallax
   const { scrollY } = useScroll();
-  const blueGlowY = useTransform(scrollY, [0, 1000], [0, 180]);
-  const blueGlowX = useTransform(scrollY, [0, 1000], [0, 50]);
-  const tealGlowY = useTransform(scrollY, [0, 1000], [0, -160]);
-  const tealGlowX = useTransform(scrollY, [0, 1000], [0, -50]);
-  const glowOpacity = useTransform(scrollY, [0, 500, 1500], [0.12, 0.03, 0.12]);
+  const blueGlowY = useTransform(scrollY, [0, 1000], [0, 280]);
+  const blueGlowX = useTransform(scrollY, [0, 1000], [0, 80]);
+  const tealGlowY = useTransform(scrollY, [0, 1000], [0, -260]);
+  const tealGlowX = useTransform(scrollY, [0, 1000], [0, -80]);
+  const glowOpacity = useTransform(scrollY, [0, 500, 1500], [0.15, 0.02, 0.15]);
 
   // Ref to track if we are currently scrolling via a click (auto-scrolling)
   const isAutoScrolling = useRef(false);
@@ -153,19 +154,19 @@ function App() {
     <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark transition-colors duration-300 font-sans selection:bg-blue-500/30 flex flex-col overflow-x-hidden">
       
       {/* Background Grid & Noise */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
+      <div className="fixed inset-0 z-0 pointer-events-none parallax-container">
         <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay" />
         <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]" 
              style={{ backgroundImage: 'radial-gradient(circle at 1px 1px, currentColor 1px, transparent 0)', backgroundSize: '40px 40px' }} 
         />
         {/* Ambient Glows */}
         <motion.div
-          style={{ y: blueGlowY, x: blueGlowX, opacity: glowOpacity }}
-          className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-blue-500 rounded-full blur-[100px]"
+          style={{ y: blueGlowY, x: blueGlowX, opacity: glowOpacity }} transformTemplate={safari3dTemplate}
+          className="absolute top-[-10%] right-[-5%] w-[600px] h-[600px] bg-blue-500 rounded-full blur-[60px]"
         />
         <motion.div
-          style={{ y: tealGlowY, x: tealGlowX, opacity: glowOpacity }}
-          className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-teal-500 rounded-full blur-[100px]"
+          style={{ y: tealGlowY, x: tealGlowX, opacity: glowOpacity }} transformTemplate={safari3dTemplate}
+          className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-teal-500 rounded-full blur-[60px]"
         />
       </div>
 

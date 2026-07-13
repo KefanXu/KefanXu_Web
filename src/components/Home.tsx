@@ -7,6 +7,7 @@ import { MoonClock } from './MoonClock';
 import { ProfileMatrix } from './ProfileMatrix';
 import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion';
 import cvPdf from '../assets/KefanXu_CV.pdf';
+import { safari3dTemplate } from '../utils/safari';
 
 const carvedShell =
   'rounded-[36px] bg-bg-light dark:bg-bg-dark border border-white/20 dark:border-white/5 shadow-[inset_3px_3px_6px_rgb(163,177,198,0.4),inset_-3px_-3px_6px_rgba(255,255,255,0.5)] dark:shadow-[inset_3px_3px_6px_#1d1e22,inset_-3px_-3px_6px_#393c44]';
@@ -73,10 +74,10 @@ export const Home: React.FC = () => {
     target: investigatingRef,
     offset: ['start end', 'end start'],
   });
-  const investigatingHeadingY = useTransform(investigatingScroll, [0, 1], [55, -40]);
-  const spaceRotation = useTransform(investigatingScroll, [0, 1], [0, 8]);
-  const investingLeftY = useTransform(investigatingScroll, [0, 1], [8, -6]);    // visual — very slow
-  const investingRightY = useTransform(investigatingScroll, [0, 1], [-40, 60]); // text — very fast
+  const investigatingHeadingY = useTransform(investigatingScroll, [0, 1], [85, -60]);
+  const spaceRotation = useTransform(investigatingScroll, [0, 1], [0, 14]);
+  const investingLeftY = useTransform(investigatingScroll, [0, 1], [16, -12]);     // visual
+  const investingRightY = useTransform(investigatingScroll, [0, 1], [-70, 100]);   // text — very fast
 
   // Bio section parallax
   const bioRef = useRef<HTMLDivElement>(null);
@@ -84,8 +85,8 @@ export const Home: React.FC = () => {
     target: bioRef,
     offset: ['start end', 'end start'],
   });
-  const bioLeftY = useTransform(bioScroll, [0, 1], [45, -60]);   // text — very fast
-  const bioRightY = useTransform(bioScroll, [0, 1], [-10, 15]);  // visual — very slow
+  const bioLeftY = useTransform(bioScroll, [0, 1], [75, -100]);   // text — very fast
+  const bioRightY = useTransform(bioScroll, [0, 1], [-18, 28]);   // visual
 
   // Map slider (0-1) to 7 distinct phases (0-6)
   const activePhaseIndex = Math.min(Math.floor(currentMoonPhase * 7), 6);
@@ -137,9 +138,9 @@ export const Home: React.FC = () => {
       <Hero />
 
       {/* Introduction Section (Added below Hero) */}
-      <div ref={bioRef} id="about" className="grid lg:grid-cols-2 gap-16 items-center px-4 md:px-12 pt-20 pb-32 mb-32 scroll-mt-32">
+      <div ref={bioRef} id="about" className="grid lg:grid-cols-2 gap-16 items-center px-4 md:px-12 pt-20 pb-32 mb-32 scroll-mt-32 parallax-container">
         {/* Left: Text Content */}
-        <motion.div style={{ y: bioLeftY }} className="flex flex-col justify-center space-y-8">
+        <motion.div style={{ y: bioLeftY }} transformTemplate={safari3dTemplate} className="flex flex-col justify-center space-y-8">
           <div className="space-y-6 text-lg md:text-xl font-display leading-relaxed text-text-light/80 dark:text-text-dark/80">
             <p>
               A PhD student at the{' '}
@@ -213,7 +214,7 @@ export const Home: React.FC = () => {
         </motion.div>
 
         {/* Right: Interactive Matrix (Visual) */}
-        <motion.div style={{ y: bioRightY }} className="hidden lg:flex justify-center items-center mt-12 lg:mt-0">
+        <motion.div style={{ y: bioRightY }} transformTemplate={safari3dTemplate} className="hidden lg:flex justify-center items-center mt-12 lg:mt-0">
           <ProfileMatrix
             showCross={isHealthInformaticsHovered && !isGTHovered && !isGraduationCapHovered && !isLinkedinHovered && !isMailHovered && !isCVHovered}
             showGTLogo={isGTHovered && !isGraduationCapHovered && !isLinkedinHovered && !isMailHovered && !isCVHovered}
@@ -228,14 +229,14 @@ export const Home: React.FC = () => {
       <Methodology />
 
       {/* Research Vision Section - Redesigned */}
-      <div ref={investigatingRef} id="investigating-life" className="flex flex-col lg:flex-row gap-16 lg:items-start px-4 md:px-12 mt-24 w-full max-w-7xl mx-auto scroll-mt-32">
+      <div ref={investigatingRef} id="investigating-life" className="flex flex-col lg:flex-row gap-16 lg:items-start px-4 md:px-12 mt-24 w-full max-w-7xl mx-auto scroll-mt-32 parallax-container">
         {/* Left: Playful Interaction */}
-        <motion.div style={{ rotate: spaceRotation, y: investingLeftY }} className="w-full lg:w-1/2 flex justify-center lg:justify-start">
+        <motion.div style={{ rotate: spaceRotation, y: investingLeftY }} transformTemplate={safari3dTemplate} className="w-full lg:w-1/2 flex justify-center lg:justify-start">
           <MoonClock value={currentMoonPhase} onSliderChange={(val) => setCurrentMoonPhase(val / 100)} />
         </motion.div>
 
         {/* Right: timeline vertically locked to MoonClock slider center on lg */}
-        <motion.div style={{ y: investingRightY }} className="w-full lg:w-1/2 relative flex flex-col">
+        <motion.div style={{ y: investingRightY }} transformTemplate={safari3dTemplate} className="w-full lg:w-1/2 relative flex flex-col">
           {/* h2 sits just above timeline; both anchored to MoonClock slider row on lg */}
           <motion.h2
             initial={{ opacity: 0, y: 16, scale: 0.95 }}
@@ -294,10 +295,11 @@ export const Home: React.FC = () => {
           </div>
 
           <motion.p
-            initial={{ opacity: 0, y: 16, scale: 0.95 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.5, delay: 0.2 }}
+            style={{ y: investingRightY }}
             className="mt-6 text-lg md:text-xl font-normal text-text-light/80 dark:text-text-dark/80 leading-[30px] max-w-xl font-display lg:mt-0 lg:pt-[calc(16rem+4rem+1.125rem+2.5rem+5.5rem+3rem)]"
           >
             I am intrigued by how individuals <span className="font-bold text-text-light dark:text-text-dark">comprehend and adjust to life transitions</span>, while also delving

@@ -7,6 +7,7 @@ import {
   MessageSquare, RefreshCw, History, FileText
 } from 'lucide-react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
+import { safari3dTemplate } from '../utils/safari';
 import { AbstractPattern } from './AbstractPattern';
 
 import { GlowingPill } from './GlowingPill';
@@ -103,8 +104,8 @@ const ProjectRow: React.FC<{
     target: rowRef,
     offset: ['start end', 'end start'],
   });
-  const visualY = useTransform(scrollYProgress, [0, 1], [12, -10]);   // visual — slow
-  const textCardY = useTransform(scrollYProgress, [0, 1], [-40, 55]);  // text — fast, big move
+  const visualY = useTransform(scrollYProgress, [0, 1], [22, -18]);    // visual
+  const textCardY = useTransform(scrollYProgress, [0, 1], [-70, 95]);  // text — fast, big move
   const isImageRight = index % 2 === 0;
   const involvement = proj.involvement ?? 'lead';
 
@@ -112,7 +113,7 @@ const ProjectRow: React.FC<{
     <div
       ref={rowRef}
       id={proj.id}
-      className={`flex flex-col ${isImageRight ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-center gap-24 lg:gap-60 scroll-mt-32`}
+      className={`flex flex-col ${isImageRight ? 'lg:flex-row-reverse' : 'lg:flex-row'} items-center gap-24 lg:gap-60 scroll-mt-32 parallax-container`}
     >
       <motion.div
         className="shrink-0 flex justify-center w-full lg:w-auto"
@@ -120,7 +121,7 @@ const ProjectRow: React.FC<{
         whileInView={{ opacity: 1, scale: 1, y: 0 }}
         viewport={{ once: true, margin: '-60px' }}
         transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        style={{ y: visualY }}
+        style={{ y: visualY }} transformTemplate={safari3dTemplate}
       >
         {getProjectVisual(proj.id)}
       </motion.div>
@@ -131,7 +132,7 @@ const ProjectRow: React.FC<{
         whileInView={{ opacity: 1, x: 0, scale: 1 }}
         viewport={{ once: true, margin: '-60px' }}
         transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-        style={{ y: textCardY }}
+        style={{ y: textCardY }} transformTemplate={safari3dTemplate}
       >
         <PeriodRow period={proj.period} involvement={involvement} />
         <h3 className="text-2xl md:text-3xl font-bold text-text-light dark:text-text-dark leading-tight mb-6 font-heading">
@@ -176,8 +177,8 @@ export const Projects: React.FC = () => {
     target: ducssRef,
     offset: ['start end', 'end start'],
   });
-  const ducssLeftY = useTransform(ducssScroll, [0, 1], [10, -8]);    // visual — very slow
-  const ducssRightY = useTransform(ducssScroll, [0, 1], [-45, 65]); // text — very fast
+  const ducssLeftY = useTransform(ducssScroll, [0, 1], [20, -15]);    // visual
+  const ducssRightY = useTransform(ducssScroll, [0, 1], [-80, 110]);  // text — very fast
 
   const filteredProjects = projects.filter(proj => 
     proj.id !== 'ducss' && (
@@ -288,12 +289,12 @@ export const Projects: React.FC = () => {
             className="space-y-64"
           >
                 {/* Featured Project: DUCSS */}
-                <div ref={ducssRef} id="ducss" className="flex flex-col lg:flex-row items-center gap-24 lg:gap-60 scroll-mt-32">
-                  <motion.div style={{ y: ducssLeftY }} className="shrink-0 transform scale-90 lg:scale-100 flex justify-center w-full lg:w-auto">
+                <div ref={ducssRef} id="ducss" className="flex flex-col lg:flex-row items-center gap-24 lg:gap-60 scroll-mt-32 parallax-container">
+                  <motion.div style={{ y: ducssLeftY }} transformTemplate={safari3dTemplate} className="shrink-0 transform scale-90 lg:scale-100 flex justify-center w-full lg:w-auto">
                      <GlowingPill />
                   </motion.div>
 
-                  <motion.div style={{ y: ducssRightY }} className="max-w-xl w-full">
+                  <motion.div style={{ y: ducssRightY }} transformTemplate={safari3dTemplate} className="max-w-xl w-full">
                       <PeriodRow period="2022 - Present" involvement="lead" />
 
                       <h3 className="text-2xl md:text-3xl font-bold text-text-light dark:text-text-dark leading-tight mb-6 font-heading">

@@ -17,6 +17,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { AnimatePresence, motion, useScroll, useTransform } from 'framer-motion';
+import { safari3dTemplate } from '../utils/safari';
 
 export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }> = ({ setIsDetailOpen }) => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -30,10 +31,10 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
     target: ecologicalRef,
     offset: ['start end', 'end start'],
   });
-  const ecologicalHeadingY = useTransform(ecologicalScroll, [0, 1], [55, -40]);
-  const ecologicalLeftY = useTransform(ecologicalScroll, [0, 1], [55, -60]);   // text — very fast
-  const ecologicalRightY = useTransform(ecologicalScroll, [0, 1], [-10, 16]);  // visual — very slow
-  const diagramRotate = useTransform(ecologicalScroll, [0, 1], [0, 6]);       // light spin
+  const ecologicalHeadingY = useTransform(ecologicalScroll, [0, 1], [85, -60]);
+  const ecologicalLeftY = useTransform(ecologicalScroll, [0, 1], [100, -120]);  // text — fast
+  const ecologicalRightY = useTransform(ecologicalScroll, [0, 1], [-8, 14]);    // visual — much slower
+  const diagramRotate = useTransform(ecologicalScroll, [0, 1], [0, 30]);        // strong spin
 
   // Notify parent about detail view state
   useEffect(() => {
@@ -118,22 +119,31 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
       
       {/* Ecological Diagram Section - Above Publications */}
       <div ref={ecologicalRef} id="ecological-lens" className="mb-16 scroll-mt-32">
-        <div className="w-full flex flex-col lg:flex-row items-start lg:items-center justify-between gap-10 lg:gap-16 py-8 px-4 md:px-12">
+        <div className="w-full flex flex-col lg:flex-row items-start lg:items-center justify-between gap-10 lg:gap-16 py-8 px-4 md:px-12 parallax-container">
           {/* Left controls */}
-          <motion.div style={{ y: ecologicalLeftY }} className="shrink-0 max-w-lg">
+          <motion.div style={{ y: ecologicalLeftY }} transformTemplate={safari3dTemplate} className="shrink-0 max-w-lg">
             <div className="flex flex-col mb-4">
               <motion.h3
               initial={{ opacity: 0, y: 16, scale: 0.95 }}
               whileInView={{ opacity: 1, y: 0, scale: 1 }}
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 0.5 }}
-              style={{ y: ecologicalHeadingY }}
+              style={{ y: ecologicalHeadingY }} transformTemplate={safari3dTemplate}
               className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark leading-tight mb-10 lg:mb-20 font-heading"
             >
                 Ecological Lens.
             </motion.h3>
               
-              <div className="flex flex-wrap grid grid-cols-2 lg:flex lg:flex-wrap gap-5 mb-10 lg:mb-14 order-last lg:order-none">
+              <motion.div
+                className="flex flex-wrap grid grid-cols-2 lg:flex lg:flex-wrap gap-5 mb-10 lg:mb-14 order-last lg:order-none"
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: '-40px' }}
+                variants={{
+                  hidden: {},
+                  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.15 } },
+                }}
+              >
               {(['Microsystem', 'Mesosystem', 'Macrosystem', 'Chronosystem'] as const).map((label) => {
                 const isActive = activeSystems.has(label);
                 const Icon =
@@ -145,7 +155,8 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
                         ? Globe2
                         : Clock3;
                 return (
-                  <button key={label} type="button" onClick={() => {
+                  <motion.button
+                    key={label} type="button" onClick={() => {
                     const newActiveSystems = new Set(activeSystems);
                     if (isActive) {
                       newActiveSystems.delete(label);
@@ -153,7 +164,13 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
                       newActiveSystems.add(label);
                     }
                     setActiveSystems(newActiveSystems);
-                  }} className="group select-none">
+                  }}
+                    className="group select-none"
+                    variants={{
+                      hidden: { opacity: 0, y: 12, scale: 0.92 },
+                      visible: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } },
+                    }}
+                  >
                     <div
                       className={`relative h-16 w-full lg:w-[280px] rounded-2xl bg-bg-light dark:bg-bg-dark
                         border border-transparent
@@ -206,10 +223,10 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
                         </div>
                       </div>
                     </div>
-                  </button>
+                  </motion.button>
                 );
               })}
-              </div>
+              </motion.div>
 
               <motion.p
                 initial={{ opacity: 0, y: 16, scale: 0.95 }}
@@ -224,8 +241,8 @@ export const Research: React.FC<{ setIsDetailOpen?: (isOpen: boolean) => void }>
           </motion.div>
 
           {/* Right: Diagram (kept on right, but closer to controls) */}
-          <motion.div style={{ y: ecologicalRightY, rotate: diagramRotate }} className="flex-1 w-full flex justify-center lg:justify-end">
-            <EcologicalDiagram activeSystems={activeSystems} />
+          <motion.div style={{ y: ecologicalRightY }} transformTemplate={safari3dTemplate} className="flex-1 w-full flex justify-center lg:justify-end">
+            <EcologicalDiagram activeSystems={activeSystems} spinRotation={diagramRotate} />
           </motion.div>
         </div>
       </div>
