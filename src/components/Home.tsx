@@ -238,10 +238,6 @@ export const Home: React.FC = () => {
         <motion.div style={{ y: investingRightY }} className="w-full lg:w-1/2 relative flex flex-col">
           {/* h2 sits just above timeline; both anchored to MoonClock slider row on lg */}
           <motion.h2
-            initial={{ opacity: 0, y: 16, scale: 0.95 }}
-            whileInView={{ opacity: 1, y: 0, scale: 1 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 0.5 }}
             style={{ y: investigatingHeadingY }}
             className="text-3xl md:text-4xl font-bold text-text-light dark:text-text-dark leading-tight mb-8 lg:mb-0 font-heading lg:absolute lg:left-0 lg:right-0 lg:top-[calc(16rem+4rem+1.125rem+2.5rem-14rem)]"
           >
@@ -293,17 +289,10 @@ export const Home: React.FC = () => {
             </motion.div>
           </div>
 
-          <motion.p
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            style={{ y: investingRightY }}
-            className="mt-6 text-lg md:text-xl font-normal text-text-light/80 dark:text-text-dark/80 leading-[30px] max-w-xl font-display lg:mt-0 lg:pt-[calc(16rem+4rem+1.125rem+2.5rem+5.5rem+3rem)]"
-          >
+          <p className="mt-6 text-lg md:text-xl font-normal text-text-light/80 dark:text-text-dark/80 leading-[30px] max-w-xl font-display lg:mt-0 lg:pt-[calc(16rem+4rem+1.125rem+2.5rem+5.5rem+3rem)]">
             I am intrigued by how individuals <span className="font-bold text-text-light dark:text-text-dark">comprehend and adjust to life transitions</span>, while also delving
             into the designing technologies to assist individuals in <span className="font-bold text-text-light dark:text-text-dark">navigating such transitions</span>.
-          </motion.p>
+          </p>
         </motion.div>
       </div>
       

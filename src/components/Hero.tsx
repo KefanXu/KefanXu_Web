@@ -69,7 +69,14 @@ export const Hero: React.FC = () => {
   return (
     <section ref={sectionRef} className="pt-48 pb-12 mb-32 flex flex-col items-center justify-center min-h-[70vh] perspective-1000 w-full max-w-7xl mx-auto px-4" style={{ WebkitMaskImage: '-webkit-radial-gradient(white, black)' }}>
       
-      <motion.div style={{ scale: cardScale, y: cardY }} className="w-full flex flex-col items-center">
+      <motion.div
+        initial={{ opacity: 0, filter: 'blur(4px)' }}
+        whileInView={{ opacity: 1, filter: 'blur(0px)' }}
+        viewport={{ once: true, margin: '-80px' }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        style={{ scale: cardScale, y: cardY }}
+        className="w-full flex flex-col items-center"
+      >
       <motion.div style={{ y: headerY }} className="text-center mb-16">
         <h2 className="text-text-light dark:text-text-dark text-sm tracking-[0.3em] uppercase mb-2 font-mono">
           About Me
