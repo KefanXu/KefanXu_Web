@@ -5,6 +5,8 @@ import { motion, useMotionValue, useTransform, useScroll } from 'framer-motion';
 import { SnakeGame } from './SnakeGame';
 import { PSPControls } from './PSPControls';
 import { LCDBezel } from './LCDBezel';
+import { SketchReveal, SketchScene, SketchThenShow } from './SketchReveal';
+import { buildLCDShellShapes } from './heroWireframes';
 
 export const Hero: React.FC = () => {
   const [power, setPower] = useState(true);
@@ -70,20 +72,21 @@ export const Hero: React.FC = () => {
     <section ref={sectionRef} className="pt-48 pb-12 mb-32 flex flex-col items-center justify-center min-h-[70vh] perspective-1000 w-full max-w-7xl mx-auto px-4" style={{ WebkitMaskImage: '-webkit-radial-gradient(white, black)' }}>
       
       <motion.div
-        initial={{ opacity: 0, filter: 'blur(4px)' }}
-        whileInView={{ opacity: 1, filter: 'blur(0px)' }}
-        viewport={{ once: true, margin: '-80px' }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         style={{ scale: cardScale, y: cardY }}
         className="w-full flex flex-col items-center"
       >
-      <motion.div style={{ y: headerY }} className="text-center mb-16">
-        <h2 className="text-text-light dark:text-text-dark text-sm tracking-[0.3em] uppercase mb-2 font-mono">
-          About Me
-        </h2>
-        <p className="text-text-light dark:text-text-dark text-xs opacity-60">
-          Kefan Xu - PhD Student
-        </p>
+      <SketchScene className="w-full flex flex-col items-center">
+      <motion.div style={{ y: headerY }} className="text-center mb-16 flex flex-col items-center gap-2">
+        <SketchReveal delay={0} radius="3px" duration={0.4} strokeWidth={1}>
+          <h2 className="text-text-light dark:text-text-dark text-sm tracking-[0.3em] uppercase font-mono">
+            About Me
+          </h2>
+        </SketchReveal>
+        <SketchReveal delay={0.08} radius="2px" duration={0.35} strokeWidth={1}>
+          <p className="text-text-light dark:text-text-dark text-xs opacity-60">
+            Kefan Xu - PhD Student
+          </p>
+        </SketchReveal>
       </motion.div>
 
       <motion.div
@@ -94,28 +97,36 @@ export const Hero: React.FC = () => {
         className="relative z-10 w-full flex flex-col lg:flex-row items-center lg:items-start justify-center gap-16"
       >
         
-        {/* LEFT CONTROLS (Desktop: Left Column, Mobile: Hidden/Moved below) */}
+        {/* LEFT CONTROLS — detailed per-part wireframes */}
         <motion.div style={{ y: controlsY }} className="hidden lg:flex flex-col gap-10 mt-4 items-center order-1">
-           <ToggleSwitch 
-             isChecked={power} 
-             onChange={setPower} 
-             label="System Power"
-           />
-           <ToggleSwitch 
-             isChecked={secureMode} 
-             onChange={setSecureMode} 
-             label="Secure Mode"
-           />
-           <ToggleSmall 
-             isChecked={backlight}
-             onChange={setBacklight}
-             label="Backlight"
-           />
+          <ToggleSwitch 
+            isChecked={power} 
+            onChange={setPower} 
+            label="System Power"
+            sketchDelay={0.15}
+          />
+          <ToggleSwitch 
+            isChecked={secureMode} 
+            onChange={setSecureMode} 
+            label="Secure Mode"
+            sketchDelay={0.28}
+          />
+          <ToggleSmall 
+            isChecked={backlight}
+            onChange={setBacklight}
+            label="Backlight"
+            sketchDelay={0.42}
+          />
         </motion.div>
 
-        {/* CENTER SCREEN MODULE */}
-        <div className="relative flex-grow max-w-2xl w-full order-1 lg:order-2">
-            {/* Screen Bezel (unified LCD border style) */}
+        {/* CENTER LCD — shell sketches first; screen pieces sketch then fade in after */}
+        <SketchThenShow
+          baseDelay={0.1}
+          getShapes={buildLCDShellShapes}
+          revealDuration={1.05}
+          className="flex-grow max-w-2xl w-full order-1 lg:order-2"
+        >
+          {(shellRevealed) => (
             <LCDBezel
               outerRadiusClassName="rounded-[40px]"
               trenchRadiusClassName="rounded-[38px]"
@@ -123,91 +134,118 @@ export const Hero: React.FC = () => {
               outerClassName="transition-all duration-500 font-mono overflow-hidden"
               trenchClassName="overflow-hidden"
             >
-                {/* LCD Screen Surface */}
                 <div className={`
-                    ${screenBg} ${screenText}
+                    ${screenText}
                     rounded-[28px] min-h-[320px] transition-colors duration-500 relative overflow-hidden flex flex-col
                     border-4 ${borderColor} border-opacity-10
                 `}>
-                    
-                    {/* Inner Shadow & Texture */}
-                    <div className="absolute inset-0 shadow-[inset_0_0_60px_rgba(0,0,0,0.15)] pointer-events-none" />
-                    <div className="absolute inset-0 opacity-[0.12] pointer-events-none" 
+                    <motion.div
+                        className={`absolute inset-0 ${screenBg} pointer-events-none`}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: shellRevealed ? 1 : 0 }}
+                        transition={{
+                          delay: shellRevealed ? 3.15 : 0,
+                          duration: 1.1,
+                          ease: [0.22, 1, 0.36, 1],
+                        }}
+                    />
+                    <div className="absolute inset-0 z-[1] shadow-[inset_0_0_60px_rgba(0,0,0,0.15)] pointer-events-none" />
+                    <div className="absolute inset-0 z-[2] opacity-[0.12] pointer-events-none" 
                         style={{ 
                           backgroundImage: power ? 'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)' : 'none',
                           backgroundSize: '3px 3px'
                         }} 
                     />
 
-                    {/* LCD Content */}
                     <motion.div 
                         animate={{ opacity: power ? 1 : 0 }}
                         transition={{ duration: 0.2 }}
                         className="flex-grow flex flex-col relative z-10 p-4"
                     >
-                        {isEasterEggActive ? (
+                        {!shellRevealed ? null : isEasterEggActive ? (
                            <SnakeGame />
                         ) : (
                            <>
-                              {/* Top Header Row */}
                               <div className={`flex border-b-4 ${borderColor} mb-8`}>
-                                 {/* Inverted Block */}
-                                 <div className={`
-                                   ${backlight ? 'bg-[#1a2f23] text-[#8aa899]' : 'bg-[#1f2937] text-[#9ca3af]'}
-                                   px-3 py-1 text-xs font-bold uppercase tracking-widest flex items-center
-                                 `}>
-                                    KEYS NAME
-                                 </div>
-                                 {/* Data */}
-                                 <div className={`flex-grow px-3 py-1 text-xs font-bold font-mono tracking-wider flex items-center justify-between`}>
-                                    <span>No.9908032189</span>
-                                    {secureMode && <Shield size={12} fill="currentColor" />}
-                                 </div>
+                                 <SketchReveal delay={0.2} radius="2px" duration={0.34} strokeWidth={1} revealHold={0.22} revealDuration={1.1} className="shrink-0">
+                                   <div className={`
+                                     ${backlight ? 'bg-[#1a2f23] text-[#8aa899]' : 'bg-[#1f2937] text-[#9ca3af]'}
+                                     px-3 py-1 text-xs font-bold uppercase tracking-widest flex items-center
+                                   `}>
+                                      KEYS NAME
+                                   </div>
+                                 </SketchReveal>
+                                 <SketchReveal delay={0.34} radius="2px" duration={0.34} strokeWidth={1} revealHold={0.22} revealDuration={1.1} className="flex-grow">
+                                   <div className={`flex-grow px-3 py-1 text-xs font-bold font-mono tracking-wider flex items-center justify-between`}>
+                                      <span>No.9908032189</span>
+                                      {secureMode && <Shield size={12} fill="currentColor" />}
+                                   </div>
+                                 </SketchReveal>
                               </div>
 
-                              {/* Main Center Content */}
                               <div className="flex-grow flex flex-col justify-center mb-8 pl-2">
-                                 <div className="text-5xl md:text-7xl font-bold tracking-tighter uppercase font-mono leading-none">
-                                    KEFAN XU
-                                 </div>
-                                 {/* Blinking Cursor */}
-                                 <div className="w-8 h-2 bg-current mt-2 animate-pulse" />
+                                 <SketchReveal delay={0.5} radius="4px" duration={0.45} strokeWidth={1.35} revealHold={0.25} revealDuration={1.2}>
+                                   <div className="text-5xl md:text-7xl font-bold tracking-tighter uppercase font-mono leading-none">
+                                      KEFAN XU
+                                   </div>
+                                 </SketchReveal>
+                                 <SketchReveal delay={0.68} radius="1px" duration={0.28} strokeWidth={1} revealHold={0.18} revealDuration={0.95} className="w-fit mt-2">
+                                   <div className="w-8 h-2 bg-current animate-pulse" />
+                                 </SketchReveal>
                               </div>
 
-                              {/* Bottom Grid System */}
                               <div className={`border-t-4 border-b-4 ${borderColor}`}>
-                                 {/* Header Row */}
                                  <div className={`grid grid-cols-10 border-b-2 ${borderColor}`}>
-                                    <div className={`col-span-3 ${backlight ? 'bg-[#1a2f23] text-[#8aa899]' : 'bg-[#1f2937] text-[#9ca3af]'} px-2 py-1 text-[10px] font-bold uppercase tracking-widest flex items-center justify-center border-r-2 ${borderColor}`}>
-                                       TYPE
+                                    <div className={`col-span-3 border-r-2 ${borderColor}`}>
+                                      <SketchReveal delay={0.82} radius="2px" duration={0.3} strokeWidth={1} revealHold={0.2} revealDuration={1.05}>
+                                        <div className={`${backlight ? 'bg-[#1a2f23] text-[#8aa899]' : 'bg-[#1f2937] text-[#9ca3af]'} px-2 py-1 text-[10px] font-bold uppercase tracking-widest flex items-center justify-center`}>
+                                           TYPE
+                                        </div>
+                                      </SketchReveal>
                                     </div>
-                                    <div className={`col-span-4 px-2 py-1 text-[10px] font-bold uppercase tracking-widest flex items-center border-r-2 ${borderColor}`}>
-                                       ACCESS APPS
+                                    <div className={`col-span-4 border-r-2 ${borderColor}`}>
+                                      <SketchReveal delay={0.94} radius="2px" duration={0.3} strokeWidth={1} revealHold={0.2} revealDuration={1.05}>
+                                        <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-widest flex items-center">
+                                           ACCESS APPS
+                                        </div>
+                                      </SketchReveal>
                                     </div>
-                                    <div className={`col-span-3 px-2 py-1 text-[10px] font-bold uppercase tracking-widest flex items-center justify-end`}>
-                                       CREATE TIME
+                                    <div className="col-span-3">
+                                      <SketchReveal delay={1.06} radius="2px" duration={0.3} strokeWidth={1} revealHold={0.2} revealDuration={1.05}>
+                                        <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-widest flex items-center justify-end">
+                                           CREATE TIME
+                                        </div>
+                                      </SketchReveal>
                                     </div>
                                  </div>
 
-                                 {/* Content Row */}
                                  <div className="grid grid-cols-10 py-3">
                                     <div className={`col-span-3 px-2 flex flex-col items-center justify-center border-r-2 ${borderColor}`}>
-                                       {/* Seed Box Style */}
-                                       <div className={`border-2 ${borderColor} px-2 py-1 rounded-sm text-[10px] font-bold uppercase`}>
-                                          PhD Student
-                                       </div>
+                                       <SketchReveal delay={1.18} radius="2px" duration={0.32} strokeWidth={1} revealHold={0.2} revealDuration={1.05}>
+                                         <div className={`border-2 ${borderColor} px-2 py-1 rounded-sm text-[10px] font-bold uppercase`}>
+                                            PhD Student
+                                         </div>
+                                       </SketchReveal>
                                     </div>
                                     <div className={`col-span-4 px-2 flex items-center gap-3 border-r-2 ${borderColor}`}>
-                                       <div className={`w-6 h-6 rounded-full border-2 ${borderColor} flex items-center justify-center`}>
-                                          <Database size={12} />
-                                       </div>
-                                       <div className={`w-6 h-6 rounded-full border-2 ${borderColor} flex items-center justify-center`}>
-                                          <Hash size={12} />
-                                       </div>
-                                       <span className="text-[10px] font-bold">HCI_LAB</span>
+                                       <SketchReveal delay={1.3} shape="circle" duration={0.32} strokeWidth={1.15} revealHold={0.2} revealDuration={1.05}>
+                                         <div className={`w-6 h-6 rounded-full border-2 ${borderColor} flex items-center justify-center`}>
+                                            <Database size={12} />
+                                         </div>
+                                       </SketchReveal>
+                                       <SketchReveal delay={1.42} shape="circle" duration={0.32} strokeWidth={1.15} revealHold={0.2} revealDuration={1.05}>
+                                         <div className={`w-6 h-6 rounded-full border-2 ${borderColor} flex items-center justify-center`}>
+                                            <Hash size={12} />
+                                         </div>
+                                       </SketchReveal>
+                                       <SketchReveal delay={1.54} radius="2px" duration={0.28} strokeWidth={1} revealHold={0.18} revealDuration={1.0}>
+                                         <span className="text-[10px] font-bold">HCI_LAB</span>
+                                       </SketchReveal>
                                     </div>
-                                    <div className={`col-span-3 px-2 flex items-center justify-end text-[10px] font-bold font-mono`}>
-                                       2022-09-01
+                                    <div className={`col-span-3 px-2 flex items-center justify-end`}>
+                                       <SketchReveal delay={1.66} radius="2px" duration={0.3} strokeWidth={1} revealHold={0.2} revealDuration={1.05}>
+                                         <span className="text-[10px] font-bold font-mono">2022-09-01</span>
+                                       </SketchReveal>
                                     </div>
                                  </div>
                               </div>
@@ -217,57 +255,82 @@ export const Hero: React.FC = () => {
                     </motion.div>
                 </div>
             </LCDBezel>
-        </div>
+          )}
+        </SketchThenShow>
 
-        {/* RIGHT CONTROLS (Desktop: Right Column, Mobile: Hidden/Moved below) */}
+        {/* RIGHT CONTROLS */}
         <motion.div style={{ y: controlsY }} className="hidden lg:flex flex-col gap-10 mt-4 items-center order-3">
-           <ToggleSwitch 
-             isChecked={bioMetrics} 
-             onChange={setBioMetrics} 
-             label="Bio-Metrics"
-           />
-           <ToggleSwitch 
-             isChecked={consoleLock} 
-             onChange={setConsoleLock} 
-             label="Console Lock"
-           />
-           <div className="flex flex-col gap-3 items-start pl-2">
-              <div className="flex items-center gap-3">
-                 <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.6)]" />
-                 <span className="text-[9px] font-mono uppercase opacity-50 tracking-widest">Haptics</span>
-              </div>
-              <div className="flex items-center gap-3">
-                 <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_5px_rgba(59,130,246,0.6)] animate-pulse" />
-                 <span className="text-[9px] font-mono uppercase opacity-50 tracking-widest">Data Link</span>
-              </div>
-           </div>
+          <ToggleSwitch 
+            isChecked={bioMetrics} 
+            onChange={setBioMetrics} 
+            label="Bio-Metrics"
+            sketchDelay={0.2}
+          />
+          <ToggleSwitch 
+            isChecked={consoleLock} 
+            onChange={setConsoleLock} 
+            label="Console Lock"
+            sketchDelay={0.34}
+          />
+          <div className="flex flex-col gap-3 items-start pl-2">
+            <div className="flex items-center gap-3">
+              <SketchReveal delay={0.48} shape="circle" duration={0.24} strokeWidth={1}>
+                <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.6)]" />
+              </SketchReveal>
+              <SketchReveal delay={0.54} radius="2px" duration={0.28} strokeWidth={1}>
+                <span className="text-[9px] font-mono uppercase opacity-50 tracking-widest">Haptics</span>
+              </SketchReveal>
+            </div>
+            <div className="flex items-center gap-3">
+              <SketchReveal delay={0.58} shape="circle" duration={0.24} strokeWidth={1}>
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_5px_rgba(59,130,246,0.6)] animate-pulse" />
+              </SketchReveal>
+              <SketchReveal delay={0.64} radius="2px" duration={0.28} strokeWidth={1}>
+                <span className="text-[9px] font-mono uppercase opacity-50 tracking-widest">Data Link</span>
+              </SketchReveal>
+            </div>
+          </div>
         </motion.div>
 
-        {/* MOBILE CONTROLS (Horizontal Grid) */}
+        {/* MOBILE CONTROLS */}
         <div className="lg:hidden w-full order-2 mt-8">
            {isEasterEggActive ? (
              <PSPControls onExit={() => {
-                // Turn off one of the switches to exit Easter Egg mode
                 setConsoleLock(false); 
              }} />
            ) : (
              <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
-                {/* All controls flattened */}
-                <div className="flex justify-center"><ToggleSwitch isChecked={power} onChange={setPower} label="System Power" /></div>
-                <div className="flex justify-center"><ToggleSwitch isChecked={secureMode} onChange={setSecureMode} label="Secure Mode" /></div>
-                <div className="flex justify-center"><ToggleSwitch isChecked={bioMetrics} onChange={setBioMetrics} label="Bio-Metrics" /></div>
-                <div className="flex justify-center"><ToggleSmall isChecked={backlight} onChange={setBacklight} label="Backlight" /></div>
-                <div className="flex justify-center"><ToggleSwitch isChecked={consoleLock} onChange={setConsoleLock} label="Console Lock" /></div>
-                
-                {/* Static Indicators */}
+                <div className="flex justify-center">
+                  <ToggleSwitch isChecked={power} onChange={setPower} label="System Power" sketchDelay={0.55} />
+                </div>
+                <div className="flex justify-center">
+                  <ToggleSwitch isChecked={secureMode} onChange={setSecureMode} label="Secure Mode" sketchDelay={0.62} />
+                </div>
+                <div className="flex justify-center">
+                  <ToggleSwitch isChecked={bioMetrics} onChange={setBioMetrics} label="Bio-Metrics" sketchDelay={0.69} />
+                </div>
+                <div className="flex justify-center">
+                  <ToggleSmall isChecked={backlight} onChange={setBacklight} label="Backlight" sketchDelay={0.76} />
+                </div>
+                <div className="flex justify-center">
+                  <ToggleSwitch isChecked={consoleLock} onChange={setConsoleLock} label="Console Lock" sketchDelay={0.83} />
+                </div>
                 <div className="flex flex-col gap-3 items-center justify-center pl-2">
                    <div className="flex items-center gap-3">
-                      <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.6)]" />
-                      <span className="text-[9px] font-mono uppercase opacity-50 tracking-widest">Haptics</span>
+                      <SketchReveal delay={0.9} shape="circle" duration={0.24} strokeWidth={1}>
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_5px_rgba(34,197,94,0.6)]" />
+                      </SketchReveal>
+                      <SketchReveal delay={0.96} radius="2px" duration={0.28} strokeWidth={1}>
+                        <span className="text-[9px] font-mono uppercase opacity-50 tracking-widest">Haptics</span>
+                      </SketchReveal>
                    </div>
                    <div className="flex items-center gap-3">
-                      <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_5px_rgba(59,130,246,0.6)] animate-pulse" />
-                      <span className="text-[9px] font-mono uppercase opacity-50 tracking-widest">Data Link</span>
+                      <SketchReveal delay={1.0} shape="circle" duration={0.24} strokeWidth={1}>
+                        <div className="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-[0_0_5px_rgba(59,130,246,0.6)] animate-pulse" />
+                      </SketchReveal>
+                      <SketchReveal delay={1.06} radius="2px" duration={0.28} strokeWidth={1}>
+                        <span className="text-[9px] font-mono uppercase opacity-50 tracking-widest">Data Link</span>
+                      </SketchReveal>
                    </div>
                 </div>
              </div>
@@ -275,6 +338,7 @@ export const Hero: React.FC = () => {
         </div>
 
       </motion.div>
+      </SketchScene>
 
       </motion.div>
     </section>
