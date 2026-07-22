@@ -190,7 +190,7 @@ export const RetroLCDSection: React.FC = () => {
             {/* Inner Trench (Concave Border) */}
             <div className="relative rounded-full bg-bg-light dark:bg-bg-dark shadow-[inset_3px_3px_6px_0_rgba(163,177,198,0.3),inset_-3px_-3px_6px_0_rgba(255,255,255,0.6)] dark:shadow-[inset_2px_2px_5px_#1d1e22,inset_-2px_-2px_5px_#393c44] p-[3px] w-[200px] h-[200px]">
               {/* Screen Display (circular) */}
-              <div className="relative bg-[#8aa899] text-[#1a2f23] rounded-full w-full h-full p-4 overflow-hidden flex items-center justify-center">
+              <div className="relative bg-bg-light text-[#1a2f23] rounded-full w-full h-full p-4 overflow-hidden flex items-center justify-center">
                 {/* Slight warm lift inside the LCD (helps sell “backlight”) */}
                 <div
                   className="lcd-warm-glow-inner absolute inset-0 rounded-full pointer-events-none opacity-0"
@@ -234,11 +234,11 @@ export const RetroLCDSection: React.FC = () => {
                           <motion.div
                             key={`${rowIndex}-${colIndex}`}
                             className={`absolute ${
-                              isActive ? 'bg-[#1a2f23]' : 'bg-[#8aa899]/30'
+                              isActive ? 'bg-[#1a2f23]' : 'bg-bg-light/30'
                             }`}
                             initial={false}
                             animate={{
-                              backgroundColor: isActive ? '#1a2f23' : '#8aa899',
+                              backgroundColor: isActive ? '#1a2f23' : '#E0E5EC',
                               opacity: isActive ? 1 : 0.25,
                             }}
                             transition={{ duration: 0.1 }}

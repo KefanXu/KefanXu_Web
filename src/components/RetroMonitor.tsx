@@ -59,7 +59,7 @@ export const RetroMonitor: React.FC<RetroMonitorProps> = ({
 
         {/* LCD screen — reuses LCDBezel + same effects as RetroLCDSection */}
         <LCDBezel outerClassName="max-w-[300px]">
-          <div className="relative bg-[#8aa899] text-[#1a2f23] rounded-[10px] overflow-hidden" style={{ width: 270, height: 180 }}>
+          <div className="relative bg-bg-light text-[#1a2f23] rounded-[10px] overflow-hidden" style={{ width: 270, height: 180 }}>
             {/* Inner shadow (same as RetroLCDSection) */}
             <div className="absolute inset-0 shadow-[inset_0_0_40px_rgba(0,0,0,0.15)] pointer-events-none" />
 

@@ -123,7 +123,7 @@ export const MoonClock: React.FC<MoonClockProps> = ({ onSliderChange, value }) =
         trenchPaddingClassName="p-[6px]"
       >
         {/* LCD Screen Container */}
-        <div className="w-full h-full bg-[#8aa899] rounded-[32px] relative overflow-hidden shadow-[inset_0_0_20px_rgba(0,0,0,0.15)] flex items-center justify-center">
+        <div className="w-full h-full bg-bg-light rounded-[32px] relative overflow-hidden shadow-[inset_0_0_20px_rgba(0,0,0,0.15)] flex items-center justify-center">
             
             {/* Pixel Grid Overlay */}
             <div className="absolute inset-0 opacity-[0.15] pointer-events-none" 
@@ -153,9 +153,9 @@ export const MoonClock: React.FC<MoonClockProps> = ({ onSliderChange, value }) =
 
                     {/* The Moon (LCD Style) */}
                     <div className="relative w-24 h-24 rounded-full bg-[#1a2f23] overflow-hidden shadow-inner opacity-90">
-                        {/* Moon Shadow Phase Mask (Light Green to match bg) */}
+                        {/* Moon shadow phase mask matches the soft LCD surface */}
                         <motion.div 
-                            className="absolute inset-0 bg-[#8aa899] rounded-full"
+                            className="absolute inset-0 bg-bg-light rounded-full"
                             animate={{ x: `${shadowX}%` }}
                             transition={{ type: 'spring', stiffness: 100, damping: 20 }}
                         />
@@ -286,7 +286,7 @@ export const MoonClock: React.FC<MoonClockProps> = ({ onSliderChange, value }) =
         trenchClassName="w-full h-full"
         trenchPaddingClassName="p-[6px]"
       >
-        <div className="w-full h-full bg-[#8aa899] rounded-[32px] relative overflow-hidden shadow-[inset_0_0_20px_rgba(0,0,0,0.15)] flex flex-col items-center p-5">
+        <div className="w-full h-full bg-bg-light rounded-[32px] relative overflow-hidden shadow-[inset_0_0_20px_rgba(0,0,0,0.15)] flex flex-col items-center p-5">
             {/* Pixel Grid Overlay */}
             <div className="absolute inset-0 opacity-[0.15] pointer-events-none" 
                 style={{ 

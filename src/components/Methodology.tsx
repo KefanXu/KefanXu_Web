@@ -615,7 +615,7 @@ export const Methodology: React.FC = () => {
             outerClassName="overflow-hidden"
             trenchClassName="overflow-hidden"
           >
-            <div className="relative bg-[#8aa899] text-[#1a2f23] rounded-full overflow-hidden py-2 border-4 border-[#1a2f23]/10">
+            <div className="relative bg-bg-light text-[#1a2f23] rounded-full overflow-hidden py-2 border-4 border-[#1a2f23]/10">
               <LcdTexture />
               <div className="relative z-10 px-10 md:px-16">
                 <LcdModeRow

@@ -53,11 +53,9 @@ export const Hero: React.FC = () => {
     y.set(0);
   };
 
-  // Define colors based on state to ensure no "white" leaks
-  // Retro Green: bg-[#8aa899] text-[#1a2f23]
-  // Retro Gray: bg-[#9ca3af] text-[#1f2937]
+  // Match the powered LCD to the soft off-white surface visible before backlighting.
   const screenBg = power 
-    ? (backlight ? 'bg-[#8aa899]' : 'bg-[#9ca3af]') 
+    ? 'bg-bg-light'
     : 'bg-[#1a1c20]';
   
   const screenText = power

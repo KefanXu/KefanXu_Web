@@ -50,7 +50,7 @@ export const ActivityMonitor: React.FC = () => {
         trenchClassName="w-full h-full"
         trenchPaddingClassName="p-[3px]"
       >
-        <div className="relative w-full h-full rounded-lg bg-bg-light dark:bg-bg-dark shadow-neu-pressed-light dark:shadow-neu-pressed-dark p-4 overflow-hidden">
+        <div className="relative w-full h-full rounded-lg bg-bg-light text-[#1a2f23] shadow-neu-pressed-light dark:shadow-neu-pressed-dark p-4 overflow-hidden">
           {/* Grid Lines */}
           <div className="absolute inset-0 p-4 flex flex-col justify-between opacity-10 pointer-events-none">
             {[...Array(5)].map((_, i) => (
